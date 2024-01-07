@@ -80,6 +80,12 @@ export default function HoliyaRequestForm() {
 
     orderDate: new Date().toISOString().split("T")[0],
     orderTime: new Date().toISOString().split("T")[1].split(".")[0],
+    //
+    serviceName : "",
+    //
+    ahmashNotes : "",
+    //
+    clientJourney : [], // {text : string, publisher : string (first + last name), date, published : boolean (before posting/updating = false, after posting becomes true)}
     mk3Number: 0,
     namerNumber: 0,
     pumaNumber: 0,
@@ -125,8 +131,18 @@ export default function HoliyaRequestForm() {
 
   function handleChange(evt) {
     const { value } = evt.target;
-    setData({ ...data, [evt.target.name]: value });
-    console.log(value);
+    if(evt.target.name === "clientJourney")
+    {
+      const index = evt.target.key;
+      let clientJourney = [...data.clientJourney];
+      clientJourney[index].text = value;
+      setData({...data, [evt.target.name] : clientJourney});
+    }
+    else
+    {
+      setData({ ...data, [evt.target.name]: value });
+      console.log(value);
+    }
   }
 
   function handleChange1(evt) {
@@ -430,7 +446,6 @@ export default function HoliyaRequestForm() {
       </MDBox>
     </Dialog>
   );
-
   const halfimForm = () => (
     <Container className="" dir="rtl">
       <Row className="justify-content-center">
@@ -509,13 +524,31 @@ export default function HoliyaRequestForm() {
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>מסע לקוח</h6>
-                      <Input
+                      {clientJourney.map((post, index) => {
+                        return <>
+                        <label>{post.publisher} {post.date}</label>
+                        <Input
+                        key={index}
+                        placeholder="מסע לקוח"
+                        type="textarea"
+                        name="clientJourney"
+                        value={post.text}
+                        onChange={handleChange}
+                        disabled={post.published}
+                      />
+                      {!post.published && 
+                      <MDButton variant="secondary">
+                        מחק
+                      </MDButton>}                 
+                      </>
+                      })}
+                      {/* <Input
                         placeholder="מסע לקוח"
                         type="textarea"
                         name="clientJourney"
                         value={data.clientJourney}
                         onChange={handleChange}
-                      />
+                      /> */}
                     </FormGroup>
                   </Col>
                 </Row>
