@@ -131,30 +131,31 @@ export default function data() {
       typeName = "מנהל מערכת";
       color = "mekatnar";
     } else if (admin === "1") {
-      typeName = "משתמש רגיל";
+      typeName = "משתמש מוקדנית";
       color = "info";
     } else if (admin === "2") {
-      typeName = "משתמש כוח אדם";
+      typeName = `משתמש אחמ"ש`;
       color = "primary";
     } else if (admin === "3") {
-      typeName = "משתמש תא חיזוי";
-      color = "primary";
-    } else if (admin === "4") {
-      typeName = "משתמש תא כשירות המסגרת";
-      color = "primary";
-    } else if (admin === "5") {
-      typeName = "משתמש תא אחזקות בתעשייה";
-      color = "primary";
-    } else if (admin === "6") {
-      typeName = "משתמש חלפים";
-      color = "primary";
-    } else if (admin === "7") {
-      typeName = 'משתמש תא אמל"ח וטכנולגיות';
-      color = "primary";
-    } else if (admin === "8") {
-      typeName = 'משתמש תא משקים מטכל"ים';
+      typeName = "משתמש מפקד מוקד";
       color = "primary";
     }
+    // } else if (admin === "4") {
+    //   typeName = "משתמש תא כשירות המסגרת";
+    //   color = "primary";
+    // } else if (admin === "5") {
+    //   typeName = "משתמש תא אחזקות בתעשייה";
+    //   color = "primary";
+    // } else if (admin === "6") {
+    //   typeName = "משתמש חלפים";
+    //   color = "primary";
+    // } else if (admin === "7") {
+    //   typeName = 'משתמש תא אמל"ח וטכנולגיות';
+    //   color = "primary";
+    // } else if (admin === "8") {
+    //   typeName = 'משתמש תא משקים מטכל"ים';
+    //   color = "primary";
+    // }
     return [typeName, color];
   };
   const setTypeSourceHoli = (sourceHoli) => {
