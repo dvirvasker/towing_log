@@ -43,7 +43,7 @@ Coded by www.creative-tim.com
 
 // import SystemAlerts from "layouts/SystemAlerts";
 import Dashboard from "layouts/dashboard/Tene/dashMain";
-import GenralInfo from "layouts/dashboard/genralInfo";
+import TowingOrders from "layouts/tables/towingOrdersTable";
 import KshirotMisgrot from "layouts/dashboard/kshirotMisgrot";
 import Pagedamagedtools from "layouts/dashboard/damagedtools";
 import Halfim from "layouts/dashboard/halfim";
@@ -67,7 +67,7 @@ const AdminRoutes = [
     key: "towingorders",
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/towingorders",
-    component: <GenralInfo />,
+    component: <TowingOrders />,
   },
   {
     type: "collapse",
