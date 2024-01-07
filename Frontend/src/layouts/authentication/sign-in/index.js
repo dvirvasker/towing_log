@@ -318,7 +318,7 @@ function signIn() {
           textAlign="center"
         >
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-            {`התחברות למערכת יומן גרירות`}
+            {`התחברות למערכת  יומן גרירות`}
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
