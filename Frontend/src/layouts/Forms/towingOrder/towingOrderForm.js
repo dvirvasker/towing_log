@@ -131,18 +131,18 @@ export default function HoliyaRequestForm() {
 
   function handleChange(evt) {
     const { value } = evt.target;
-    if(evt.target.name === "clientJourney")
-    {
-      const index = evt.target.key;
-      let clientJourney = [...data.clientJourney];
-      clientJourney[index].text = value;
-      setData({...data, [evt.target.name] : clientJourney});
-    }
-    else
-    {
+    // if(evt.target.name === "clientJourney")
+    // {
+    //   // const index = evt.target.key;
+    //   // let clientJourney = [...data.clientJourney];
+    //   // clientJourney[index].text = value;
+    //   // setData({...data, [evt.target.name] : clientJourney});
+    // }
+    // else
+    // {
       setData({ ...data, [evt.target.name]: value });
       console.log(value);
-    }
+    // }
   }
 
   function handleChange1(evt) {
@@ -524,7 +524,7 @@ export default function HoliyaRequestForm() {
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>מסע לקוח</h6>
-                      {clientJourney.map((post, index) => {
+                      {/* {clientJourney.map((post, index) => {
                         return <>
                         <label>{post.publisher} {post.date}</label>
                         <Input
@@ -541,14 +541,14 @@ export default function HoliyaRequestForm() {
                         מחק
                       </MDButton>}                 
                       </>
-                      })}
-                      {/* <Input
+                      })} */}
+                      <Input
                         placeholder="מסע לקוח"
                         type="textarea"
                         name="clientJourney"
                         value={data.clientJourney}
                         onChange={handleChange}
-                      /> */}
+                      />
                     </FormGroup>
                   </Col>
                 </Row>
