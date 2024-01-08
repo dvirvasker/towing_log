@@ -74,7 +74,7 @@ const userManagementTable = () => {
     setDbError(true);
     setDbe(false);
   };
-  function handleChange(evt) {
+  const handleChange =(evt)=> {
     const { value, name } = evt.target;
     if (name === "status") {
       setStatus(value);
@@ -195,7 +195,7 @@ const userManagementTable = () => {
               >
                 <MenuItem value="0">מפקד מוקד</MenuItem>
                 <MenuItem value="1">מוקדנית</MenuItem>
-                <MenuItem value="2">אחמ"ש</MenuItem>
+                <MenuItem value="2">אחמש</MenuItem>
               </Select>
             </FormControl>
           </MDBox>
@@ -284,7 +284,7 @@ const userManagementTable = () => {
                     <option value="דרום">דרום</option>
                     <option value="מרכז">מרכז</option>
                     <option value="הערבה">הערבה</option>
-                    <option value="איו''ש">איו''ש</option>
+                    <option value="איו''ש">איוש</option>
                   </Input>
                 </Col>
               </Row>
