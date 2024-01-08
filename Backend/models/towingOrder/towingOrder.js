@@ -22,6 +22,7 @@ const towingOrderSchema = new mongoose.Schema(
     transferOrderTime: { type: String },
     reciveName: { type: String },
     executiveBody: { type: String },
+    turnNumber: {type: String},
     demandDate: { type: Date },
     area: { type: String },
     status: { type: String },

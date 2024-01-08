@@ -89,7 +89,7 @@ export default function HoliyaRequestForm() {
     clientJourney: [],
     // {text : string, publisher : string (first + last name), date, published : boolean (before posting/updating = false, after posting becomes true)}
     carnumber: "",
-    erorrInfo: "",
+    erorrInfo: [],
     errInfoOther: "",
     location: "",
     garage: "",
@@ -116,20 +116,9 @@ export default function HoliyaRequestForm() {
   function handleChange(evt) {
     console.log(evt);
     const { value } = evt.target;
-    // if(evt.target.name === "clientJourney")
-    // {
-    //   const index = key;
-    //   console.log(index);
-    //   const clientJourney = [...data.clientJourney];
-    //   console.log(clientJourney);
-    //   clientJourney[index].text = value;
-    //   setData({...data, [evt.target.name] : clientJourney});
-    // }
-    // else
-    // {
+
     setData({ ...data, [evt.target.name]: value });
     console.log(value);
-    // }
   }
   const handleClientJourneyChange = (evt, key) => {
     const index = key;
@@ -160,14 +149,56 @@ export default function HoliyaRequestForm() {
   const CheckFormData = () => {
     let flag = true;
     const ErrorReason = [];
-    if (!data.date_update) {
+    const AddError = (error) => {
       flag = false;
-      ErrorReason.push("תאריך ריק");
+      ErrorReason.push(error);
     }
-    if (data.personalnumber === "" || data.personalnumber === undefined) {
-      flag = false;
-      ErrorReason.push("מספר אישי ריק");
+    if (!data.orderDate) {
+      AddError("תאריך ריק");
     }
+    if(!data.orderTime || data.orderDate === "")
+    {
+      AddError("שעה ריקה");
+    }
+    if(data.serviceName === "")
+    {
+      AddError("שם נציג שירות ריק")
+    }
+    if(data.carnumber === "")
+    {
+      AddError("צ' ריק")
+    }
+    else if(!(digitsOnly(data.carnumber) && data.carnumber.length !== 7))
+    {
+      AddError("צ' לא תקין")
+    }
+    if(data.erorrInfo.length() === 0)
+    {
+      AddError("לא רשומה סיבת תקלה")
+    }
+    if(data.erorrInfo.includes("אחר"))
+    {
+      if(data.errInfoOther.trim() === "")
+      {
+        AddError("הערות ריק")
+      }
+    }
+    if(data.location.trim === ""){
+      AddError("מיקום ריק")
+    }
+    if(data.garage === "" ||  data.garage === "בחר")
+    {
+      AddError("לגרור ל, ריק")
+    }
+    if(data.fullName.trim() === "")
+    {
+      AddError("שם מלא ריק")
+    }
+    if(!(data.phoneNumber.length))
+    // if (data.personalnumber === "" || data.personalnumber === undefined) {
+    //   flag = false;
+    //   ErrorReason.push("מספר אישי ריק");
+    // }
 
     if (flag !== true) {
       ErrorReason.forEach((reason) => {
@@ -207,6 +238,7 @@ export default function HoliyaRequestForm() {
       transferOrderTime: data.transferOrderTime,
       reciveName: data.reciveName,
       executiveBody: data.executiveBody,
+      turnNumber: data.turnNumber,
       demandDate: data.demandDate,
       area: data.area,
       status: data.status,
@@ -376,6 +408,50 @@ export default function HoliyaRequestForm() {
   };
   const journey = data.clientJourney;
   console.log(journey);
+
+  const toggleError = (evt) => {
+    const errorInfo = [...data.erorrInfo];
+    if(evt.target.checked)
+    {
+      errorInfo.push(evt.target.value);
+      setData((prev) => ({...prev, [evt.target.name]:errorInfo}))
+    }
+    else
+    {
+      const index = errorInfo.indexOf(evt.target.value);
+      errorInfo.splice(index, 1);
+      // console.log(filtered);
+      setData((prev) => ({...prev, [evt.target.name] : errorInfo}))
+    }
+  }
+
+  const errorInput = (val) => (<div style={{display: 'flex'}}>
+    <Input style={{marginLeft: '5px'}} 
+    type="checkbox"
+    name="erorrInfo"
+    value={val}
+    onClick={toggleError}
+      />
+      <p>{val}</p>
+      </div>)
+
+  const errorResArr = [
+    "לא מניע",
+    "מערכות בטיחות (הגה, בלמים)",
+    "נורת התראה אדומה",
+    "פנצ'ר",
+    "מפתח",
+    "תאונה",
+    "תקלת מנוע",
+    "חוסר נוזלים",
+    "תקלת חשמל/קצר",
+    "תיבת הילוכים",
+    "רכב נעול (פריצה)",
+    "קודן",
+    "אחר"
+  ]
+  console.log("מערך סיבות טעות")
+  console.log(data.erorrInfo);
   const halfimForm = () => (
     <Container className="" dir="rtl">
       <Row className="justify-content-center">
@@ -561,12 +637,33 @@ export default function HoliyaRequestForm() {
                   </Col>
                 </Row>
 
-                {/* <Row>
+                <Row>
                   <Col>
                   <h6>מהות התקלה</h6>
-                  <Input></Input>
+                  <div style={{display: 'flex', flexWrap:'wrap', gap: '10px'}}>
+                  {errorResArr.map((res) =>  errorInput(res)
+                  )}
+                   {
+                  data.erorrInfo.includes("אחר") && <>
+                    <p >הערות: </p>
+                    <Row>
+                      <Col>
+                    <Input 
+                    // style={{display:'inline', width:'320px'}}
+                    placeholder="הערות"
+                    name="errInfoOther"
+                    value={data.errInfoOther}
+                    onChange={handleChange}
+                    type="text"
+                    />
+                    </Col></Row>
+                    
+                   </>
+                }
+                  </div>
                   </Col>
-                </Row> */}
+                </Row>
+               
 
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>

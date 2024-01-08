@@ -39,6 +39,7 @@ exports.create = (req, res) => {
   const transferOrderTime = req.body.transferOrderTime;
   const reciveName = req.body.reciveName;
   const executiveBody = req.body.executiveBody;
+  const turnNumber = req.body.turnNumber;
   const demandDate = req.body.demandDate;
   const area = req.body.area;
   const status = req.body.status;
@@ -63,6 +64,7 @@ exports.create = (req, res) => {
     transferOrderTime,
     reciveName,
     executiveBody,
+    turnNumber,
     demandDate,
     area,
     status,
@@ -98,6 +100,7 @@ exports.update = (req, res) => {
     request.transferOrderTime = req.body.transferOrderTime;
     request.reciveName = req.body.reciveName;
     request.executiveBody = req.body.executiveBody;
+    request.turnNumber = req.body.turnNumber;
     request.demandDate = req.body.demandDate;
     request.area = req.body.area;
     request.status = req.body.status;
