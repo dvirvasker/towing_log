@@ -72,26 +72,8 @@ const { user } = isAuthenticated();
 export default function HoliyaRequestForm() {
   const [archiveData, setArchiveData] = useState([]);
   const [checkData, setCheckData] = useState("update");
-  const createReference = () => {
-    const referenceDate = new Date()
-      .toISOString()
-      .substring(3)
-      .replace(/-/g, "")
-      .replace(/T/g, "")
-      .replace(/:/g, "")
-      .split(".")[0];
-    console.log(referenceDate);
-    return referenceDate;
-  };
   const [data, setData] = useState({
     personalnumber: user.personalnumber,
-    reference: new Date()
-      .toISOString()
-      .substring(3)
-      .replace(/-/g, "")
-      .replace(/T/g, "")
-      .replace(/:/g, "")
-      .split(".")[0],
     urgent: false,
 
     date_update: new Date().toISOString(),
