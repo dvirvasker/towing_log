@@ -46,9 +46,9 @@ import axios from "axios";
 import { Navigate, Outlet } from "react-router-dom";
 import { CardBody, Col, Container, Form, FormGroup, FormText, Input, Label, Row } from "reactstrap";
 
-const userManagementTable = () => {
+const towingOrdersTable = () => {
   const tableTittle = "הזמנות גרירה";
-
+  const [filterOpen, setFilterOpen] = useState(false);
   const [status, setStatus] = useState("בחר");
   const [area, setArea] = useState("בחר");
   const [dbError, setDbError] = useState(false);
@@ -93,9 +93,6 @@ const userManagementTable = () => {
     rows: pRows,
     dbError: dbe,
     setDBerror: setDbe,
-    changeRoleW,
-    setChangeRoleW,
-    pressedID,
   } = towingOrdersData(status, area, data.fromDate, data.toDate);
   const handleErrorClose = () => {
     setDbError(true);
@@ -184,81 +181,81 @@ const userManagementTable = () => {
       </MDBox>
     </Dialog>
   );
-  const handlechangeRoleWClose = () => {
-    setChangeRoleW(false);
-  };
-  const showChangeRoleW = () => (
-    <Dialog
-      open={changeRoleW}
-      onClose={handleErrorClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <MDBox
-        variant="gradient"
-        bgColor="mekatnar"
-        coloredShadow="mekatnar"
-        borderRadius="l"
-        // mx={2}
-        // mt={2}
-        p={3}
-        // mb={2}
-        textAlign="center"
-      >
-        <MDTypography variant="h1" fontWeight="medium" color="white" mt={1}>
-          בחר את התפקיד החדש
-        </MDTypography>
+  // const handlechangeRoleWClose = () => {
+  //   setChangeRoleW(false);
+  // };
+  // const showChangeRoleW = () => (
+  //   <Dialog
+  //     open={changeRoleW}
+  //     onClose={handleErrorClose}
+  //     aria-labelledby="alert-dialog-title"
+  //     aria-describedby="alert-dialog-description"
+  //   >
+  //     <MDBox
+  //       variant="gradient"
+  //       bgColor="mekatnar"
+  //       coloredShadow="mekatnar"
+  //       borderRadius="l"
+  //       // mx={2}
+  //       // mt={2}
+  //       p={3}
+  //       // mb={2}
+  //       textAlign="center"
+  //     >
+  //       <MDTypography variant="h1" fontWeight="medium" color="white" mt={1}>
+  //         בחר את התפקיד החדש
+  //       </MDTypography>
 
-        <DialogContent>
-          <MDBox mb={2}>
-            <FormControl>
-              <InputLabel id="demo-simple-select-autowidth-label">בחר סוג משתמש</InputLabel>
-              <Select
-                labelId="demo-simple-select-autowidth-label"
-                name="userType"
-                id="demo-simple-select-autowidth"
-                value={() => {
-                  axios
-                    .post(`http://localhost:5000/TowingLogApi/user/getuserbyid`, {
-                      userid: pressedID,
-                    })
-                    .then(
-                      (response) =>
-                        `${response.datadata.user.admin}${response.datadata.user.adminType}`
-                    )
-                    .catch((error) => {
-                      console.log(error);
-                      return "00";
-                    });
-                }}
-                onChange={() => {
-                  axios
-                    .put(`http://localhost:5000/TowingLogApi/user/update/${pressedID}`, {
-                      admin: "00",
-                      adminType: "00",
-                    })
-                    .then((response) => {
-                      setChangeRoleW(false);
-                      window.location.reload(false);
-                    })
-                    .catch((error) => {
-                      console.log(error);
-                    });
-                }}
-                autoWidth
-                label="בחר סוג משתמש"
-                sx={{ height: 50, minWidth: 150 }}
-              >
-                <MenuItem value="0">מפקד מוקד</MenuItem>
-                <MenuItem value="1">מוקדנית</MenuItem>
-                <MenuItem value="2">אחמש</MenuItem>
-              </Select>
-            </FormControl>
-          </MDBox>
-        </DialogContent>
-      </MDBox>
-    </Dialog>
-  );
+  //       <DialogContent>
+  //         <MDBox mb={2}>
+  //           <FormControl>
+  //             <InputLabel id="demo-simple-select-autowidth-label">בחר סוג משתמש</InputLabel>
+  //             <Select
+  //               labelId="demo-simple-select-autowidth-label"
+  //               name="userType"
+  //               id="demo-simple-select-autowidth"
+  //               value={() => {
+  //                 axios
+  //                   .post(`http://localhost:5000/TowingLogApi/user/getuserbyid`, {
+  //                     userid: pressedID,
+  //                   })
+  //                   .then(
+  //                     (response) =>
+  //                       `${response.datadata.user.admin}${response.datadata.user.adminType}`
+  //                   )
+  //                   .catch((error) => {
+  //                     console.log(error);
+  //                     return "00";
+  //                   });
+  //               }}
+  //               onChange={() => {
+  //                 axios
+  //                   .put(`http://localhost:5000/TowingLogApi/user/update/${pressedID}`, {
+  //                     admin: "00",
+  //                     adminType: "00",
+  //                   })
+  //                   .then((response) => {
+  //                     setChangeRoleW(false);
+  //                     window.location.reload(false);
+  //                   })
+  //                   .catch((error) => {
+  //                     console.log(error);
+  //                   });
+  //               }}
+  //               autoWidth
+  //               label="בחר סוג משתמש"
+  //               sx={{ height: 50, minWidth: 150 }}
+  //             >
+  //               <MenuItem value="0">מפקד מוקד</MenuItem>
+  //               <MenuItem value="1">מוקדנית</MenuItem>
+  //               <MenuItem value="2">אחמש</MenuItem>
+  //             </Select>
+  //           </FormControl>
+  //         </MDBox>
+  //       </DialogContent>
+  //     </MDBox>
+  //   </Dialog>
+  // );
   const table = () => (
     <MDBox pt={6} pb={3}>
       <Grid container spacing={6}>
@@ -278,7 +275,19 @@ const userManagementTable = () => {
                 {tableTittle}
               </MDTypography>
               <Grid container justifyContent="flex-end">
-                {/* <Link to="/UploadEcxelFile"> */}
+                <MDButton
+                  variant="gradient"
+                  onClick={() => setFilterOpen(!filterOpen)}
+                  // onClick={() => {
+                  //   // setIsInfoPressed(true);
+                  //   // setpressedID(hozla._id);
+                  // }}
+                  circular="true"
+                  iconOnly="true"
+                  size="medium"
+                >
+                  <Icon>filter_alt</Icon>
+                </MDButton>
                 <MDButton
                   variant="gradient"
                   onClick={() => setToAddFile(true)}
@@ -292,110 +301,112 @@ const userManagementTable = () => {
                 >
                   <Icon>add</Icon>
                 </MDButton>
-                {/* </Link> */}
               </Grid>
             </MDBox>
-            <MDBox mx={2} mt={1} px={2}>
-              <Row>
-                <Col
-                  style={{
-                    justifyContent: "right",
-                    alignContent: "right",
-                    textAlign: "right",
-                  }}
-                >
-                  <h6 style={{}}>סטטוס</h6>
-                  <Input
-                    placeholder="סטטוס"
-                    type="select"
-                    name="status"
-                    value={status}
-                    onChange={handleChange}
+            {filterOpen === true ? (
+              <MDBox mx={2} mt={1} px={2}>
+                <Row>
+                  <Col
+                    style={{
+                      justifyContent: "right",
+                      alignContent: "right",
+                      textAlign: "right",
+                    }}
                   >
-                    <option value="בחר">בחר</option>
-                    <option value="פתוח">פתוח</option>
-                    <option value="סגור">סגור</option>
-                    <option value="מבוטל">מבוטל</option>
-                    <option value="מוקפא">מוקפא</option>
-                    <option value="ממתין לאישור">ממתין לאישור</option>
-                  </Input>
-                </Col>
-                <Col
-                  style={{
-                    justifyContent: "right",
-                    alignContent: "right",
-                    textAlign: "right",
-                  }}
-                >
-                  <h6 style={{}}>מרחב</h6>
-                  <Input
-                    placeholder="מרחב"
-                    type="select"
-                    name="area"
-                    value={area}
-                    onChange={handleChange}
+                    <h6 style={{}}>סטטוס</h6>
+                    <Input
+                      placeholder="סטטוס"
+                      type="select"
+                      name="status"
+                      value={status}
+                      onChange={handleChange}
+                    >
+                      <option value="בחר">בחר</option>
+                      <option value="פתוח">פתוח</option>
+                      <option value="סגור">סגור</option>
+                      <option value="מבוטל">מבוטל</option>
+                      <option value="מוקפא">מוקפא</option>
+                      <option value="ממתין לאישור">ממתין לאישור</option>
+                    </Input>
+                  </Col>
+                  <Col
+                    style={{
+                      justifyContent: "right",
+                      alignContent: "right",
+                      textAlign: "right",
+                    }}
                   >
-                    <option value="בחר">בחר</option>
-                    <option value="צפון">צפון</option>
-                    <option value="דרום">דרום</option>
-                    <option value="מרכז">מרכז</option>
-                    <option value="הערבה">הערבה</option>
-                    <option value="איו''ש">איוש</option>
-                  </Input>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <FormGroup>
-                    <h6 style={{}}>מתאריך</h6>
+                    <h6 style={{}}>מרחב</h6>
                     <Input
-                      placeholder="מתאריך"
-                      type="date"
-                      name="fromDate"
-                      value={data.fromDate}
+                      placeholder="מרחב"
+                      type="select"
+                      name="area"
+                      value={area}
                       onChange={handleChange}
-                    />
-                  </FormGroup>
-                </Col>
-                <Col>
-                  <FormGroup>
-                    <h6 style={{}}>עד תאריך</h6>
-                    <Input
-                      placeholder="עד תאריך"
-                      type="date"
-                      name="toDate"
-                      value={data.toDate}
-                      onChange={handleChange}
-                    />
-                  </FormGroup>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <h6>מהות התקלה</h6>
-                  <div style={{ display: "flex", flexWrap: "wrap" }}>
-                    {errorResArr.map((res) => errorInput(res))}
-                    {data.erorrInfo.includes("אחר") && (
-                      <>
-                        <p>הערות: </p>
-                        <Row>
-                          <Col>
-                            <Input
-                              // style={{display:'inline', width:'320px'}}
-                              placeholder="הערות"
-                              name="errInfoOther"
-                              value={data.errInfoOther}
-                              onChange={handleChange}
-                              type="text"
-                            />
-                          </Col>
-                        </Row>
-                      </>
-                    )}
-                  </div>
-                </Col>
-              </Row>
-            </MDBox>
+                    >
+                      <option value="בחר">בחר</option>
+                      <option value="צפון">צפון</option>
+                      <option value="דרום">דרום</option>
+                      <option value="מרכז">מרכז</option>
+                      <option value="הערבה">הערבה</option>
+                      <option value="איו''ש">איוש</option>
+                    </Input>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <FormGroup>
+                      <h6 style={{}}>מתאריך</h6>
+                      <Input
+                        placeholder="מתאריך"
+                        type="date"
+                        name="fromDate"
+                        value={data.fromDate}
+                        onChange={handleChange}
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col>
+                    <FormGroup>
+                      <h6 style={{}}>עד תאריך</h6>
+                      <Input
+                        placeholder="עד תאריך"
+                        type="date"
+                        name="toDate"
+                        value={data.toDate}
+                        onChange={handleChange}
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <h6>מהות התקלה</h6>
+                    <div style={{ display: "flex", flexWrap: "wrap" }}>
+                      {errorResArr.map((res) => errorInput(res))}
+                      {data.erorrInfo.includes("אחר") && (
+                        <>
+                          <p>הערות: </p>
+                          <Row>
+                            <Col>
+                              <Input
+                                // style={{display:'inline', width:'320px'}}
+                                placeholder="הערות"
+                                name="errInfoOther"
+                                value={data.errInfoOther}
+                                onChange={handleChange}
+                                type="text"
+                              />
+                            </Col>
+                          </Row>
+                        </>
+                      )}
+                    </div>
+                  </Col>
+                </Row>
+              </MDBox>
+            ) : null}
+
             <MDBox pt={3}>
               {pRows.length !== 0 ? (
                 <DataTable
@@ -433,4 +444,4 @@ const userManagementTable = () => {
   );
 };
 
-export default userManagementTable;
+export default towingOrdersTable;

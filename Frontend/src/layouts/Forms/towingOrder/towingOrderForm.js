@@ -319,7 +319,7 @@ export default function HoliyaRequestForm() {
           loading: false,
           error: false,
           successmsg: true,
-          NavigateToReferrer: true,
+          NavigateToReferrer: false,
         });
       })
       .catch((error) => {
@@ -386,15 +386,27 @@ export default function HoliyaRequestForm() {
         // mb={2}
         textAlign="center"
       >
-        <MDTypography variant="h1" fontWeight="medium" color="white" mt={1}>
-          טופס חלפים עודכן{" "}
+        <MDTypography variant="h2" fontWeight="medium" color="white" mt={1}>
+          הזמנה {data.reference} נוצרה בהצלחה
         </MDTypography>
 
-        {/* <DialogContent>
-          <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-            אישור
-          </MDTypography>
-        </DialogContent> */}
+        <DialogContent>
+          <MDButton
+            color="white"
+            size="large"
+            variant="outlined"
+            onClick={() => {
+              setData({
+                ...data,
+                successmsg: false,
+                NavigateToReferrer: true,
+              });
+            }}
+            className="btn-new-blue"
+          >
+            סגור
+          </MDButton>
+        </DialogContent>
       </MDBox>
     </Dialog>
   );
@@ -986,7 +998,7 @@ export default function HoliyaRequestForm() {
                     className="btn-new-blue"
                     type="submit"
                   >
-                    עדכן טופס חלפים
+                    שלח טופס גרירה
                     <Icon fontSize="small">upload</Icon>&nbsp;
                   </MDButton>
                 </div>

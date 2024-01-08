@@ -29,26 +29,27 @@ exports.create = (req, res) => {
   const ahmashNotes = req.body.ahmashNotes;
 
   const clientJourneyArray = [];
-  req.body.clientJourney.forEach((element) => {
-    const journey = {
-      text: element.text,
-      publisher: element.publisher,
-      date: element.date,
-      published: element.published,
-    };
-    clientJourneyArray.push(journey);
-  });
-  // const propPrints = propPrintsrray;
-
+  if (req.body.clientJourney.length !== 0) {
+    req.body.clientJourney.forEach((element) => {
+      const journey = {
+        text: element.text,
+        publisher: element.publisher,
+        date: element.date,
+        published: element.published,
+      };
+      clientJourneyArray.push(journey);
+    });
+  }
   const clientJourney = clientJourneyArray;
 
   const carnumber = req.body.carnumber;
 
   const erorrInfoArray = [];
-  req.body.erorrInfo.forEach((element) => {
-    erorrInfoArray.push(element);
-  });
-
+  if (req.body.erorrInfo.length !== 0) {
+    req.body.erorrInfo.forEach((element) => {
+      erorrInfoArray.push(element);
+    });
+  }
   const erorrInfo = erorrInfoArray;
 
   const errInfoOther = req.body.errInfoOther;
