@@ -74,6 +74,11 @@ const digitsOnly = (str) => /^\d+$/.test(str);
 export default function HoliyaRequestForm() {
   const [archiveData, setArchiveData] = useState([]);
   const [checkData, setCheckData] = useState("update");
+  const [carData, setCarData] = useState([]);
+  const [carTypesData, setCarTypesData] = useState([]);
+  const [garagesData, setGaragesData] = useState([]);
+  const [ordersData, setOrdersData] = useState([]);
+  const [bankData, setBankData] = useState({});
   const [data, setData] = useState({
     reference: new Date()
       .toISOString()
@@ -120,6 +125,80 @@ export default function HoliyaRequestForm() {
     setData({ ...data, [evt.target.name]: value });
     console.log(value);
   }
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/TowingLogApi/get_banks`)
+      .then((response) => {
+        setBankData(response.data.data);
+
+      })
+      .catch((error) => {});
+
+    }, []);
+
+    useEffect(() => {
+    axios
+      .get(`http://localhost:5000/TowingLogApi/CarDatas`)
+      .then((response) => {
+        console.log(response.data);
+        response.data.forEach(carDataInfo => {
+          const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId]
+          carDataInfo.gdodName = gdod.name;
+          carDataInfo.hativaId = gdod.hativaId;
+          const hativa = bankData.Unit_bank.hativas[carDataInfo.hativaId];
+          carDataInfo.hativaName = hativa.name;
+          carDataInfo.ogdaId = hativa.ogdaId;
+          const ogda = bankData.Unit_bank.ogdas[carDataInfo.ogdaId];
+          carDataInfo.ogdaName = ogda.name;
+          carDataInfo.pikodId = ogda.pikodId;
+          const pikod = bankData.Unit_bank.pikods[carDataInfo.pikodId];
+          carDataInfo.pikodName = pikod.name;
+          console.log(carDataInfo);
+        })
+        setCarData(response.data);
+      })
+      .catch((error) => {});
+
+    }, [bankData]);
+
+    useEffect(() => {
+      axios
+      .get(`http://localhost:5000/TowingLogApi/Garages`)
+      .then((response) => {
+        setGaragesData(response.data);
+
+      })
+      .catch((error) => {});
+    }, []);
+
+    useEffect(() => {
+      axios
+      .get(`http://localhost:5000/TowingLogApi/CarTypes`)
+      .then((response) => {
+        setCarTypesData(response.data);
+
+      })
+      .catch((error) => {});
+    }, []);
+
+    useEffect(() => {
+      axios
+      .get(`http://localhost:5000/TowingLogApi/TowingOrder`)
+      .then((response) => {
+        setOrdersData(response.data);
+
+      })
+      .catch((error) => {});
+      
+  }, []);
+
+  console.log(carData);
+  console.log(garagesData);
+  console.log(carTypesData);
+  console.log(ordersData);
+  console.log("bank: ")
+  console.log(bankData);
+  
   const handleClientJourneyChange = (evt, key) => {
     const index = key;
     const { value } = evt.target;
@@ -168,7 +247,7 @@ export default function HoliyaRequestForm() {
     {
       AddError("צ' ריק")
     }
-    else if(!(digitsOnly(data.carnumber) && data.carnumber.length !== 7))
+    else if(!(digitsOnly(data.carnumber) && data.carnumber.length <= 7))
     {
       AddError("צ' לא תקין")
     }
@@ -209,7 +288,7 @@ export default function HoliyaRequestForm() {
       return true;
     }
   };
-
+  
   const SendFormData = (event) => {
     event.preventDefault();
     setData({
@@ -452,6 +531,13 @@ export default function HoliyaRequestForm() {
   ]
   console.log("מערך סיבות טעות")
   console.log(data.erorrInfo);
+
+  const SearchCarNumber = (carNumber) => {
+    if(carNumber.trim() !== "")
+    {
+      console.log(`Car number searched:  ${carNumber}`);
+    }
+  }
   const halfimForm = () => (
     <Container className="" dir="rtl">
       <Row className="justify-content-center">
@@ -592,14 +678,16 @@ export default function HoliyaRequestForm() {
                           maxLength={7}
                           // minLength={7}
                         />
-                        <MDButton variant="gradient" color="info" iconOnly>
+                        <MDButton variant="gradient" color="info" iconOnly
+                        onClick={() => {SearchCarNumber(data.carnumber)}}
+                        >
                           <Icon>search</Icon>
                         </MDButton>
                       </div>
                     </FormGroup>
                   </Col>
 
-                  <Col>
+                  {/* <Col>
                     <FormGroup>
                       <h6 style={{}}>יחידה</h6>
                       <Input
@@ -608,19 +696,27 @@ export default function HoliyaRequestForm() {
                         name="unit"
                         value={data.unit}
                         onChange={handleChange}
+                        // disabled={data.carnumber.trim() === ""}
                       />
                     </FormGroup>
-                  </Col>
+                  </Col> */}
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>סוג רכב נגרר</h6>
                       <Input
                         placeholder="סוג רכב נגרר"
-                        type="text"
+                        type="select"
                         name="a"
                         value={data.a}
                         onChange={handleChange}
-                      />
+                        // disabled={data.carnumber.trim() === ""}
+                      >
+                        <option value="בחר">בחר</option>
+                        {carTypesData.map((carType) => <>
+                        <option value={carType._id}>{carType.carType}</option>
+                        </>)}
+                        </Input>
+                      
                     </FormGroup>
                   </Col>
                   <Col>
@@ -632,11 +728,46 @@ export default function HoliyaRequestForm() {
                         name="auto"
                         value={data.auto}
                         onChange={handleChange}
+                        // disabled={data.carnumber.trim() === ""}
                       />
                     </FormGroup>
                   </Col>
                 </Row>
+                <Row>
+                <Col>
+                  <h6>פיקוד</h6>
+                  <Input
+                  type="text"
+                  placeholder="פיקוד"
+                  />
+                  </Col>
 
+                  <Col>
+                  <h6>אוגדה</h6>
+                  <Input
+                  type="text"
+                  placeholder="אוגדה"
+                  />
+                  </Col>
+
+                  <Col>
+                  <h6>חטיבה</h6>
+                  <Input
+                  type="text"
+                  placeholder="חטיבה"
+                  />
+                  </Col>
+
+                  <Col>
+                  <h6>גדוד</h6>
+                  <Input
+                  type="text"
+                  placeholder="גדוד"
+                  />
+                  </Col>
+
+                  
+                </Row>
                 <Row>
                   <Col>
                   <h6>מהות התקלה</h6>

@@ -263,7 +263,7 @@ getBanks().then(() => {
 // };
 
 app.get("/TowingLogApi/get_banks", async (req, res) => {
-  res.json(await getMagadTree());
+  res.json({data: {Unit_bank, Magadal_bank} });
 });
 
 const TowingOrder = require("./routes/towingorder/towingorder");
