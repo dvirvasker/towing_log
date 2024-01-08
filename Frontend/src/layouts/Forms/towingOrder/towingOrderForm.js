@@ -69,19 +69,24 @@ import {
 import { authenticate, isAuthenticated, signin } from "auth/index";
 const { user } = isAuthenticated();
 
-const digitsOnly = (str) =>  /^\d+$/.test(str);
-
+const digitsOnly = (str) => /^\d+$/.test(str);
 
 export default function HoliyaRequestForm() {
   const [archiveData, setArchiveData] = useState([]);
   const [checkData, setCheckData] = useState("update");
   const [data, setData] = useState({
-    reference : "",
+    reference: new Date()
+      .toISOString()
+      .substring(3)
+      .replace(/-/g, "")
+      .replace(/T/g, "")
+      .replace(/:/g, "")
+      .split(".")[0],
     orderDate: new Date().toISOString().split("T")[0],
     orderTime: new Date().toISOString().split("T")[1].split(".")[0].slice(0, 5),
-    serviceName : `${user.firstName} ${user.lastName}`,
-    ahmashNotes : "",
-    clientJourney : [], 
+    serviceName: `${user.firstName} ${user.lastName}`,
+    ahmashNotes: "",
+    clientJourney: [],
     // {text : string, publisher : string (first + last name), date, published : boolean (before posting/updating = false, after posting becomes true)}
     carnumber: "",
     erorrInfo: "",
@@ -102,8 +107,6 @@ export default function HoliyaRequestForm() {
     area: "",
     status: "",
     commanderNotes: "",
-
-   
   });
   console.log(data);
 
@@ -129,19 +132,19 @@ export default function HoliyaRequestForm() {
     // }
   }
   const handleClientJourneyChange = (evt, key) => {
-      const index = key;
-      const { value } = evt.target;
-      const clientJourney = [...data.clientJourney];
-      clientJourney[index].text = value;
-      setData((prev) => ({...prev, [evt.target.name] : clientJourney}));
-  }
+    const index = key;
+    const { value } = evt.target;
+    const clientJourney = [...data.clientJourney];
+    clientJourney[index].text = value;
+    setData((prev) => ({ ...prev, [evt.target.name]: clientJourney }));
+  };
   const removeClientJourneyPost = (index) => {
     const clientJourney = [...data.clientJourney];
     clientJourney.splice(index, 1);
     console.log(clientJourney);
 
-    setData((prev) => ({...prev, clientJourney,}));  
-  }
+    setData((prev) => ({ ...prev, clientJourney }));
+  };
 
   function handleChange1(evt) {
     const value = Math.max(min, Math.min(max, Number(evt.target.value)));
@@ -191,7 +194,7 @@ export default function HoliyaRequestForm() {
       orderTime: data.orderTime,
       serviceName: data.serviceName,
       ahmashNotes: data.ahmashNotes,
-      clientJourney: data.clientJourney.map(post => ({...post, publisher : true})),
+      clientJourney: data.clientJourney.map((post) => ({ ...post, publisher: true })),
       carnumber: data.carnumber,
       erorrInfo: data.erorrInfo,
       errInfoOther: data.errInfoOther,
@@ -208,7 +211,6 @@ export default function HoliyaRequestForm() {
       area: data.area,
       status: data.status,
       commanderNotes: data.commanderNotes,
-      
     };
 
     axios
@@ -269,8 +271,6 @@ export default function HoliyaRequestForm() {
       return <Navigate to="/halfim" />;
     }
   };
-
-  
 
   const showSuccess = () => (
     <Dialog
@@ -366,14 +366,14 @@ export default function HoliyaRequestForm() {
   const AddPost = () => {
     const clientJourney = [...data.clientJourney];
     clientJourney.push({
-      text : "",
-      publisher : `${user.firstName} ${user.lastName}`,
-      date : new Date().toISOString().split("T")[0],
-      published : false
-    })
-    setData((prev) => ({...prev, clientJourney,}))
+      text: "",
+      publisher: `${user.firstName} ${user.lastName}`,
+      date: new Date().toISOString().split("T")[0],
+      published: false,
+    });
+    setData((prev) => ({ ...prev, clientJourney }));
     console.log("used set data");
-  }
+  };
   const journey = data.clientJourney;
   console.log(journey);
   const halfimForm = () => (
@@ -437,43 +437,57 @@ export default function HoliyaRequestForm() {
                       />
                     </FormGroup>
                   </Col>
-                  {(user.admin === "0" || user.admin === "2") && 
-                  <Col>
-                    <FormGroup>
-                      <h6 style={{}}>הערות אחמ"ש</h6>
-                      <Input
-                        placeholder="הערות אחמ''ש"
-                        type="textarea"
-                        name="ahmashNotes"
-                        value={data.ahmashNotes}
-                        onChange={handleChange}
-                      />
-                    </FormGroup>
-                  </Col>
-                  }
+                  {(user.admin === "0" || user.admin === "2") && (
+                    <Col>
+                      <FormGroup>
+                        <h6 style={{}}>הערות אחמ"ש</h6>
+                        <Input
+                          placeholder="הערות אחמ''ש"
+                          type="textarea"
+                          name="ahmashNotes"
+                          value={data.ahmashNotes}
+                          onChange={handleChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                  )}
                 </Row>
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
-                      <h6 >מסע לקוח</h6>
-                      {journey.length > 0 && journey.map((post, index) => <>
-                        <p style={{fontSize:'large'}}>{post.publisher} {post.date}</p>
-                        <Input
-                        key={index}
-                        placeholder="מסע לקוח"
-                        type="textarea"
-                        name="clientJourney"
-                        value={post.text}
-                        onChange={(evt) => {handleClientJourneyChange(evt, index)}}
-                        disabled={post.published}
-                      />
-                      {!post.published && 
-                      <MDButton variant="gradient" color="error" iconOnly sx={{marginBottom: 1, marginTop: 1, display: 'block'}} 
-                      onClick={() => {removeClientJourneyPost(index)}}>
-                        <Icon>delete</Icon>
-                      </MDButton>}                 
-                      </>
-                      )}
+                      <h6>מסע לקוח</h6>
+                      {journey.length > 0 &&
+                        journey.map((post, index) => (
+                          <>
+                            <p style={{ fontSize: "large" }}>
+                              {post.publisher} {post.date}
+                            </p>
+                            <Input
+                              key={index}
+                              placeholder="מסע לקוח"
+                              type="textarea"
+                              name="clientJourney"
+                              value={post.text}
+                              onChange={(evt) => {
+                                handleClientJourneyChange(evt, index);
+                              }}
+                              disabled={post.published}
+                            />
+                            {!post.published && (
+                              <MDButton
+                                variant="gradient"
+                                color="error"
+                                iconOnly
+                                sx={{ marginBottom: 1, marginTop: 1, display: "block" }}
+                                onClick={() => {
+                                  removeClientJourneyPost(index);
+                                }}
+                              >
+                                <Icon>delete</Icon>
+                              </MDButton>
+                            )}
+                          </>
+                        ))}
                       <MDButton variant="gradient" color="primary" onClick={AddPost} iconOnly>
                         <Icon>add</Icon>
                       </MDButton>
@@ -491,20 +505,20 @@ export default function HoliyaRequestForm() {
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>צ'</h6>
-                      <div style={{display:"flex"}}>
-                      <Input
-                        style={{marginLeft: '5px'}}                
-                        placeholder="צ'"
-                        type="text"
-                        name="carnumber"
-                        value={data.carnumber}
-                        onChange={handleChange}
-                        maxLength={7}
-                        // minLength={7}
-                      />
-                      <MDButton variant="gradient" color="info" iconOnly>
-                        <Icon>search</Icon>
-                      </MDButton>
+                      <div style={{ display: "flex" }}>
+                        <Input
+                          style={{ marginLeft: "5px" }}
+                          placeholder="צ'"
+                          type="text"
+                          name="carnumber"
+                          value={data.carnumber}
+                          onChange={handleChange}
+                          maxLength={7}
+                          // minLength={7}
+                        />
+                        <MDButton variant="gradient" color="info" iconOnly>
+                          <Icon>search</Icon>
+                        </MDButton>
                       </div>
                     </FormGroup>
                   </Col>
@@ -547,14 +561,12 @@ export default function HoliyaRequestForm() {
                   </Col>
                 </Row>
 
-
                 {/* <Row>
                   <Col>
                   <h6>מהות התקלה</h6>
                   <Input></Input>
                   </Col>
                 </Row> */}
-
 
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
@@ -663,7 +675,7 @@ export default function HoliyaRequestForm() {
                   </Col>
                   <Col>
                     <FormGroup>
-                      <h6 >גוף מבצע</h6>
+                      <h6>גוף מבצע</h6>
                       <Input
                         placeholder="גוף מבצע"
                         type="select"
@@ -671,38 +683,33 @@ export default function HoliyaRequestForm() {
                         value={data.executiveBody}
                         onChange={handleChange}
                       >
-                         <option value="בחר">בחר</option>
-                         <option value="1">חברה אזרחית - גרירה</option>
-                         <option value="2">חברה אזרחית – ניידת שירות</option>
-                         <option value="3">צבאי</option>
-                         <option value="4">מוביל כננת</option>
-                         
+                        <option value="בחר">בחר</option>
+                        <option value="1">חברה אזרחית - גרירה</option>
+                        <option value="2">חברה אזרחית – ניידת שירות</option>
+                        <option value="3">צבאי</option>
+                        <option value="4">מוביל כננת</option>
                       </Input>
-                      </FormGroup>
-                      </Col>
+                    </FormGroup>
+                  </Col>
                 </Row>
-                     {
-                      (data.executiveBody === "1" || 
-                      data.executiveBody === "2") &&
-                      <Row>
-                      <Col/>
-                      <Col>
+                {(data.executiveBody === "1" || data.executiveBody === "2") && (
+                  <Row>
+                    <Col />
+                    <Col>
                       <FormGroup>
-                      <h6 >מספר הזמנה</h6>
+                        <h6>מספר הזמנה</h6>
                         <Input
-                        placeholder="מספר הזמנה"
-                        type="string"
-                        name="turnNumber"
-                        value={data.turnNumber}
-                        onChange={handleChange}
+                          placeholder="מספר הזמנה"
+                          type="string"
+                          name="turnNumber"
+                          value={data.turnNumber}
+                          onChange={handleChange}
                         />
                       </FormGroup>
-                      </Col>
-                      </Row>
-                      
-                     }
-                   
-                  
+                    </Col>
+                  </Row>
+                )}
+
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
@@ -732,7 +739,6 @@ export default function HoliyaRequestForm() {
                         <option value="3">מרכז</option>
                         <option value="4">הערבה</option>
                         <option value="5">איו"ש</option>
-                        
                       </Input>
                     </FormGroup>
                   </Col>
