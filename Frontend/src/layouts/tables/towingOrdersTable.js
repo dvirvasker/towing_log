@@ -53,6 +53,33 @@ const userManagementTable = () => {
   const [area, setArea] = useState("בחר");
   const [dbError, setDbError] = useState(false);
   const [toAddFile, setToAddFile] = useState(false);
+  const [data, setData] = useState({
+    fromDate: "",
+    toDate: "",
+    erorrInfo: [],
+    errInfoOther: "",
+    //
+    turnNumber: "",
+    //
+    demandDate: new Date().toISOString().split("T")[0],
+    area: "",
+    status: "",
+    commanderNotes: "",
+  });
+  const errorResArr = [
+    "לא מניע",
+    "מערכות בטיחות (הגה, בלמים)",
+    "נורת התראה אדומה",
+    "פנצ'ר",
+    "מפתח",
+    "תאונה",
+    "תקלת מנוע",
+    "חוסר נוזלים",
+    "תקלת חשמל/קצר",
+    "תיבת הילוכים",
+    "רכב נעול (פריצה)",
+    "קודן",
+  ];
   //   const { columns, rows } = authorsTableData();
   // eslint-disable-next-line consistent-return
   useEffect(() => {
@@ -69,19 +96,48 @@ const userManagementTable = () => {
     changeRoleW,
     setChangeRoleW,
     pressedID,
-  } = towingOrdersData(status, area);
+  } = towingOrdersData(status, area, data.fromDate, data.toDate);
   const handleErrorClose = () => {
     setDbError(true);
     setDbe(false);
   };
-  const handleChange =(evt)=> {
+
+  const toggleError = (evt) => {
+    const errorInfo = [...data.erorrInfo];
+    if (evt.target.checked) {
+      errorInfo.push(evt.target.value);
+      setData((prev) => ({ ...prev, [evt.target.name]: errorInfo }));
+    } else {
+      const index = errorInfo.indexOf(evt.target.value);
+      errorInfo.splice(index, 1);
+      // console.log(filtered);
+      setData((prev) => ({ ...prev, [evt.target.name]: errorInfo }));
+    }
+  };
+
+  const errorInput = (val) => (
+    <div style={{ display: "flex", paddingLeft: "0.5%" }}>
+      <Input
+        style={{ marginLeft: "5px" }}
+        type="checkbox"
+        name="erorrInfo"
+        value={val}
+        onClick={toggleError}
+      />
+      <p>{val}</p>
+    </div>
+  );
+
+  const handleChange = (evt) => {
     const { value, name } = evt.target;
     if (name === "status") {
       setStatus(value);
     } else if (name === "area") {
       setArea(value);
+    } else if (name === "fromDate" || name === "toDate") {
+      setData({ ...data, [name]: value });
     }
-  }
+  };
   const addFile = () => (
     <Dialog
       px={5}
@@ -286,6 +342,57 @@ const userManagementTable = () => {
                     <option value="הערבה">הערבה</option>
                     <option value="איו''ש">איוש</option>
                   </Input>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <FormGroup>
+                    <h6 style={{}}>מתאריך</h6>
+                    <Input
+                      placeholder="מתאריך"
+                      type="date"
+                      name="fromDate"
+                      value={data.fromDate}
+                      onChange={handleChange}
+                    />
+                  </FormGroup>
+                </Col>
+                <Col>
+                  <FormGroup>
+                    <h6 style={{}}>עד תאריך</h6>
+                    <Input
+                      placeholder="עד תאריך"
+                      type="date"
+                      name="toDate"
+                      value={data.toDate}
+                      onChange={handleChange}
+                    />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <h6>מהות התקלה</h6>
+                  <div style={{ display: "flex", flexWrap: "wrap" }}>
+                    {errorResArr.map((res) => errorInput(res))}
+                    {data.erorrInfo.includes("אחר") && (
+                      <>
+                        <p>הערות: </p>
+                        <Row>
+                          <Col>
+                            <Input
+                              // style={{display:'inline', width:'320px'}}
+                              placeholder="הערות"
+                              name="errInfoOther"
+                              value={data.errInfoOther}
+                              onChange={handleChange}
+                              type="text"
+                            />
+                          </Col>
+                        </Row>
+                      </>
+                    )}
+                  </div>
                 </Col>
               </Row>
             </MDBox>

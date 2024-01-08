@@ -43,7 +43,7 @@ import { Link, useParams } from "react-router-dom";
 // import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 // import logoInvesion from "assets/images/small-logos/logo-invision.svg";
 
-export default function data(status, area) {
+export default function data(status, area, fromDate, toDate) {
   // const Project = ({ image, name }) => (
   //   <MDBox display="flex" alignItems="center" lineHeight={1}>
   //     <MDAvatar src={image} name={name} size="sm" variant="rounded" />
@@ -91,6 +91,17 @@ export default function data(status, area) {
       filter2 = filter1;
     } else if (area) {
       filter2 = filter1.filter((el) => el.area === area);
+    }
+
+    let filter3 = [];
+    if (fromDate && toDate) {
+      filter3 = filter2.filter(
+        (el) =>
+          new Date(el.orderDate).setHours(0, 0, 0, 0) >= new Date(fromDate).setHours(0, 0, 0, 0) &&
+          new Date(el.orderDate).setHours(0, 0, 0, 0) <= new Date(toDate).setHours(0, 0, 0, 0)
+      );
+    } else {
+      filter3 = filter2;
     }
 
     // let filter3 = [];
@@ -143,12 +154,12 @@ export default function data(status, area) {
     //   filter6 = filter5.filter((el) => el.classReport === typeclass.classReport.id);
     // }
 
-    setRequestDB(filter2);
+    setRequestDB(filter3);
   };
 
   useEffect(async () => {
     filteruse();
-  }, [status, area]);
+  }, [status, area, fromDate, toDate]);
 
   useEffect(() => {
     axios

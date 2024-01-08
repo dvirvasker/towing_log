@@ -113,6 +113,7 @@ export default function HoliyaRequestForm() {
     status: "",
     commanderNotes: "",
   });
+  const carDataInfoArray = [];
   console.log(data);
 
   const min = 0;
@@ -130,19 +131,17 @@ export default function HoliyaRequestForm() {
       .get(`http://localhost:5000/TowingLogApi/get_banks`)
       .then((response) => {
         setBankData(response.data.data);
-
       })
       .catch((error) => {});
+  }, []);
 
-    }, []);
-
-    useEffect(() => {
+  useEffect(() => {
     axios
       .get(`http://localhost:5000/TowingLogApi/CarDatas`)
       .then((response) => {
         console.log(response.data);
-        response.data.forEach(carDataInfo => {
-          const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId]
+        response.data.forEach((carDataInfo) => {
+          const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId];
           carDataInfo.gdodName = gdod.name;
           carDataInfo.hativaId = gdod.hativaId;
           const hativa = bankData.Unit_bank.hativas[carDataInfo.hativaId];
@@ -153,52 +152,47 @@ export default function HoliyaRequestForm() {
           carDataInfo.pikodId = ogda.pikodId;
           const pikod = bankData.Unit_bank.pikods[carDataInfo.pikodId];
           carDataInfo.pikodName = pikod.name;
-          console.log(carDataInfo);
-        })
+          // console.log(carDataInfo);
+        });
         setCarData(response.data);
       })
       .catch((error) => {});
+  }, [bankData]);
 
-    }, [bankData]);
-
-    useEffect(() => {
-      axios
+  useEffect(() => {
+    axios
       .get(`http://localhost:5000/TowingLogApi/Garages`)
       .then((response) => {
         setGaragesData(response.data);
-
       })
       .catch((error) => {});
-    }, []);
+  }, []);
 
-    useEffect(() => {
-      axios
+  useEffect(() => {
+    axios
       .get(`http://localhost:5000/TowingLogApi/CarTypes`)
       .then((response) => {
         setCarTypesData(response.data);
-
       })
       .catch((error) => {});
-    }, []);
+  }, []);
 
-    useEffect(() => {
-      axios
+  useEffect(() => {
+    axios
       .get(`http://localhost:5000/TowingLogApi/TowingOrder`)
       .then((response) => {
         setOrdersData(response.data);
-
       })
       .catch((error) => {});
-      
   }, []);
 
   console.log(carData);
   console.log(garagesData);
   console.log(carTypesData);
   console.log(ordersData);
-  console.log("bank: ")
+  console.log("bank: ");
   console.log(bankData);
-  
+
   const handleClientJourneyChange = (evt, key) => {
     const index = key;
     const { value } = evt.target;
@@ -231,64 +225,54 @@ export default function HoliyaRequestForm() {
     const AddError = (error) => {
       flag = false;
       ErrorReason.push(error);
-    }
+    };
     if (!data.orderDate) {
       AddError("תאריך ריק");
     }
-    if(!data.orderTime || data.orderDate === "")
-    {
+    if (!data.orderTime || data.orderDate === "") {
       AddError("שעה ריקה");
     }
-    if(data.serviceName === "")
-    {
-      AddError("שם נציג שירות ריק")
+    if (data.serviceName === "") {
+      AddError("שם נציג שירות ריק");
     }
-    if(data.carnumber === "")
-    {
-      AddError("צ' ריק")
+    if (data.carnumber === "") {
+      AddError("צ' ריק");
+    } else if (!(digitsOnly(data.carnumber) && data.carnumber.length <= 7)) {
+      AddError("צ' לא תקין");
     }
-    else if(!(digitsOnly(data.carnumber) && data.carnumber.length <= 7))
-    {
-      AddError("צ' לא תקין")
+    if (data.erorrInfo.length === 0) {
+      AddError("לא רשומה סיבת תקלה");
     }
-    if(data.erorrInfo.length() === 0)
-    {
-      AddError("לא רשומה סיבת תקלה")
-    }
-    if(data.erorrInfo.includes("אחר"))
-    {
-      if(data.errInfoOther.trim() === "")
-      {
-        AddError("הערות ריק")
+    if (data.erorrInfo.includes("אחר")) {
+      if (data.errInfoOther.trim() === "") {
+        AddError("הערות ריק");
       }
     }
-    if(data.location.trim === ""){
-      AddError("מיקום ריק")
+    if (data.location.trim === "") {
+      AddError("מיקום ריק");
     }
-    if(data.garage === "" ||  data.garage === "בחר")
-    {
-      AddError("לגרור ל, ריק")
+    if (data.garage === "" || data.garage === "בחר") {
+      AddError("לגרור ל, ריק");
     }
-    if(data.fullName.trim() === "")
-    {
-      AddError("שם מלא ריק")
+    if (data.fullName.trim() === "") {
+      AddError("שם מלא ריק");
     }
-    if(!(data.phoneNumber.length))
-    // if (data.personalnumber === "" || data.personalnumber === undefined) {
-    //   flag = false;
-    //   ErrorReason.push("מספר אישי ריק");
-    // }
+    if (!data.phoneNumber.length)
+      if (flag !== true) {
+        // if (data.personalnumber === "" || data.personalnumber === undefined) {
+        //   flag = false;
+        //   ErrorReason.push("מספר אישי ריק");
+        // }
 
-    if (flag !== true) {
-      ErrorReason.forEach((reason) => {
-        toast.error(reason);
-        return false;
-      });
-    } else {
-      return true;
-    }
+        ErrorReason.forEach((reason) => {
+          toast.error(reason);
+          return false;
+        });
+      } else {
+        return true;
+      }
   };
-  
+
   const SendFormData = (event) => {
     event.preventDefault();
     setData({
@@ -323,6 +307,7 @@ export default function HoliyaRequestForm() {
       status: data.status,
       commanderNotes: data.commanderNotes,
     };
+    console.log(requestData);
 
     axios
       .post(`http://localhost:5000/TowingLogApi/TowingOrder/add`, requestData)
@@ -490,29 +475,29 @@ export default function HoliyaRequestForm() {
 
   const toggleError = (evt) => {
     const errorInfo = [...data.erorrInfo];
-    if(evt.target.checked)
-    {
+    if (evt.target.checked) {
       errorInfo.push(evt.target.value);
-      setData((prev) => ({...prev, [evt.target.name]:errorInfo}))
-    }
-    else
-    {
+      setData((prev) => ({ ...prev, [evt.target.name]: errorInfo }));
+    } else {
       const index = errorInfo.indexOf(evt.target.value);
       errorInfo.splice(index, 1);
       // console.log(filtered);
-      setData((prev) => ({...prev, [evt.target.name] : errorInfo}))
+      setData((prev) => ({ ...prev, [evt.target.name]: errorInfo }));
     }
-  }
+  };
 
-  const errorInput = (val) => (<div style={{display: 'flex'}}>
-    <Input style={{marginLeft: '5px'}} 
-    type="checkbox"
-    name="erorrInfo"
-    value={val}
-    onClick={toggleError}
+  const errorInput = (val) => (
+    <div style={{ display: "flex" }}>
+      <Input
+        style={{ marginLeft: "5px" }}
+        type="checkbox"
+        name="erorrInfo"
+        value={val}
+        onClick={toggleError}
       />
       <p>{val}</p>
-      </div>)
+    </div>
+  );
 
   const errorResArr = [
     "לא מניע",
@@ -527,17 +512,18 @@ export default function HoliyaRequestForm() {
     "תיבת הילוכים",
     "רכב נעול (פריצה)",
     "קודן",
-    "אחר"
-  ]
-  console.log("מערך סיבות טעות")
+    "אחר",
+  ];
+  console.log("מערך סיבות טעות");
   console.log(data.erorrInfo);
 
   const SearchCarNumber = (carNumber) => {
-    if(carNumber.trim() !== "")
-    {
+    if (carNumber.trim() !== "") {
+      carDataInfoArray.push(carData.filter((el) => el.carnumber === carNumber));
+      console.log(carDataInfoArray);
       console.log(`Car number searched:  ${carNumber}`);
     }
-  }
+  };
   const halfimForm = () => (
     <Container className="" dir="rtl">
       <Row className="justify-content-center">
@@ -675,11 +661,15 @@ export default function HoliyaRequestForm() {
                           name="carnumber"
                           value={data.carnumber}
                           onChange={handleChange}
-                          maxLength={7}
-                          // minLength={7}
+                          maxLength={8}
                         />
-                        <MDButton variant="gradient" color="info" iconOnly
-                        onClick={() => {SearchCarNumber(data.carnumber)}}
+                        <MDButton
+                          variant="gradient"
+                          color="info"
+                          iconOnly
+                          onClick={() => {
+                            SearchCarNumber(data.carnumber);
+                          }}
                         >
                           <Icon>search</Icon>
                         </MDButton>
@@ -712,11 +702,12 @@ export default function HoliyaRequestForm() {
                         // disabled={data.carnumber.trim() === ""}
                       >
                         <option value="בחר">בחר</option>
-                        {carTypesData.map((carType) => <>
-                        <option value={carType._id}>{carType.carType}</option>
-                        </>)}
-                        </Input>
-                      
+                        {carTypesData.map((carType) => (
+                          <>
+                            <option value={carType._id}>{carType.carType}</option>
+                          </>
+                        ))}
+                      </Input>
                     </FormGroup>
                   </Col>
                   <Col>
@@ -734,67 +725,51 @@ export default function HoliyaRequestForm() {
                   </Col>
                 </Row>
                 <Row>
-                <Col>
-                  <h6>פיקוד</h6>
-                  <Input
-                  type="text"
-                  placeholder="פיקוד"
-                  />
+                  <Col>
+                    <h6>פיקוד</h6>
+                    <Input type="text" placeholder="פיקוד" />
                   </Col>
 
                   <Col>
-                  <h6>אוגדה</h6>
-                  <Input
-                  type="text"
-                  placeholder="אוגדה"
-                  />
+                    <h6>אוגדה</h6>
+                    <Input type="text" placeholder="אוגדה" />
                   </Col>
 
                   <Col>
-                  <h6>חטיבה</h6>
-                  <Input
-                  type="text"
-                  placeholder="חטיבה"
-                  />
+                    <h6>חטיבה</h6>
+                    <Input type="text" placeholder="חטיבה" />
                   </Col>
 
                   <Col>
-                  <h6>גדוד</h6>
-                  <Input
-                  type="text"
-                  placeholder="גדוד"
-                  />
+                    <h6>גדוד</h6>
+                    <Input type="text" placeholder="גדוד" />
                   </Col>
-
-                  
                 </Row>
                 <Row>
                   <Col>
-                  <h6>מהות התקלה</h6>
-                  <div style={{display: 'flex', flexWrap:'wrap', gap: '10px'}}>
-                  {errorResArr.map((res) =>  errorInput(res)
-                  )}
-                   {
-                  data.erorrInfo.includes("אחר") && <>
-                    <p >הערות: </p>
-                    <Row>
-                      <Col>
-                    <Input 
-                    // style={{display:'inline', width:'320px'}}
-                    placeholder="הערות"
-                    name="errInfoOther"
-                    value={data.errInfoOther}
-                    onChange={handleChange}
-                    type="text"
-                    />
-                    </Col></Row>
-                    
-                   </>
-                }
-                  </div>
+                    <h6>מהות התקלה</h6>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                      {errorResArr.map((res) => errorInput(res))}
+                      {data.erorrInfo.includes("אחר") && (
+                        <>
+                          <p>הערות: </p>
+                          <Row>
+                            <Col>
+                              <Input
+                                // style={{display:'inline', width:'320px'}}
+                                placeholder="הערות"
+                                name="errInfoOther"
+                                value={data.errInfoOther}
+                                onChange={handleChange}
+                                type="text"
+                              />
+                            </Col>
+                          </Row>
+                        </>
+                      )}
+                    </div>
                   </Col>
                 </Row>
-               
 
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>

@@ -21,14 +21,36 @@ exports.read = async (req, res) => {
 };
 
 exports.create = (req, res) => {
+  console.log(req.body);
   const reference = req.body.reference;
   const orderDate = req.body.orderDate;
   const orderTime = req.body.orderTime;
   const serviceName = req.body.serviceName;
   const ahmashNotes = req.body.ahmashNotes;
-  const clientJourney = req.body.clientJourney;
+
+  const clientJourneyArray = [];
+  req.body.clientJourney.forEach((element) => {
+    const journey = {
+      text: element.text,
+      publisher: element.publisher,
+      date: element.date,
+      published: element.published,
+    };
+    clientJourneyArray.push(journey);
+  });
+  // const propPrints = propPrintsrray;
+
+  const clientJourney = clientJourneyArray;
+
   const carnumber = req.body.carnumber;
-  const erorrInfo = req.body.erorrInfo;
+
+  const erorrInfoArray = [];
+  req.body.erorrInfo.forEach((element) => {
+    erorrInfoArray.push(element);
+  });
+
+  const erorrInfo = erorrInfoArray;
+
   const errInfoOther = req.body.errInfoOther;
   const location = req.body.location;
   const garage = req.body.garage;
