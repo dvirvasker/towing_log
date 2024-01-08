@@ -56,7 +56,7 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { Collapse } from "@mui/material";
 import NGTeamLogo from "assets/images/NewNGlogoWhite.svg";
 import hozlaLogo from "assets/images/hozlaLogo.png";
-import mekatnarLogo from "assets/images/unitsimg/mekatnar58.png";
+import EgedArziLogo from "assets/images/unitsimg/EgedArzi.png";
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
@@ -363,8 +363,8 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       <List>{renderRoutes}</List>
       <MDBox
         component="img"
-        src={mekatnarLogo}
-        alt="mekatnarLogo"
+        src={EgedArziLogo}
+        alt="EgedArziLogo"
         width="70px"
         alignSelf="center"
         sx={{

@@ -43,7 +43,7 @@ import { Link, useParams } from "react-router-dom";
 // import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 // import logoInvesion from "assets/images/small-logos/logo-invision.svg";
 
-export default function data() {
+export default function data(status, area) {
   // const Project = ({ image, name }) => (
   //   <MDBox display="flex" alignItems="center" lineHeight={1}>
   //     <MDAvatar src={image} name={name} size="sm" variant="rounded" />
@@ -55,6 +55,7 @@ export default function data() {
   const params = useParams();
   const [isError, setIsError] = useState(false);
   const [requestDB, setRequestDB] = useState([]);
+  const [originaldata, setOriginaldata] = useState([]);
   const [isInfoPressed, setIsInfoPressed] = useState(false);
   const [pressedID, setpressedID] = useState("");
   const [changeRoleW, setChangeRoleW] = useState(false);
@@ -62,16 +63,105 @@ export default function data() {
   const [user, setUser] = useState(isAuthenticated());
   const MINUTE_MS = 100000;
 
+  const options = {
+    // weekday: 'long', // or 'short', 'narrow'
+    year: "numeric",
+    month: "numeric", // or 'short', 'narrow'
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    // second: 'numeric',
+    // timeZoneName: 'short', // or 'long'
+  };
+
+  const filteruse = () => {
+    const beforfilter = originaldata;
+    // console.log(beforfilter);
+    let filter1 = [];
+
+    if (status === "בחר" || status === undefined) {
+      filter1 = beforfilter;
+    } else if (status) {
+      filter1 = beforfilter.filter((el) => el.status === status);
+    }
+
+    let filter2 = [];
+
+    if (area === "בחר" || area === undefined) {
+      filter2 = filter1;
+    } else if (area) {
+      filter2 = filter1.filter((el) => el.area === area);
+    }
+
+    // let filter3 = [];
+
+    // if (visitWanted === "בחר" || visitWanted === undefined) {
+    //   filter3 = filter2;
+    // } else if (visitWanted === "true") {
+    //   filter3 = filter2.filter((el) => el.visitWanted === true);
+    // } else if (visitWanted === "false") {
+    //   filter3 = filter2.filter((el) => el.visitWanted === false);
+    // }
+
+    // let filter4 = [];
+
+    // if (dead === "בחר" || dead === undefined) {
+    //   filter4 = filter3;
+    // } else if (dead === "true") {
+    //   filter4 = filter3.filter((el) => el.dead === true);
+    // } else if (dead === "false") {
+    //   filter4 = filter3.filter((el) => el.dead === false);
+    // }
+
+    // let filter5 = [];
+
+    // if (statusre.status === "בחר" || statusre.status === undefined) {
+    //   filter5 = filter4;
+    // } else if (statusre.status === "5") {
+    //   filter5 = filter4.filter((el) => el.status === 5);
+    // } else if (statusre.status === "15") {
+    //   filter5 = filter4.filter((el) => el.status === 15);
+    // } else if (statusre.status === "25") {
+    //   filter5 = filter4.filter((el) => el.status === 25);
+    // } else if (statusre.status === "50") {
+    //   filter5 = filter4.filter((el) => el.status === 50);
+    // } else if (statusre.status === "75") {
+    //   filter5 = filter4.filter((el) => el.status === 75);
+    // } else if (statusre.status === "100") {
+    //   filter5 = filter4.filter((el) => el.status === 100);
+    // } else if (statusre.status === "888") {
+    //   filter5 = filter4.filter((el) => el.status === 888);
+    // } else if (statusre.status === "999") {
+    //   filter5 = filter4.filter((el) => el.status === 999);
+    // }
+
+    // let filter6 = [];
+
+    // if (typeclass.classReport === "בחר" || typeclass.classReport === undefined) {
+    //   filter6 = filter5;
+    // } else {
+    //   filter6 = filter5.filter((el) => el.classReport === typeclass.classReport.id);
+    // }
+
+    setRequestDB(filter2);
+  };
+
+  useEffect(async () => {
+    filteruse();
+  }, [status, area]);
+
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/TowingLogApi/usersLevel`)
+      .get(`http://localhost:5000/TowingLogApi/TowingOrder`)
       .then((response) => {
-        // console.log(response.data);
-        if (user.user.admin === "0") {
-          setRequestDB(response.data);
-        } else {
-          setRequestDB(response.data.filter((u) => u.admin !== "0"));
-        }
+        console.log(response.data);
+        // if (response.data !== null) {
+        setRequestDB(response.data);
+        setOriginaldata(response.data);
+        // }
+        // else {
+        //   setRequestDB(response.data.filter((u) => u.admin !== "0"));
+        // }
       })
       .catch((error) => {
         // console.log(error);
@@ -178,34 +268,21 @@ export default function data() {
 
   const dbRows = requestDB.map((towingOrder, index) => ({
     // fileID: towingOrder._id,
-    reference: towingOrder.personalnumber,
-    orderDate: towingOrder.firstName,
-    carnumber: towingOrder.lastName,
-    location: towingOrder.personalnumber,
-    garage: towingOrder.firstName,
+    reference: towingOrder.reference,
+    orderDate: new Date(towingOrder.orderDate)
+      .toLocaleDateString(undefined, options)
+      .split(", ")[0],
+    carnumber: towingOrder.carnumber,
+    location: towingOrder.location,
+    garage: towingOrder.garage,
     executiveBody: towingOrder.executiveBody,
-    demandDate: towingOrder.personalnumber,
-    area: towingOrder.firstName,
-    status: towingOrder.lastName,
-    userAprroved: (
-      <MDBadge
-        badgeContent={towingOrder.approved ? "מאושר" : "לא מאושר"}
-        variant="contained"
-        container
-        value={towingOrder.approved}
-        color={towingOrder.approved ? "success" : "error"}
-      />
-    ),
-    userType: (
-      <MDBadge
-        badgeContent={setTypeUser(towingOrder.admin)[0]}
-        color={setTypeUser(towingOrder.admin)[1]}
-        size="sm"
-        container
-      />
-    ),
+    demandDate: new Date(towingOrder.demandDate)
+      .toLocaleDateString(undefined, options)
+      .split(", ")[0],
+    area: towingOrder.area,
+    status: towingOrder.status,
     editPower: (
-      <Link to={`/authentication/admin/edituser/${towingOrder._id}`} key={towingOrder._id}>
+      <Link to={`/towingorders/${towingOrder._id}`} key={towingOrder._id}>
         <MDButton variant="gradient" color="mekatnar" circular="true" iconOnly="true" size="medium">
           <Icon>edit</Icon>
         </MDButton>

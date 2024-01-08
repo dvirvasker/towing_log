@@ -62,6 +62,15 @@ app.use("/TowingLogApi", userRoutes);
 const TowingOrder = require("./routes/towingorder/towingorder");
 app.use("/TowingLogApi/TowingOrder", TowingOrder);
 
+const CarTypes = require("./routes/cartypes/cartypes");
+app.use("/TowingLogApi/CarTypes", CarTypes);
+
+const Garages = require("./routes/garages/garages");
+app.use("/TowingLogApi/Garages", Garages);
+
+const CarDatas = require("./routes/cardatas/cardatas");
+app.use("/TowingLogApi/CarDatas", CarDatas);
+
 //* file uploader Routes
 // upload files
 const fileuploaderRoutes = require("./routes/fileuploader/fileuploader");

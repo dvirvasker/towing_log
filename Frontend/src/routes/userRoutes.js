@@ -41,6 +41,7 @@ Coded by www.creative-tim.com
 // Material Dashboard 2 React layouts
 import KshirotMisgrot from "layouts/dashboard/kshirotMisgrot";
 import GenralInfo from "layouts/dashboard/genralInfo";
+import TowingOrders from "layouts/tables/towingOrdersTable";
 import MashkTech from "layouts/dashboard/mashkTeh";
 import NesoaShchikaDashbord from "layouts/dashboard/nesoaShchika";
 import Dashboard from "layouts/dashboard/Tene/dashMain";
@@ -61,7 +62,7 @@ const routes = [
     key: "towingorders",
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/towingorders",
-    component: <GenralInfo />,
+    component: <TowingOrders />,
   },
   {
     type: "collapse",

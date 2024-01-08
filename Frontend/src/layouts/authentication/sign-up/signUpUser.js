@@ -52,7 +52,7 @@ import { Dialog, DialogContent, DialogContentText, DialogTitle, Modal } from "@m
 import { authenticate, isAuthenticated, signin, signout, updateRefreshCount } from "auth/index";
 
 // Images
-import bgImage from "assets/images/greenBG.jpg";
+import bgImage from "assets/images/hummer.jpg";
 
 // import bgImage from "assets/images/skydesertBackgroundImage.jpg";
 // import bgImage from "assets/images/desertBackgroundImage.jpg";
@@ -71,7 +71,7 @@ function SignUpUser() {
     lastName: "",
     personalnumber: "",
 
-    admin: "1",
+    admin: "",
 
     password: "",
 
@@ -154,7 +154,7 @@ function SignUpUser() {
           נרשמת בהצלחה למערכת
         </MDTypography>
         <MDButton onClick={handleCloseSuccsecModal} variant="gradient" color="light">
-          {signUpData.admin === "1" ? "סגירה" : "מעבר לאתר"}
+          {signUpData.admin === "1" || signUpData.admin === "2" ? "סגירה" : "מעבר לאתר"}
         </MDButton>
       </MDBox>
     </Dialog>
@@ -258,6 +258,11 @@ function SignUpUser() {
       ErrorReason.push("אנא הכנס שם משפחה");
       // toast.error(ErrorReason);
     }
+    if (signUpData.admin === "") {
+      flag = false;
+      ErrorReason.push("אנא בחר הרשאה");
+      // toast.error(ErrorReason);
+    }
     // if (signUpData.admin === "") {
     //   flag = false;
     //   ErrorReason.push("אנא בחר סוג משתמש ");
@@ -302,8 +307,8 @@ function SignUpUser() {
       firstName: signUpData.firstName,
       lastName: signUpData.lastName,
       personalnumber: signUpData.personalnumber,
-      admin: "1",
-      approved: true,
+      admin: signUpData.admin,
+      approved: false,
       password: signUpData.password,
     };
     await axios
@@ -313,9 +318,9 @@ function SignUpUser() {
         console.log(`${res.data}`);
         console.log({ personalnumber: res.data.user.personalnumber });
         console.log(res.data.user.personalnumber);
-        if (signUpData.admin === "1") {
-          authenticate(res.data);
-        }
+        // if (signUpData.admin === "0") {
+        //   authenticate(res.data);
+        // }
         setSignUpData({ ...signUpData, loading: false, error: false, successmsg: true });
         const count = parseInt(localStorage.getItem("RefreshCount"), 10) + 1;
         updateRefreshCount(count);
@@ -360,30 +365,6 @@ function SignUpUser() {
             <MDInput
               required
               type="text"
-              name="personalnumber"
-              onChange={handleChange}
-              variant="standard"
-              label="מספר אישי"
-              value={signUpData.personalnumber}
-              fullWidth
-            />
-          </MDBox>
-          <MDBox mb={2}>
-            <MDInput
-              required
-              type="text"
-              name="password"
-              onChange={handleChange}
-              variant="standard"
-              label="סיסמא"
-              value={signUpData.password}
-              fullWidth
-            />
-          </MDBox>
-          <MDBox mb={2}>
-            <MDInput
-              required
-              type="text"
               name="firstName"
               label="שם פרטי"
               variant="standard"
@@ -404,6 +385,49 @@ function SignUpUser() {
               fullWidth
             />
           </MDBox>
+          <MDBox mb={2}>
+            <MDInput
+              required
+              type="text"
+              name="password"
+              onChange={handleChange}
+              variant="standard"
+              label="סיסמא"
+              value={signUpData.password}
+              fullWidth
+            />
+          </MDBox>
+          <MDBox mb={2}>
+            <MDInput
+              required
+              type="text"
+              name="personalnumber"
+              onChange={handleChange}
+              variant="standard"
+              label="מספר אישי"
+              value={signUpData.personalnumber}
+              fullWidth
+            />
+          </MDBox>
+          <FormControl required>
+            <InputLabel id="demo-simple-select-autowidth-label">בחר הרשאה</InputLabel>
+            <Select
+              required
+              labelId="demo-simple-select-autowidth-label"
+              name="admin"
+              id="demo-simple-select-autowidth"
+              value={signUpData.admin}
+              onChange={handleChange}
+              autoWidth
+              label="בחר הרשאה"
+              sx={{ height: 50, minWidth: 150 }}
+            >
+              <MenuItem value="0">מפקד מוקד</MenuItem>
+              <MenuItem value="1">מוקדנית</MenuItem>
+              <MenuItem value="2">אחמ"ש</MenuItem>
+            </Select>
+          </FormControl>
+
           {/* <FormControl required>
             <InputLabel id="demo-simple-select-autowidth-label">בחר הרשאה</InputLabel>
             <Select

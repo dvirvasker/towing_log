@@ -389,15 +389,9 @@ function EditUser() {
               label="בחר הרשאה"
               sx={{ height: 50, minWidth: 150 }}
             >
-              <MenuItem value="0">מנהל מערכת</MenuItem>
-              <MenuItem value="1">משתמש רגיל</MenuItem>
-              <MenuItem value="2">משתמש כוח אדם</MenuItem>
-              <MenuItem value="3">משתמש תא חיזוי</MenuItem>
-              <MenuItem value="4">משתמש תא כשירות המסגרת</MenuItem>
-              <MenuItem value="5">משתמש תא אחזקות בתעשייה</MenuItem>
-              <MenuItem value="6">משתמש חלפים</MenuItem>
-              <MenuItem value="7">משתמש תא אמל"ח וטכנולגיות</MenuItem>
-              <MenuItem value="8">משתמש תא משקים מטכל"ים</MenuItem>
+              <MenuItem value="0">מפקד מוקד</MenuItem>
+              <MenuItem value="1">מוקדנית</MenuItem>
+              <MenuItem value="2">אחמ"ש</MenuItem>
             </Select>
           </FormControl>
 

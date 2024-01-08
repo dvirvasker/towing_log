@@ -105,7 +105,7 @@ export default function HoliyaRequestForm() {
 
    
   });
-  console.log(data.orderTime);
+  console.log(data);
 
   const min = 0;
   const max = 100;
@@ -124,8 +124,8 @@ export default function HoliyaRequestForm() {
     // }
     // else
     // {
-      setData({ ...data, [evt.target.name]: value });
-      console.log(value);
+    setData({ ...data, [evt.target.name]: value });
+    console.log(value);
     // }
   }
   const handleClientJourneyChange = (evt, key) => {

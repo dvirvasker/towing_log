@@ -1,7 +1,7 @@
 const TowingOrder = require("../../models/towingOrder/towingOrder");
 
 exports.find = (req, res) => {
-  TowingOrder.findOne((err, towingorder) => {
+  TowingOrder.find((err, towingorder) => {
     if (err) res.send(err);
     res.json(towingorder);
   }).sort({ createdAt: -1 });

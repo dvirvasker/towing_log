@@ -164,10 +164,9 @@ const userManagementTable = () => {
                 sx={{ height: 50, minWidth: 150 }}
               >
                 <MenuItem value="">בחר</MenuItem>
-                <MenuItem value="00">משתמש רגיל</MenuItem>
-                <MenuItem value="11">מבקר</MenuItem>
-                <MenuItem value="12">מנהל מערכת</MenuItem>
-                <MenuItem value="22">מנהל מערכת ראשי</MenuItem>
+                <MenuItem value="0">מפקד מוקד</MenuItem>
+                <MenuItem value="1">מוקדנית</MenuItem>
+                <MenuItem value="2">אחמ"ש</MenuItem>
               </Select>
             </FormControl>
           </MDBox>
