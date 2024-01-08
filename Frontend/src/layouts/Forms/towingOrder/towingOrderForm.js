@@ -72,8 +72,26 @@ const { user } = isAuthenticated();
 export default function HoliyaRequestForm() {
   const [archiveData, setArchiveData] = useState([]);
   const [checkData, setCheckData] = useState("update");
+  const createReference = () => {
+    const referenceDate = new Date()
+      .toISOString()
+      .substring(3)
+      .replace(/-/g, "")
+      .replace(/T/g, "")
+      .replace(/:/g, "")
+      .split(".")[0];
+    console.log(referenceDate);
+    return referenceDate;
+  };
   const [data, setData] = useState({
     personalnumber: user.personalnumber,
+    reference: new Date()
+      .toISOString()
+      .substring(3)
+      .replace(/-/g, "")
+      .replace(/T/g, "")
+      .replace(/:/g, "")
+      .split(".")[0],
     urgent: false,
 
     date_update: new Date().toISOString(),
@@ -81,11 +99,11 @@ export default function HoliyaRequestForm() {
     orderDate: new Date().toISOString().split("T")[0],
     orderTime: new Date().toISOString().split("T")[1].split(".")[0],
     //
-    serviceName : "",
+    serviceName: "",
     //
-    ahmashNotes : "",
+    ahmashNotes: "",
     //
-    clientJourney : [], // {text : string, publisher : string (first + last name), date, published : boolean (before posting/updating = false, after posting becomes true)}
+    clientJourney: [], // {text : string, publisher : string (first + last name), date, published : boolean (before posting/updating = false, after posting becomes true)}
     mk3Number: 0,
     namerNumber: 0,
     pumaNumber: 0,
@@ -124,7 +142,7 @@ export default function HoliyaRequestForm() {
     loading: false,
     NavigateToReferrer: false,
   });
-  console.log(data.orderTime);
+  console.log(data);
 
   const min = 0;
   const max = 100;
@@ -140,8 +158,8 @@ export default function HoliyaRequestForm() {
     // }
     // else
     // {
-      setData({ ...data, [evt.target.name]: value });
-      console.log(value);
+    setData({ ...data, [evt.target.name]: value });
+    console.log(value);
     // }
   }
 

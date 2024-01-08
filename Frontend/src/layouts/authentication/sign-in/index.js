@@ -49,7 +49,7 @@ import { Dialog, DialogContent, DialogContentText, DialogTitle, Modal } from "@m
 import { authenticate, isAuthenticated, signin, signout, updateRefreshCount } from "auth/index";
 
 // Images
-import bgImage from "assets/images/greenBG.jpg";
+import bgImage from "assets/images/hummer.jpg";
 // import bgImage from "assets/images/skydesertBackgroundImage.jpg";
 // import bgImage from "assets/images/desertBackgroundImage.jpg";
 import manualHoliyotPDF from "assets/docs/manualHoliyot.pdf";

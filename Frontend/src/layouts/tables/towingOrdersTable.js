@@ -49,6 +49,8 @@ import { CardBody, Col, Container, Form, FormGroup, FormText, Input, Label, Row 
 const userManagementTable = () => {
   const tableTittle = "הזמנות גרירה";
 
+  const [status, setStatus] = useState("בחר");
+  const [area, setArea] = useState("בחר");
   const [dbError, setDbError] = useState(false);
   const [toAddFile, setToAddFile] = useState(false);
   //   const { columns, rows } = authorsTableData();
@@ -67,11 +69,19 @@ const userManagementTable = () => {
     changeRoleW,
     setChangeRoleW,
     pressedID,
-  } = towingOrdersData();
+  } = towingOrdersData(status, area);
   const handleErrorClose = () => {
     setDbError(true);
     setDbe(false);
   };
+  function handleChange(evt) {
+    const { value, name } = evt.target;
+    if (name === "status") {
+      setStatus(value);
+    } else if (name === "area") {
+      setArea(value);
+    }
+  }
   const addFile = () => (
     <Dialog
       px={5}
@@ -183,11 +193,9 @@ const userManagementTable = () => {
                 label="בחר סוג משתמש"
                 sx={{ height: 50, minWidth: 150 }}
               >
-                <MenuItem value="">בחר</MenuItem>
-                <MenuItem value="00">משתמש רגיל</MenuItem>
-                <MenuItem value="11">מבקר</MenuItem>
-                <MenuItem value="12">מנהל מערכת</MenuItem>
-                <MenuItem value="22">מנהל מערכת ראשי</MenuItem>
+                <MenuItem value="0">מפקד מוקד</MenuItem>
+                <MenuItem value="1">מוקדנית</MenuItem>
+                <MenuItem value="2">אחמ"ש</MenuItem>
               </Select>
             </FormControl>
           </MDBox>
@@ -230,6 +238,56 @@ const userManagementTable = () => {
                 </MDButton>
                 {/* </Link> */}
               </Grid>
+            </MDBox>
+            <MDBox mx={2} mt={1} px={2}>
+              <Row>
+                <Col
+                  style={{
+                    justifyContent: "right",
+                    alignContent: "right",
+                    textAlign: "right",
+                  }}
+                >
+                  <h6 style={{}}>סטטוס</h6>
+                  <Input
+                    placeholder="סטטוס"
+                    type="select"
+                    name="status"
+                    value={status}
+                    onChange={handleChange}
+                  >
+                    <option value="בחר">בחר</option>
+                    <option value="פתוח">פתוח</option>
+                    <option value="סגור">סגור</option>
+                    <option value="מבוטל">מבוטל</option>
+                    <option value="מוקפא">מוקפא</option>
+                    <option value="ממתין לאישור">ממתין לאישור</option>
+                  </Input>
+                </Col>
+                <Col
+                  style={{
+                    justifyContent: "right",
+                    alignContent: "right",
+                    textAlign: "right",
+                  }}
+                >
+                  <h6 style={{}}>מרחב</h6>
+                  <Input
+                    placeholder="מרחב"
+                    type="select"
+                    name="area"
+                    value={area}
+                    onChange={handleChange}
+                  >
+                    <option value="בחר">בחר</option>
+                    <option value="צפון">צפון</option>
+                    <option value="דרום">דרום</option>
+                    <option value="מרכז">מרכז</option>
+                    <option value="הערבה">הערבה</option>
+                    <option value="איו''ש">איו''ש</option>
+                  </Input>
+                </Col>
+              </Row>
             </MDBox>
             <MDBox pt={3}>
               {pRows.length !== 0 ? (

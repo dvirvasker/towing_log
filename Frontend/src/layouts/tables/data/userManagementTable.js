@@ -128,32 +128,14 @@ export default function data() {
     let typeName = "";
     let color = "mekatnar";
     if (admin === "0") {
-      typeName = "מנהל מערכת";
+      typeName = "מפקד מוקד";
       color = "mekatnar";
     } else if (admin === "1") {
-      typeName = "משתמש רגיל";
+      typeName = "מוקדנית";
       color = "info";
     } else if (admin === "2") {
-      typeName = "משתמש כוח אדם";
-      color = "primary";
-    } else if (admin === "3") {
-      typeName = "משתמש תא חיזוי";
-      color = "primary";
-    } else if (admin === "4") {
-      typeName = "משתמש תא כשירות המסגרת";
-      color = "primary";
-    } else if (admin === "5") {
-      typeName = "משתמש תא אחזקות בתעשייה";
-      color = "primary";
-    } else if (admin === "6") {
-      typeName = "משתמש חלפים";
-      color = "primary";
-    } else if (admin === "7") {
-      typeName = 'משתמש תא אמל"ח וטכנולגיות';
-      color = "primary";
-    } else if (admin === "8") {
-      typeName = 'משתמש תא משקים מטכל"ים';
-      color = "primary";
+      typeName = "אחמ''ש";
+      color = "warning";
     }
     return [typeName, color];
   };
