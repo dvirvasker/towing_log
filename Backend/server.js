@@ -59,6 +59,213 @@ app.use("/TowingLogApi", userRoutes);
 // const HolyaReports = require("./routes/reports/report");
 // app.use("/TowingLogApi/HolyaReports", HolyaReports);
 
+const Gdod = require("./models/units/gdod");
+const Hativa = require("./models/units/hativa");
+const Ogda = require("./models/units/ogda");
+const Pikod = require("./models/units/pikod");
+
+const Magad = require("./models/magads/magad");
+const Magadal = require("./models/magads/magadal");
+const Makat = require("./models/magads/makat");
+const Mkabaz = require("./models/magads/mkabaz");
+
+const { getMagadTree } = require("./on_run_req/getMagadal");
+const { getUnitTree } = require("./on_run_req/getUnitTree");
+
+let Magadal_bank = {};
+let Unit_bank = {};
+const getMagadal_bank = async () => {
+  // const res = await getMagadTree();
+  // // console.log(res);
+  // return res;
+};
+
+const getUnit_bank = async () => {
+  const res = await getUnitTree();
+  // console.log(res);
+  return res;
+};
+
+async function getBanks() {
+  [Magadal_bank, Unit_bank] = await Promise.all([
+    getMagadal_bank(),
+    getUnit_bank(),
+  ]);
+}
+getBanks().then(() => {
+  // console.log(Magadal_bank);
+  // console.log(Unit_bank);
+});
+
+// const getMagadTree = async (req, res) => {
+//   const pipeline = [
+//     {
+//       $lookup: {
+//         from: "magads",
+//         localField: "_id",
+//         foreignField: "magadal",
+//         as: "magads",
+//       },
+//     },
+//     {
+//       $unwind: "$magads",
+//     },
+//     {
+//       $lookup: {
+//         from: "mkabazs",
+//         localField: "magads._id",
+//         foreignField: "magad",
+//         as: "magads.mkabazs",
+//       },
+//     },
+//     {
+//       $unwind: "$magads.mkabazs",
+//     },
+//     {
+//       $lookup: {
+//         from: "makats",
+//         localField: "magads.mkabazs._id",
+//         foreignField: "mkabaz",
+//         as: "magads.mkabazs.makats",
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: {
+//           magadalId: "$_id",
+//           magadalName: "$name",
+//           magadId: "$magads._id",
+//           magadName: "$magads.name",
+//           mkabazId: "$magads.mkabazs._id",
+//           mkabazName: "$magads.mkabazs.name",
+//         },
+//         makats: { $first: "$magads.mkabazs.makats" },
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: {
+//           magadalId: "$_id",
+//           magadalName: "$name",
+//           magadId: "$_id.magadId",
+//           magadName: "$_id.magadName",
+//         },
+//         mkabazs: {
+//           $push: {
+//             mkabazId: "$_id.mkabazId",
+//             mkabazName: "$_id.mkabazName",
+//             makats: "$makats",
+//           },
+//         },
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: {
+//           magadalId: "$_id.magadalId",
+//           magadalName: "$_id.magadalName",
+//         },
+//         magads: {
+//           $push: {
+//             magadId: "$_id.magadId",
+//             magadName: "$_id.magadName",
+//             mkabazs: "$mkabazs",
+//           },
+//         },
+//       },
+//     },
+//     {
+//       $project: {
+//         _id: 0,
+//         magadalId: "$_id.magadalId.magadalId",
+//         magadalName: "$_id.magadalId.magadalName",
+//         magads: 1,
+//       },
+//     },
+//   ];
+//   const start = performance.now();
+
+//   const result = await Magadal.aggregate(pipeline);
+//   const makats = {};
+//   const mkabazs = {};
+//   const magads = {};
+//   const magadals = {};
+//   const all = {};
+
+//   result.forEach((magadal) => {
+//     // adding makats and mkabzas to dict
+//     magadal.magads.forEach((magad) => {
+//       magad.mkabazs.forEach((mkabaz) => {
+//         // adding makats to dict
+//         mkabaz.makats?.forEach((makat) => {
+//           makats[makat._id] = { name: makat.name, mkabazId: mkabaz.mkabazId };
+//         });
+
+//         // adding mkabaz to mkabaz dict
+//         mkabazs[mkabaz.mkabazId] = handleBanks(
+//           mkabazs[mkabaz.mkabazId],
+//           mkabaz.mkabazName,
+//           "magadId",
+//           magad.magadId,
+//           "_id",
+//           mkabaz.makats,
+//           "makats"
+//         );
+//       });
+//       // adding magads to dict
+//       magads[magad.magadId] = handleBanks(
+//         magads[magad.magadId],
+//         magad.magadName,
+//         "magadalId",
+//         magadal.magadalId,
+//         "mkabazId",
+//         magad.mkabazs,
+//         "mkabazs"
+//       );
+//     });
+
+//     magadals[magadal.magadalId] = handleBanks(
+//       magadals[magadal.magadalId],
+//       magadal.magadalName,
+//       null,
+//       null,
+//       "magadId",
+//       magadal.magads,
+//       "magads",
+//       true
+//     );
+//   });
+
+//   const final = handleBanksResult(result, "magadalId");
+//   //! one of those is redandent need to see who
+//   const sum = {};
+//   const Top = {};
+//   Object.keys(magadals).map((key) => {
+//     {
+//       sum[magadals[key].name] = [
+//         ...new Set(
+//           magadals[key].magads
+//             .map((el) => magads[el])
+//             .map((item) => item)
+//             .map((el) => el.mkabazs)
+//             .flat()
+//             .map((mkabaz) => mkabazs[mkabaz].makats)
+//             .flat()
+//         ),
+//       ];
+//       Top[key] = sum[magadals[key].name];
+//     }
+//   });
+//   const end = performance.now();
+
+//   console.log(`time to calc tenetree ${~~(end - start)} ms`);
+//   return { makats, mkabazs, magads, magadals, final, sum, Top };
+// };
+
+app.get("/TowingLogApi/get_banks", async (req, res) => {
+  res.json(await getMagadTree());
+});
+
 const TowingOrder = require("./routes/towingorder/towingorder");
 app.use("/TowingLogApi/TowingOrder", TowingOrder);
 
