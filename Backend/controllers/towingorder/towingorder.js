@@ -80,7 +80,6 @@ exports.create = (req, res) => {
 
 exports.update = (req, res) => {
   TowingOrder.findOne().then((request) => {
-    request.personalnumber = req.body.personalnumber;
     request.reference = req.body.reference;
     request.orderDate = req.body.orderDate;
     request.orderTime = req.body.orderTime;

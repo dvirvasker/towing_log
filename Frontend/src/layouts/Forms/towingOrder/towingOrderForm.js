@@ -69,60 +69,41 @@ import {
 import { authenticate, isAuthenticated, signin } from "auth/index";
 const { user } = isAuthenticated();
 
+const digitsOnly = (str) =>  /^\d+$/.test(str);
+
+
 export default function HoliyaRequestForm() {
   const [archiveData, setArchiveData] = useState([]);
   const [checkData, setCheckData] = useState("update");
   const [data, setData] = useState({
-    personalnumber: user.personalnumber,
-    urgent: false,
-
-    date_update: new Date().toISOString(),
-
+    reference : "",
     orderDate: new Date().toISOString().split("T")[0],
-    orderTime: new Date().toISOString().split("T")[1].split(".")[0],
-    //
-    serviceName : "",
-    //
+    orderTime: new Date().toISOString().split("T")[1].split(".")[0].slice(0, 5),
+    serviceName : `${user.firstName} ${user.lastName}`,
     ahmashNotes : "",
+    clientJourney : [], 
+    // {text : string, publisher : string (first + last name), date, published : boolean (before posting/updating = false, after posting becomes true)}
+    carnumber: "",
+    erorrInfo: "",
+    errInfoOther: "",
+    location: "",
+    garage: "",
+    fullName: "",
+    phoneNumber: "",
+    otherPhoneNumber: "",
+    transferOrderDate: new Date().toISOString().split("T")[0],
+    transferOrderTime: "",
+    reciveName: "",
+    executiveBody: "",
     //
-    clientJourney : [], // {text : string, publisher : string (first + last name), date, published : boolean (before posting/updating = false, after posting becomes true)}
-    mk3Number: 0,
-    namerNumber: 0,
-    pumaNumber: 0,
-    achzaritNumber: 0,
-    dahporimNumber: 0,
-    tomatNumber: 0,
-    hamerNumber: 0,
-    s3ramahHalfim: 0,
-    tomatHalfim: 0,
-    s3ramahKshirot: 0,
-    trucks: 0,
-    itemsInStockZero: 0,
-    ogda162: 0,
-    ogda36: 0,
-    ogda252: 0,
-    ogda143: 0,
-    ogda98: 0,
-    drishotDarom: 0,
-    dhiyotDarom: 0,
-    nipukimDarom: 0,
-    drishotZtafon: 0,
-    dhiyotZtafon: 0,
-    nipukimZtafon: 0,
+    turnNumber: "",
+    //
+    demandDate: new Date().toISOString().split("T")[0],
+    area: "",
+    status: "",
+    commanderNotes: "",
 
-    merkavamk4Text: "",
-    merkavamk3Text: "",
-    tomatText: "",
-    ginsText: "",
-    namerText: "",
-    pumaText: "",
-    achzaritText: "",
-    dahpurText: "",
-
-    error: false,
-    successmsg: false,
-    loading: false,
-    NavigateToReferrer: false,
+   
   });
   console.log(data.orderTime);
 
@@ -130,19 +111,36 @@ export default function HoliyaRequestForm() {
   const max = 100;
 
   function handleChange(evt) {
+    console.log(evt);
     const { value } = evt.target;
     // if(evt.target.name === "clientJourney")
     // {
-    //   // const index = evt.target.key;
-    //   // let clientJourney = [...data.clientJourney];
-    //   // clientJourney[index].text = value;
-    //   // setData({...data, [evt.target.name] : clientJourney});
+    //   const index = key;
+    //   console.log(index);
+    //   const clientJourney = [...data.clientJourney];
+    //   console.log(clientJourney);
+    //   clientJourney[index].text = value;
+    //   setData({...data, [evt.target.name] : clientJourney});
     // }
     // else
     // {
       setData({ ...data, [evt.target.name]: value });
       console.log(value);
     // }
+  }
+  const handleClientJourneyChange = (evt, key) => {
+      const index = key;
+      const { value } = evt.target;
+      const clientJourney = [...data.clientJourney];
+      clientJourney[index].text = value;
+      setData((prev) => ({...prev, [evt.target.name] : clientJourney}));
+  }
+  const removeClientJourneyPost = (index) => {
+    const clientJourney = [...data.clientJourney];
+    clientJourney.splice(index, 1);
+    console.log(clientJourney);
+
+    setData((prev) => ({...prev, clientJourney,}));  
   }
 
   function handleChange1(evt) {
@@ -159,14 +157,13 @@ export default function HoliyaRequestForm() {
   const CheckFormData = () => {
     let flag = true;
     const ErrorReason = [];
-
     if (!data.date_update) {
       flag = false;
-      ErrorReason.push(" תאריך ריק ");
+      ErrorReason.push("תאריך ריק");
     }
     if (data.personalnumber === "" || data.personalnumber === undefined) {
       flag = false;
-      ErrorReason.push("  מספר אישי ריק");
+      ErrorReason.push("מספר אישי ריק");
     }
 
     if (flag !== true) {
@@ -189,66 +186,36 @@ export default function HoliyaRequestForm() {
       NavigateToReferrer: false,
     });
     const requestData = {
+      reference: data.reference,
       orderDate: data.orderDate,
       orderTime: data.orderTime,
-      mk3Number: data.mk3Number,
-      namerNumber: data.namerNumber,
-      pumaNumber: data.pumaNumber,
-      achzaritNumber: data.achzaritNumber,
-      dahporimNumber: data.dahporimNumber,
-      tomatNumber: data.tomatNumber,
-      hamerNumber: data.hamerNumber,
-      s3ramahHalfim: data.s3ramahHalfim,
-      tomatHalfim: data.tomatHalfim,
-      s3ramahKshirot: data.s3ramahKshirot,
-      trucks: data.trucks,
-      itemsInStockZero: data.itemsInStockZero,
-      ogda162: data.ogda162,
-      ogda36: data.ogda36,
-      ogda252: data.ogda252,
-      ogda143: data.ogda143,
-      ogda98: data.ogda98,
-      drishotDarom: data.drishotDarom,
-      dhiyotDarom: data.dhiyotDarom,
-      nipukimDarom: data.nipukimDarom,
-      drishotZtafon: data.drishotZtafon,
-      dhiyotZtafon: data.dhiyotZtafon,
-      nipukimZtafon: data.nipukimZtafon,
-      merkavamk4Text: data.merkavamk4Text,
-      merkavamk3Text: data.merkavamk3Text,
-      tomatText: data.tomatText,
-      ginsText: data.ginsText,
-      namerText: data.namerText,
-      pumaText: data.pumaText,
-      achzaritText: data.achzaritText,
-      dahpurText: data.dahpurText,
-      personalnumber: data.personalnumber,
-      date_update: data.date_update,
+      serviceName: data.serviceName,
+      ahmashNotes: data.ahmashNotes,
+      clientJourney: data.clientJourney.map(post => ({...post, publisher : true})),
+      carnumber: data.carnumber,
+      erorrInfo: data.erorrInfo,
+      errInfoOther: data.errInfoOther,
+      location: data.location,
+      garage: data.garage,
+      fullName: data.fullName,
+      phoneNumber: data.phoneNumber,
+      otherPhoneNumber: data.otherPhoneNumber,
+      transferOrderDate: data.transferOrderDate,
+      transferOrderTime: data.transferOrderTime,
+      reciveName: data.reciveName,
+      executiveBody: data.executiveBody,
+      demandDate: data.demandDate,
+      area: data.area,
+      status: data.status,
+      commanderNotes: data.commanderNotes,
+      
     };
 
     axios
-      .post(`http://localhost:5000/TowingLogApi/Halfim/${checkData}`, requestData)
+      .post(`http://localhost:5000/TowingLogApi/TowingOrder/add`, requestData)
       .then((response) => {
         // toast.success(`הטופס נשלח בהצלחה`);
         console.log(response.data);
-        if (checkData === "update") {
-          axios
-            .post(`http://localhost:5000/TowingLogApi/HalfimArchive/add`, archiveData)
-            .then((res) => {
-              // toast.success(`הטופס נשלח בהצלחה`);
-              console.log(res.data);
-            })
-            .catch((error) => {
-              // console.log(error);
-              setData({
-                ...data,
-                errortype: error.response,
-                loading: false,
-                error: true,
-                NavigateToReferrer: false,
-              });
-            });
-        }
         setData({
           ...data,
           loading: false,
@@ -303,57 +270,7 @@ export default function HoliyaRequestForm() {
     }
   };
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:5000/TowingLogApi/Halfim/`)
-      .then(async (response) => {
-        console.log(response.data);
-        if (response.data !== null) {
-          setData({
-            ...data,
-            orderDate: response.data.orderDate,
-            orderTime: response.data.orderTime,
-            mk3Number: response.data.mk3Number,
-            namerNumber: response.data.namerNumber,
-            pumaNumber: response.data.pumaNumber,
-            achzaritNumber: response.data.achzaritNumber,
-            dahporimNumber: response.data.dahporimNumber,
-            tomatNumber: response.data.tomatNumber,
-            hamerNumber: response.data.hamerNumber,
-            s3ramahHalfim: response.data.s3ramahHalfim,
-            tomatHalfim: response.data.tomatHalfim,
-            s3ramahKshirot: response.data.s3ramahKshirot,
-            trucks: response.data.trucks,
-            itemsInStockZero: response.data.itemsInStockZero,
-            ogda162: response.data.ogda162,
-            ogda36: response.data.ogda36,
-            ogda252: response.data.ogda252,
-            ogda143: response.data.ogda143,
-            ogda98: response.data.ogda98,
-            drishotDarom: response.data.drishotDarom,
-            dhiyotDarom: response.data.dhiyotDarom,
-            nipukimDarom: response.data.nipukimDarom,
-            drishotZtafon: response.data.drishotZtafon,
-            dhiyotZtafon: response.data.dhiyotZtafon,
-            nipukimZtafon: response.data.nipukimZtafon,
-            merkavamk4Text: response.data.merkavamk4Text,
-            merkavamk3Text: response.data.merkavamk3Text,
-            tomatText: response.data.tomatText,
-            ginsText: response.data.ginsText,
-            namerText: response.data.namerText,
-            pumaText: response.data.pumaText,
-            achzaritText: response.data.achzaritText,
-            dahpurText: response.data.dahpurText,
-          });
-          setArchiveData(response.data);
-        } else {
-          setCheckData("add");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
+  
 
   const showSuccess = () => (
     <Dialog
@@ -446,6 +363,19 @@ export default function HoliyaRequestForm() {
       </MDBox>
     </Dialog>
   );
+  const AddPost = () => {
+    const clientJourney = [...data.clientJourney];
+    clientJourney.push({
+      text : "",
+      publisher : `${user.firstName} ${user.lastName}`,
+      date : new Date().toISOString().split("T")[0],
+      published : false
+    })
+    setData((prev) => ({...prev, clientJourney,}))
+    console.log("used set data");
+  }
+  const journey = data.clientJourney;
+  console.log(journey);
   const halfimForm = () => (
     <Container className="" dir="rtl">
       <Row className="justify-content-center">
@@ -507,6 +437,7 @@ export default function HoliyaRequestForm() {
                       />
                     </FormGroup>
                   </Col>
+                  {(user.admin === "0" || user.admin === "2") && 
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>הערות אחמ"ש</h6>
@@ -519,36 +450,40 @@ export default function HoliyaRequestForm() {
                       />
                     </FormGroup>
                   </Col>
+                  }
                 </Row>
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
-                      <h6 style={{}}>מסע לקוח</h6>
-                      {/* {clientJourney.map((post, index) => {
-                        return <>
-                        <label>{post.publisher} {post.date}</label>
+                      <h6 >מסע לקוח</h6>
+                      {journey.length > 0 && journey.map((post, index) => <>
+                        <p style={{fontSize:'large'}}>{post.publisher} {post.date}</p>
                         <Input
                         key={index}
                         placeholder="מסע לקוח"
                         type="textarea"
                         name="clientJourney"
                         value={post.text}
-                        onChange={handleChange}
+                        onChange={(evt) => {handleClientJourneyChange(evt, index)}}
                         disabled={post.published}
                       />
                       {!post.published && 
-                      <MDButton variant="secondary">
-                        מחק
+                      <MDButton variant="gradient" color="error" iconOnly sx={{marginBottom: 1, marginTop: 1, display: 'block'}} 
+                      onClick={() => {removeClientJourneyPost(index)}}>
+                        <Icon>delete</Icon>
                       </MDButton>}                 
                       </>
-                      })} */}
-                      <Input
+                      )}
+                      <MDButton variant="gradient" color="primary" onClick={AddPost} iconOnly>
+                        <Icon>add</Icon>
+                      </MDButton>
+                      {/* <Input
                         placeholder="מסע לקוח"
                         type="textarea"
                         name="clientJourney"
                         value={data.clientJourney}
                         onChange={handleChange}
-                      />
+                      /> */}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -556,16 +491,21 @@ export default function HoliyaRequestForm() {
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>צ'</h6>
+                      <div style={{display:"flex"}}>
                       <Input
+                        style={{marginLeft: '5px'}}                
                         placeholder="צ'"
                         type="text"
                         name="carnumber"
                         value={data.carnumber}
                         onChange={handleChange}
+                        maxLength={7}
+                        // minLength={7}
                       />
                       <MDButton variant="gradient" color="info" iconOnly>
                         <Icon>search</Icon>
                       </MDButton>
+                      </div>
                     </FormGroup>
                   </Col>
 
@@ -606,6 +546,16 @@ export default function HoliyaRequestForm() {
                     </FormGroup>
                   </Col>
                 </Row>
+
+
+                {/* <Row>
+                  <Col>
+                  <h6>מהות התקלה</h6>
+                  <Input></Input>
+                  </Col>
+                </Row> */}
+
+
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
@@ -650,10 +600,11 @@ export default function HoliyaRequestForm() {
                       <h6 style={{}}>טלפון</h6>
                       <Input
                         placeholder="טלפון"
-                        type="number"
+                        type="string"
                         name="phoneNumber"
                         value={data.phoneNumber}
                         onChange={handleChange}
+                        maxLength={11}
                       />
                     </FormGroup>
                   </Col>
@@ -662,10 +613,11 @@ export default function HoliyaRequestForm() {
                       <h6 style={{}}>טלפון נוסף</h6>
                       <Input
                         placeholder="טלפון נוסף"
-                        type="number"
+                        type="string"
                         name="otherPhoneNumber"
                         value={data.otherPhoneNumber}
                         onChange={handleChange}
+                        maxLength={11}
                       />
                     </FormGroup>
                   </Col>
@@ -676,9 +628,9 @@ export default function HoliyaRequestForm() {
                       <h6 style={{}}>תאריך העברת הזמנה</h6>
                       <Input
                         placeholder="תאריך העברת הזמנה"
-                        type="number"
-                        name="phoneNumber"
-                        value={data.phoneNumber}
+                        type="date"
+                        name="transferOrderDate"
+                        value={data.transferOrderDate}
                         onChange={handleChange}
                       />
                     </FormGroup>
@@ -688,7 +640,7 @@ export default function HoliyaRequestForm() {
                       <h6 style={{}}>שעת העברת הזמנה</h6>
                       <Input
                         placeholder="שעת העברת הזמנה"
-                        type="number"
+                        type="time"
                         name="transferOrderTime"
                         value={data.transferOrderTime}
                         onChange={handleChange}
@@ -702,7 +654,7 @@ export default function HoliyaRequestForm() {
                       <h6 style={{}}>שם מקבל מחלקה צבאית או שגריר</h6>
                       <Input
                         placeholder="שם מקבל מחלקה צבאית או שגריר"
-                        type="number"
+                        type="text"
                         name="reciveName"
                         value={data.reciveName}
                         onChange={handleChange}
@@ -711,24 +663,53 @@ export default function HoliyaRequestForm() {
                   </Col>
                   <Col>
                     <FormGroup>
-                      <h6 style={{}}>גוף מבצע</h6>
+                      <h6 >גוף מבצע</h6>
                       <Input
                         placeholder="גוף מבצע"
                         type="select"
                         name="executiveBody"
                         value={data.executiveBody}
                         onChange={handleChange}
-                      />
-                    </FormGroup>
-                  </Col>
+                      >
+                         <option value="בחר">בחר</option>
+                         <option value="1">חברה אזרחית - גרירה</option>
+                         <option value="2">חברה אזרחית – ניידת שירות</option>
+                         <option value="3">צבאי</option>
+                         <option value="4">מוביל כננת</option>
+                         
+                      </Input>
+                      </FormGroup>
+                      </Col>
                 </Row>
+                     {
+                      (data.executiveBody === "1" || 
+                      data.executiveBody === "2") &&
+                      <Row>
+                      <Col/>
+                      <Col>
+                      <FormGroup>
+                      <h6 >מספר הזמנה</h6>
+                        <Input
+                        placeholder="מספר הזמנה"
+                        type="string"
+                        name="turnNumber"
+                        value={data.turnNumber}
+                        onChange={handleChange}
+                        />
+                      </FormGroup>
+                      </Col>
+                      </Row>
+                      
+                     }
+                   
+                  
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>תאריך ביצוע מבוקש</h6>
                       <Input
                         placeholder="תאריך ביצוע מבוקש"
-                        type="number"
+                        type="date"
                         name="demandDate"
                         value={data.demandDate}
                         onChange={handleChange}
@@ -740,11 +721,19 @@ export default function HoliyaRequestForm() {
                       <h6 style={{}}>מרחב</h6>
                       <Input
                         placeholder="מרחב"
-                        type="text"
+                        type="select"
                         name="area"
                         value={data.area}
                         onChange={handleChange}
-                      />
+                      >
+                        <option value="בחר">בחר</option>
+                        <option value="1">צפון</option>
+                        <option value="2">דרום</option>
+                        <option value="3">מרכז</option>
+                        <option value="4">הערבה</option>
+                        <option value="5">איו"ש</option>
+                        
+                      </Input>
                     </FormGroup>
                   </Col>
                   <Col>
@@ -752,11 +741,18 @@ export default function HoliyaRequestForm() {
                       <h6 style={{}}>סטטוס</h6>
                       <Input
                         placeholder="סטטוס"
-                        type="number"
+                        type="select"
                         name="status"
                         value={data.status}
                         onChange={handleChange}
-                      />
+                      >
+                        <option value="בחר">בחר</option>
+                        <option value="1">פתוח</option>
+                        <option value="2">סגור</option>
+                        <option value="3">מוקפא</option>
+                        <option value="4">מבוטל</option>
+                        <option value="5">ממתין לאישור</option>
+                      </Input>
                     </FormGroup>
                   </Col>
                   <Col>
