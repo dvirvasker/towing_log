@@ -79,6 +79,7 @@ const towingOrdersTable = () => {
     "תיבת הילוכים",
     "רכב נעול (פריצה)",
     "קודן",
+    "אחר"
   ];
   //   const { columns, rows } = authorsTableData();
   // eslint-disable-next-line consistent-return

@@ -71,7 +71,7 @@ const { user } = isAuthenticated();
 
 const digitsOnly = (str) => /^\d+$/.test(str);
 
-export default function HoliyaRequestForm() {
+export default function HoliyaRequestForm(props) {
   const [archiveData, setArchiveData] = useState([]);
   const [checkData, setCheckData] = useState("update");
   const [carData, setCarData] = useState([]);
@@ -79,6 +79,19 @@ export default function HoliyaRequestForm() {
   const [garagesData, setGaragesData] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
   const [bankData, setBankData] = useState({});
+  const [pikods, setPikods] = useState([]);
+  const [ogdas, setOgdas] = useState([]);
+  const [hativas, setHativas] = useState([]);
+  const [gdods, setGdods] = useState([]);
+
+  const [chosenPikod, setChosenPikod] = useState("בחר");
+  const [chosenOgda, setChosenOgda] = useState("בחר");
+  const [chosenHativa, setChosenHativa] = useState("בחר");
+  const [chosenGdod, setChosenGdod] = useState("בחר");
+  const date = new Date().toISOString().split("T")[0];
+  // const [htivas, setHtivas]
+
+  
   const [data, setData] = useState({
     reference: new Date()
       .toISOString()
@@ -105,6 +118,7 @@ export default function HoliyaRequestForm() {
     transferOrderTime: "",
     reciveName: "",
     executiveBody: "",
+    garageOther: "",
     //
     turnNumber: "",
     //
@@ -113,6 +127,14 @@ export default function HoliyaRequestForm() {
     status: "",
     commanderNotes: "",
   });
+  // console.log(props);
+  // const {task, orderData} = props;
+  // useEffect(() => {
+  //   if(task === "edit")
+  //   {
+  //     setData(orderData);
+  //   }
+  // }, [task])
   const carDataInfoArray = [];
   console.log(data);
 
@@ -123,6 +145,14 @@ export default function HoliyaRequestForm() {
     console.log(evt);
     const { value } = evt.target;
 
+    if(evt.target.name === "orderDate" || evt.target.name === "transferOrderDate")
+    {
+      if(value < new Date())
+      {
+        toast.error("אין לבחור תאריך עבר")
+      }
+    }
+
     setData({ ...data, [evt.target.name]: value });
     console.log(value);
   }
@@ -130,7 +160,12 @@ export default function HoliyaRequestForm() {
     axios
       .get(`http://localhost:5000/TowingLogApi/get_banks`)
       .then((response) => {
+        console.log("מדפיס מערך פיקודיפ");
         setBankData(response.data.data);
+        setPikods(Object.entries(response.data.data.Unit_bank.pikods).map(([key, value]) => ({...value,id: key})));
+        setOgdas(Object.entries(response.data.data.Unit_bank.ogdas).map(([key, value]) => ({...value,id: key})));
+        setHativas(Object.entries(response.data.data.Unit_bank.hativas).map(([key, value]) => ({...value,id: key})));
+        setGdods(Object.entries(response.data.data.Unit_bank.gdods).map(([key, value]) => ({...value,id: key})));
       })
       .catch((error) => {});
   }, []);
@@ -192,6 +227,11 @@ export default function HoliyaRequestForm() {
   console.log(ordersData);
   console.log("bank: ");
   console.log(bankData);
+  console.log(pikods);
+  console.log(ogdas);
+  console.log(hativas);
+  console.log(gdods);
+  
 
   const handleClientJourneyChange = (evt, key) => {
     const index = key;
@@ -219,6 +259,15 @@ export default function HoliyaRequestForm() {
       SendFormData(event);
     }
   };
+  function isValidIsraeliPhoneNumber(phoneNumber) {
+    // Remove any non-digit characters from the input
+    const cleanedPhoneNumber = phoneNumber.replace(/\D/g, '');
+  
+    // Check if the cleaned phone number matches either format
+    const isValidFormat = /^05\d{8}$|^05\d{1}-\d{7}$/.test(cleanedPhoneNumber);
+  
+    return isValidFormat;
+  }
   const CheckFormData = () => {
     let flag = true;
     const ErrorReason = [];
@@ -237,27 +286,46 @@ export default function HoliyaRequestForm() {
     }
     if (data.carnumber === "") {
       AddError("צ' ריק");
-    } else if (!(digitsOnly(data.carnumber) && data.carnumber.length <= 7)) {
+    } else if (!(digitsOnly(data.carnumber) && data.carnumber.length <= 9)) {
       AddError("צ' לא תקין");
     }
-    if (data.erorrInfo.length === 0) {
-      AddError("לא רשומה סיבת תקלה");
-    }
+    // if (data.erorrInfo.length === 0) {
+    //   AddError("לא רשומה סיבת תקלה");
+    // }
     if (data.erorrInfo.includes("אחר")) {
       if (data.errInfoOther.trim() === "") {
         AddError("הערות ריק");
       }
     }
-    if (data.location.trim === "") {
-      AddError("מיקום ריק");
+    if(data.garage === "" || data.garage === "בחר")
+    {
+      AddError(
+        "מוסך ריק"
+      )
+    } 
+    if(data.garage === "אחר" && data.garageOther.trim() === "")
+    {
+      AddError("מוסך ריק (אחר)")
     }
-    if (data.garage === "" || data.garage === "בחר") {
-      AddError("לגרור ל, ריק");
+    if(!isValidIsraeliPhoneNumber(data.phoneNumber))
+    {
+      AddError("מספר טלפון לא תקין")
     }
-    if (data.fullName.trim() === "") {
-      AddError("שם מלא ריק");
+    if(!isValidIsraeliPhoneNumber(data.otherPhoneNumber))
+    {
+      AddError("מספר טלפון נוסף לא תקין")
     }
-    if (!data.phoneNumber.length)
+    
+    // if (data.location.trim === "") {
+    //   AddError("מיקום ריק");
+    // }
+    // if (data.garage === "" || data.garage === "בחר") {
+    //   AddError("לגרור ל, ריק");
+    // }
+    // if (data.fullName.trim() === "") {
+    //   AddError("שם מלא ריק");
+    // }
+    // if (!data.phoneNumber.length)
       if (flag !== true) {
         // if (data.personalnumber === "" || data.personalnumber === undefined) {
         //   flag = false;
@@ -269,6 +337,7 @@ export default function HoliyaRequestForm() {
           return false;
         });
       } else {
+        console.log("Valid");
         return true;
       }
   };
@@ -288,12 +357,12 @@ export default function HoliyaRequestForm() {
       orderTime: data.orderTime,
       serviceName: data.serviceName,
       ahmashNotes: data.ahmashNotes,
-      clientJourney: data.clientJourney.map((post) => ({ ...post, publisher: true })),
+      clientJourney: data.clientJourney.map((post) => ({ ...post, published: true })),
       carnumber: data.carnumber,
       erorrInfo: data.erorrInfo,
       errInfoOther: data.errInfoOther,
       location: data.location,
-      garage: data.garage,
+      garage: data.garage !== "אחר" ? data.garage : data.garageOther,
       fullName: data.fullName,
       phoneNumber: data.phoneNumber,
       otherPhoneNumber: data.otherPhoneNumber,
@@ -534,8 +603,20 @@ export default function HoliyaRequestForm() {
       carDataInfoArray.push(carData.filter((el) => el.carnumber === carNumber));
       console.log(carDataInfoArray);
       console.log(`Car number searched:  ${carNumber}`);
+      setChosenPikod(carDataInfoArray[0][0].pikodId);
+      setChosenOgda(carDataInfoArray[0][0].ogdaId);
+      setChosenHativa(carDataInfoArray[0][0].hativaId);
+      setChosenGdod(carDataInfoArray[0][0].gdodId);
+      setData((prev) => ({...prev, a:carDataInfoArray[0][0].carTypeId}))
+      const carType = carTypesData.filter((element) => element._id === carDataInfoArray[0][0].carTypeId);
+      setData((prev) => ({...prev, weight:carType[0].weight}))
     }
   };
+  const filteredOgdas = ogdas.filter((ogda) => ogda.pikodId === chosenPikod);
+  const filteredHativas = hativas.filter((hativa) => hativa.ogdaId === chosenOgda);
+  const filteredGdods = gdods.filter((gdod) => gdod.hativaId === chosenHativa);
+
+
   const halfimForm = () => (
     <Container className="" dir="rtl">
       <Row className="justify-content-center">
@@ -568,6 +649,7 @@ export default function HoliyaRequestForm() {
                         name="orderDate"
                         value={data.orderDate}
                         onChange={handleChange}
+                        min={date}
                       />
                     </FormGroup>
                   </Col>
@@ -597,7 +679,6 @@ export default function HoliyaRequestForm() {
                       />
                     </FormGroup>
                   </Col>
-                  {(user.admin === "0" || user.admin === "2") && (
                     <Col>
                       <FormGroup>
                         <h6 style={{}}>הערות אחמ"ש</h6>
@@ -607,10 +688,10 @@ export default function HoliyaRequestForm() {
                           name="ahmashNotes"
                           value={data.ahmashNotes}
                           onChange={handleChange}
+                          disabled={!(user.admin === "0" || user.admin === "2")}
                         />
                       </FormGroup>
                     </Col>
-                  )}
                 </Row>
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
@@ -728,8 +809,8 @@ export default function HoliyaRequestForm() {
                       <Input
                         placeholder="משקל מילוי אוטומטי"
                         type="text"
-                        name="auto"
-                        value={data.auto}
+                        name="weight"
+                        value={data.weight}
                         onChange={handleChange}
                         // disabled={data.carnumber.trim() === ""}
                       />
@@ -738,23 +819,88 @@ export default function HoliyaRequestForm() {
                 </Row>
                 <Row>
                   <Col>
+                    <FormGroup>
                     <h6>פיקוד</h6>
-                    <Input type="text" placeholder="פיקוד" />
+                      <Input
+                        placeholder="פיקוד"
+                        type="select"
+                        name="pikod"
+                        value={chosenPikod}
+                        onChange={(evt) => {setChosenPikod(evt.target.value)}}
+                        disabled={chosenOgda !== "בחר"}
+                      >
+                        <option value="בחר">בחר</option>
+                        {pikods.map((pikod) => (
+                          <>
+                            <option value={pikod.id}>{pikod.name}</option>
+                          </>
+                        ))}
+                      </Input>
+                    </FormGroup>
                   </Col>
 
                   <Col>
+                  <FormGroup>
                     <h6>אוגדה</h6>
-                    <Input type="text" placeholder="אוגדה" />
+                      <Input
+                        placeholder="אוגדה"
+                        type="select"
+                        name="ogda"
+                        value={chosenOgda}
+                        onChange={(evt) => {setChosenOgda(evt.target.value)}}
+                        disabled={chosenHativa !== "בחר" || chosenPikod === "בחר"}                      >
+                        <option value="בחר">בחר</option>
+                        {
+                        filteredOgdas.map((ogda) => (
+                          <>
+                            <option value={ogda.id}>{ogda.name}</option>
+                          </>
+                        ))}
+                      </Input>
+                    </FormGroup>
                   </Col>
 
                   <Col>
+                  <FormGroup>
                     <h6>חטיבה</h6>
-                    <Input type="text" placeholder="חטיבה" />
+                      <Input
+                        placeholder="חטיבה"
+                        type="select"
+                        name="hativa"
+                        value={chosenHativa}
+                        onChange={(evt) => {setChosenHativa(evt.target.value)}}
+                        disabled={chosenGdod !== "בחר"|| chosenOgda === "בחר"}                      >
+                        <option value="בחר">בחר</option>
+                        {
+                        filteredHativas.map((hativa) => (
+                          <>
+                            <option value={hativa.id}>{hativa.name}</option>
+                          </>
+                        ))}
+                      </Input>
+                    </FormGroup>
                   </Col>
 
                   <Col>
+                  <FormGroup>
                     <h6>גדוד</h6>
-                    <Input type="text" placeholder="גדוד" />
+                      <Input
+                        placeholder="גדוד"
+                        type="select"
+                        name="gdod"
+                        value={chosenGdod}
+                        onChange={(evt) => {setChosenGdod(evt.target.value)}}
+                        disabled={chosenHativa === "בחר"}                      
+                        >
+                        <option value="בחר">בחר</option>
+                        {
+                        filteredGdods.map((gdod) => (
+                          <>
+                            <option value={gdod.id}>{gdod.name}</option>
+                          </>
+                        ))}
+                      </Input>
+                    </FormGroup>
                   </Col>
                 </Row>
                 <Row>
@@ -801,14 +947,37 @@ export default function HoliyaRequestForm() {
                       <h6 style={{}}>לגרור ל</h6>
                       <Input
                         placeholder="לגרור ל"
-                        type="text"
+                        type="select"
                         name="garage"
                         value={data.garage}
                         onChange={handleChange}
-                      />
+                      >
+                        <option value="בחר">בחר</option>
+                        {garagesData.map((garage) => <option value={garage._id}>
+                          {garage.garageName}
+                          </option>)}
+                          <option value="אחר">אחר</option>
+                      </Input>
                     </FormGroup>
                   </Col>
                 </Row>
+                {(data.garage === "אחר") && (
+                  <Row>
+                    <Col />
+                    <Col>
+                      <FormGroup>
+                        <h6>מיקום גרירה</h6>
+                        <Input
+                          placeholder="מיקום גרירה"
+                          type="string"
+                          name="garageOther"
+                          value={data.garageOther}
+                          onChange={handleChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                )}
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
@@ -859,6 +1028,7 @@ export default function HoliyaRequestForm() {
                         name="transferOrderDate"
                         value={data.transferOrderDate}
                         onChange={handleChange}
+                        min={date}
                       />
                     </FormGroup>
                   </Col>
@@ -899,15 +1069,15 @@ export default function HoliyaRequestForm() {
                         onChange={handleChange}
                       >
                         <option value="בחר">בחר</option>
-                        <option value="1">חברה אזרחית - גרירה</option>
-                        <option value="2">חברה אזרחית – ניידת שירות</option>
-                        <option value="3">צבאי</option>
-                        <option value="4">מוביל כננת</option>
+                        <option value="חברה אזרחית - גרירה">חברה אזרחית - גרירה</option>
+                        <option value="חברה אזרחית – ניידת שירות">חברה אזרחית – ניידת שירות</option>
+                        <option value="צבאי">צבאי</option>
+                        <option value="מוביל כננת">מוביל כננת</option>
                       </Input>
                     </FormGroup>
                   </Col>
                 </Row>
-                {(data.executiveBody === "1" || data.executiveBody === "2") && (
+                {(data.executiveBody === "חברה אזרחית - גרירה" || data.executiveBody === "חברה אזרחית – ניידת שירות") && (
                   <Row>
                     <Col />
                     <Col>
@@ -948,12 +1118,12 @@ export default function HoliyaRequestForm() {
                         value={data.area}
                         onChange={handleChange}
                       >
-                        <option value="בחר">בחר</option>
-                        <option value="1">צפון</option>
-                        <option value="2">דרום</option>
-                        <option value="3">מרכז</option>
-                        <option value="4">הערבה</option>
-                        <option value="5">איו"ש</option>
+                      <option value="בחר">בחר</option>
+                      <option value="צפון">צפון</option>
+                      <option value="דרום">דרום</option>
+                      <option value="מרכז">מרכז</option>
+                      <option value="הערבה">הערבה</option>
+                      <option value="איו''ש">איוש</option>
                       </Input>
                     </FormGroup>
                   </Col>
@@ -967,15 +1137,15 @@ export default function HoliyaRequestForm() {
                         value={data.status}
                         onChange={handleChange}
                       >
-                        <option value="בחר">בחר</option>
-                        <option value="1">פתוח</option>
-                        <option value="2">סגור</option>
-                        <option value="3">מוקפא</option>
-                        <option value="4">מבוטל</option>
-                        <option value="5">ממתין לאישור</option>
-                      </Input>
+                      <option value="בחר">בחר</option>
+                      <option value="פתוח">פתוח</option>
+                      <option value="סגור">סגור</option>
+                      <option value="מבוטל">מבוטל</option>
+                      <option value="מוקפא">מוקפא</option>
+                      <option value="ממתין לאישור">ממתין לאישור</option>                      </Input>
                     </FormGroup>
                   </Col>
+                 
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>הערות מפקד</h6>
@@ -985,9 +1155,11 @@ export default function HoliyaRequestForm() {
                         name="commanderNotes"
                         value={data.commanderNotes}
                         onChange={handleChange}
+                        disabled={user.admin !== "0"}
                       />
                     </FormGroup>
                   </Col>
+                  
                 </Row>
 
                 <div className="text-center">

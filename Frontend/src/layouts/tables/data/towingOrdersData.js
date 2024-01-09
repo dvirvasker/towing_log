@@ -34,6 +34,8 @@ import MDButton from "components/MDButton";
 import MDProgress from "components/MDProgress";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Dialog, DialogContent } from "@mui/material";
+import TowingOrderForm from "layouts/Forms/towingOrder/towingOrderForm";
 
 // Images
 // import LogoAsana from "assets/images/small-logos/logo-asana.svg";
@@ -59,7 +61,7 @@ export default function data(status, area, fromDate, toDate) {
   const [isInfoPressed, setIsInfoPressed] = useState(false);
   const [pressedID, setpressedID] = useState("");
   const [changeRoleW, setChangeRoleW] = useState(false);
-
+  const [toEditFile, setToEditFile] = useState(false);
   const [user, setUser] = useState(isAuthenticated());
   const MINUTE_MS = 100000;
 
@@ -276,7 +278,22 @@ export default function data(status, area, fromDate, toDate) {
   // const convertNum = (num) => {
   //   parseInt()
   // }
-
+  // const editFile = (towingOrder) => (
+  //   <Dialog
+  //     px={5}
+  //     open={toEditFile}
+  //     onClose={() => setToEditFile(false)}
+  //     aria-labelledby="alert-dialog-title"
+  //     aria-describedby="alert-dialog-description"
+  //     maxWidth="xl"
+  //   >
+  //     <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
+  //       <DialogContent>
+  //       <TowingOrderForm task="edit" orderData={towingOrder}/>
+  //       </DialogContent>
+  //     </MDBox>
+  //   </Dialog>
+  // );
   const dbRows = requestDB.map((towingOrder, index) => ({
     // fileID: towingOrder._id,
     reference: towingOrder.reference,
