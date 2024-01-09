@@ -13,7 +13,7 @@ const {
 router.put("/remove/:id", remove);
 router.get("/:id", read);
 router.post("/add", create);
-router.post("/update", update);
+router.post("/update/:id", update);
 router.get("/", find);
 router.get("/personalnumber/:id", findbypersonalnumber);
 

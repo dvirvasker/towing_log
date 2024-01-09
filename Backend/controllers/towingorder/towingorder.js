@@ -104,15 +104,35 @@ exports.create = (req, res) => {
 };
 
 exports.update = (req, res) => {
-  TowingOrder.findOne().then((request) => {
+  TowingOrder.findById(req.params.id).then((request) => {
     request.reference = req.body.reference;
     request.orderDate = req.body.orderDate;
     request.orderTime = req.body.orderTime;
     request.serviceName = req.body.serviceName;
     request.ahmashNotes = req.body.ahmashNotes;
-    request.clientJourney = req.body.clientJourney;
+
+    const clientJourneyArray = [];
+    if (req.body.clientJourney.length !== 0) {
+      req.body.clientJourney.forEach((element) => {
+        const journey = {
+          text: element.text,
+          publisher: element.publisher,
+          date: element.date,
+          published: element.published,
+        };
+        clientJourneyArray.push(journey);
+      });
+    }
+    request.clientJourney = clientJourneyArray;
     request.carnumber = req.body.carnumber;
-    request.erorrInfo = req.body.erorrInfo;
+
+    const erorrInfoArray = [];
+    if (req.body.erorrInfo.length !== 0) {
+      req.body.erorrInfo.forEach((element) => {
+        erorrInfoArray.push(element);
+      });
+    }
+    request.erorrInfo = erorrInfoArray;
     request.errInfoOther = req.body.errInfoOther;
     request.location = req.body.location;
     request.garage = req.body.garage;

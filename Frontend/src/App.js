@@ -77,6 +77,7 @@ import { authenticate, isAuthenticated, signin, updateRefreshCount } from "auth/
 
 import sidenav from "assets/theme/components/sidenav";
 import EditUser from "layouts/authentication/editUser/editUser";
+import TowingOrderFormDB from "layouts/Forms/towingOrder/towingOrderFormDB";
 import AboutPage from "views/aboutpage/AboutPage";
 import "./font.css";
 
@@ -266,6 +267,10 @@ export default function App() {
 
                   <Route path="/authentication/admin/edituser">
                     <Route path=":id" element={<EditUser />} />
+                  </Route>
+
+                  <Route path="/towingorders">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
                   </Route>
 
                   {/* <Route path="/casualtiesFamily/profile/">

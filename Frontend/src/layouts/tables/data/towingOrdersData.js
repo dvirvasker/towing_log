@@ -35,7 +35,7 @@ import MDProgress from "components/MDProgress";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Dialog, DialogContent } from "@mui/material";
-import TowingOrderForm from "layouts/Forms/towingOrder/towingOrderForm";
+import TowingOrderFormDB from "layouts/Forms/towingOrder/towingOrderFormDB";
 
 // Images
 // import LogoAsana from "assets/images/small-logos/logo-asana.svg";
@@ -301,7 +301,7 @@ export default function data(status, area, fromDate, toDate) {
     >
       <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
         <DialogContent>
-          <TowingOrderForm task="update" towingOrderData={towingOrder} />
+          <TowingOrderFormDB />
         </DialogContent>
       </MDBox>
     </Dialog>
@@ -322,19 +322,21 @@ export default function data(status, area, fromDate, toDate) {
     area: towingOrder.area,
     status: towingOrder.status,
     editPower: (
-      <MDButton
-        variant="gradient"
-        color="mekatnar"
-        circular="true"
-        iconOnly="true"
-        size="medium"
-        onClick={() => {
-          setToEditFile(true);
-        }}
-      >
-        {editFile(towingOrder._id)}
-        <Icon>edit</Icon>
-      </MDButton>
+      <Link to={`/towingorders/${towingOrder._id}`} key={towingOrder._id}>
+        <MDButton
+          variant="gradient"
+          color="mekatnar"
+          circular="true"
+          iconOnly="true"
+          size="medium"
+          onClick={() => {
+            setToEditFile(true);
+          }}
+        >
+          {editFile(towingOrder._id)}
+          <Icon>edit</Icon>
+        </MDButton>
+      </Link>
     ),
   }));
 

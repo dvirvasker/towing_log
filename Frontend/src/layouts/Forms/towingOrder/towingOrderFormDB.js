@@ -27,10 +27,13 @@ import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
+import Footer from "examples/Footer";
+import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
+import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Link, Navigate, Outlet } from "react-router-dom";
+import { Link, Navigate, Outlet, useParams, useNavigate } from "react-router-dom";
 // import { Upload } from "antd-upload";
 // import { multipleFilesUpload } from "../../data/api";
 
@@ -73,7 +76,9 @@ const { user } = isAuthenticated();
 
 const digitsOnly = (str) => /^\d+$/.test(str);
 
-const TowingOrderForm = () => {
+const TowingOrderFormDB = () => {
+  const params = useParams();
+  const navigate = useNavigate();
   const [archiveData, setArchiveData] = useState([]);
   const [checkData, setCheckData] = useState("update");
   const [carData, setCarData] = useState([]);
@@ -94,60 +99,17 @@ const TowingOrderForm = () => {
   // const [htivas, setHtivas]
 
   const [data, setData] = useState({
-    reference: new Date()
-      .toISOString()
-      .substring(3)
-      .replace(/-/g, "")
-      .replace(/T/g, "")
-      .replace(/:/g, "")
-      .split(".")[0],
-    orderDate: new Date().toISOString().split("T")[0],
-    orderTime: new Date().toISOString().split("T")[1].split(".")[0].slice(0, 5),
-    serviceName: `${user.firstName} ${user.lastName}`,
-    ahmashNotes: "",
     clientJourney: [],
-    // {text : string, publisher : string (first + last name), date, published : boolean (before posting/updating = false, after posting becomes true)}
-    carnumber: "",
     erorrInfo: [],
-    errInfoOther: "",
-    location: "",
-    garage: "",
-    fullName: "",
-    phoneNumber: "",
-    otherPhoneNumber: "",
-    transferOrderDate: new Date().toISOString().split("T")[0],
-    transferOrderTime: "",
-    reciveName: "",
-    executiveBody: "",
-    garageOther: "",
-    //
-    turnNumber: "",
-    //
-    demandDate: new Date().toISOString().split("T")[0],
-    area: "",
-    status: "",
-    commanderNotes: "",
   });
   const carDataInfoArray = [];
-  const setChosenCarNumber = (carNumber) => {
-    carDataInfoArray.push(carData.filter((el) => el.carnumber === carNumber));
-    console.log(carDataInfoArray);
-    console.log(`Car number searched:  ${carNumber}`);
-    if (carDataInfoArray[0][0]) {
-      setChosenPikod(carDataInfoArray[0][0].pikodId);
-      setChosenOgda(carDataInfoArray[0][0].ogdaId);
-      setChosenHativa(carDataInfoArray[0][0].hativaId);
-      setChosenGdod(carDataInfoArray[0][0].gdodId);
-      setData((prev) => ({ ...prev, a: carDataInfoArray[0][0].carTypeId }));
-      const carType = carTypesData.filter(
-        (element) => element._id === carDataInfoArray[0][0].carTypeId
-      );
-      setData((prev) => ({ ...prev, weight: carType[0].weight }));
-    } else {
-      toast.error("צ' לא קיים");
-      setData((prev) => ({ ...data, carnumber: "" }));
-    }
-  };
+  const filteredOgdas = ogdas.filter((ogda) => ogda.pikodId === chosenPikod);
+  const filteredHativas = hativas.filter((hativa) => hativa.ogdaId === chosenOgda);
+  const filteredGdods = gdods.filter((gdod) => gdod.hativaId === chosenHativa);
+
+  // useEffect(() => {
+  //   setChosenCarNumber(data.carnumber);
+  // }, [data]);
 
   // console.log(data);
 
@@ -167,11 +129,11 @@ const TowingOrderForm = () => {
     setData({ ...data, [evt.target.name]: value });
     console.log(value);
   }
+
   useEffect(() => {
     axios
       .get(`http://localhost:5000/TowingLogApi/get_banks`)
       .then((response) => {
-        console.log("מדפיס מערך פיקודיפ");
         setBankData(response.data.data);
         setPikods(
           Object.entries(response.data.data.Unit_bank.pikods).map(([key, value]) => ({
@@ -250,6 +212,49 @@ const TowingOrderForm = () => {
       })
       .catch((error) => {});
   }, []);
+
+  useEffect(async () => {
+    await axios
+      .get(`http://localhost:5000/TowingLogApi/TowingOrder/${params.id}`)
+      .then((response) => {
+        delete response.data.updatedAt;
+        delete response.data.__v;
+        delete response.data._id;
+        delete response.data.createdAt;
+        response.data.orderDate = response.data.orderDate.split("T")[0];
+        response.data.demandDate = response.data.demandDate.split("T")[0];
+        response.data.transferOrderDate = response.data.transferOrderDate.split("T")[0];
+
+        console.log(response.data);
+        setData(response.data);
+      })
+      .catch((error) => {});
+  }, []);
+
+  function setChosenCarNumber(value) {
+    const carNumber = value;
+    console.log(carNumber);
+    carDataInfoArray.push(carData.filter((el) => el.carnumber === carNumber));
+    console.log(carData);
+    if (carDataInfoArray[0][0]) {
+      setChosenPikod(carDataInfoArray[0][0].pikodId);
+      setChosenOgda(carDataInfoArray[0][0].ogdaId);
+      setChosenHativa(carDataInfoArray[0][0].hativaId);
+      setChosenGdod(carDataInfoArray[0][0].gdodId);
+      setData((prev) => ({ ...prev, a: carDataInfoArray[0][0].carTypeId }));
+      const carType = carTypesData.filter(
+        (element) => element._id === carDataInfoArray[0][0].carTypeId
+      );
+      setData((prev) => ({ ...prev, weight: carType[0].weight }));
+    } else {
+      toast.error("צ' לא קיים");
+      setData((prev) => ({ ...data, carnumber: "" }));
+    }
+  }
+
+  useEffect(async () => {
+    setChosenCarNumber(data.carnumber);
+  }, [carData]);
 
   const handleClientJourneyChange = (evt, key) => {
     const index = key;
@@ -391,7 +396,7 @@ const TowingOrderForm = () => {
     console.log(requestData);
 
     axios
-      .post(`http://localhost:5000/TowingLogApi/TowingOrder/add`, requestData)
+      .post(`http://localhost:5000/TowingLogApi/TowingOrder/update/${params.id}`, requestData)
       .then((response) => {
         // toast.success(`הטופס נשלח בהצלחה`);
         console.log(response.data);
@@ -444,7 +449,6 @@ const TowingOrderForm = () => {
   };
   const NavigateUser = () => {
     if (data.NavigateToReferrer) {
-      window.location.href = window.location.href;
       return <Navigate to="/towingorders" />;
     }
   };
@@ -468,7 +472,7 @@ const TowingOrderForm = () => {
         textAlign="center"
       >
         <MDTypography variant="h2" fontWeight="medium" color="white" mt={1}>
-          הזמנה {data.reference} נוצרה בהצלחה
+          הזמנה {data.reference} עודכנה בהצלחה
         </MDTypography>
 
         <DialogContent>
@@ -621,23 +625,6 @@ const TowingOrderForm = () => {
     if (existing.length === 0) {
       if (carNumber.trim() !== "") {
         setChosenCarNumber(carNumber);
-        // carDataInfoArray.push(carData.filter((el) => el.carnumber === carNumber));
-        // console.log(carDataInfoArray);
-        // console.log(`Car number searched:  ${carNumber}`);
-        // if (carDataInfoArray[0][0]) {
-        //   setChosenPikod(carDataInfoArray[0][0].pikodId);
-        //   setChosenOgda(carDataInfoArray[0][0].ogdaId);
-        //   setChosenHativa(carDataInfoArray[0][0].hativaId);
-        //   setChosenGdod(carDataInfoArray[0][0].gdodId);
-        //   setData((prev) => ({ ...prev, a: carDataInfoArray[0][0].carTypeId }));
-        //   const carType = carTypesData.filter(
-        //     (element) => element._id === carDataInfoArray[0][0].carTypeId
-        //   );
-        //   setData((prev) => ({ ...prev, weight: carType[0].weight }));
-        // } else {
-        //   toast.error("צ' לא קיים");
-        //   setData((prev) => ({ ...data, carnumber: "" }));
-        // }
       }
     } else {
       toast.error(
@@ -647,14 +634,11 @@ const TowingOrderForm = () => {
       );
     }
   };
-  const filteredOgdas = ogdas.filter((ogda) => ogda.pikodId === chosenPikod);
-  const filteredHativas = hativas.filter((hativa) => hativa.ogdaId === chosenOgda);
-  const filteredGdods = gdods.filter((gdod) => gdod.hativaId === chosenHativa);
 
   const towingOrderForm = () => (
     <Container className="" dir="rtl">
       <Row className="justify-content-center">
-        <Col lg="12" md="12">
+        <Col lg="10" md="10">
           <Card className="shadow border-0">
             <CardBody className="px-lg-12 py-lg-12">
               <MDBox
@@ -670,6 +654,9 @@ const TowingOrderForm = () => {
               >
                 <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
                   טופס הזמנת גרירה
+                </MDTypography>
+                <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
+                  {data.reference}
                 </MDTypography>
               </MDBox>
               <Form style={{ textAlign: "right", paddingBottom: "5%" }} role="form">
@@ -1203,19 +1190,33 @@ const TowingOrderForm = () => {
                     </FormGroup>
                   </Col>
                 </Row>
-
-                <div className="text-center">
-                  <MDButton
-                    color="mekatnar"
-                    size="large"
-                    onClick={onSubmit}
-                    className="btn-new-blue"
-                    type="submit"
-                  >
-                    שלח טופס גרירה
-                    <Icon fontSize="small">upload</Icon>&nbsp;
-                  </MDButton>
-                </div>
+                <Row>
+                  <Col>
+                    <div className="text-center">
+                      <MDButton
+                        color="mekatnar"
+                        size="large"
+                        onClick={onSubmit}
+                        className="btn-new-blue"
+                        type="submit"
+                        style={{ marginLeft: "3%" }}
+                      >
+                        עדכן טופס גרירה
+                        <Icon fontSize="small">check</Icon>&nbsp;
+                      </MDButton>
+                      <MDButton
+                        color="error"
+                        size="large"
+                        onClick={() => navigate(-1)}
+                        className="btn-new-blue"
+                        style={{ marginRight: "3%" }}
+                      >
+                        צא ללא שינויים
+                        <Icon fontSize="small">clear</Icon>&nbsp;
+                      </MDButton>
+                    </div>
+                  </Col>
+                </Row>
               </Form>
             </CardBody>
           </Card>
@@ -1225,29 +1226,32 @@ const TowingOrderForm = () => {
   );
 
   return (
-    <MDBox>
-      {/* //! fot the pop up warning windoes */}
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
-      {showError()}
-      {showSuccess()}
-      {showLoading()}
-      {NavigateUser()}
+    <DashboardLayout>
+      <DashboardNavbar />
+      <MDBox pt={6} pb={3}>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
+        {showError()}
+        {showSuccess()}
+        {showLoading()}
+        {NavigateUser()}
 
-      {towingOrderForm()}
+        {towingOrderForm()}
+      </MDBox>
+      <Footer />
       <Outlet />
-    </MDBox>
+    </DashboardLayout>
   );
 };
 
-export default TowingOrderForm;
+export default TowingOrderFormDB;

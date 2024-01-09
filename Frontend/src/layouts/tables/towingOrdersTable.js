@@ -79,7 +79,7 @@ const towingOrdersTable = () => {
     "תיבת הילוכים",
     "רכב נעול (פריצה)",
     "קודן",
-    "אחר"
+    "אחר",
   ];
   //   const { columns, rows } = authorsTableData();
   // eslint-disable-next-line consistent-return
@@ -147,7 +147,7 @@ const towingOrdersTable = () => {
     >
       <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
         <DialogContent>
-          <TowingOrderForm task="add" towingOrderData={{}}/>
+          <TowingOrderForm />
         </DialogContent>
       </MDBox>
     </Dialog>
@@ -275,20 +275,8 @@ const towingOrdersTable = () => {
               <MDTypography variant="h3" color="white">
                 {tableTittle}
               </MDTypography>
+
               <Grid container justifyContent="flex-end">
-                <MDButton
-                  variant="gradient"
-                  onClick={() => setFilterOpen(!filterOpen)}
-                  // onClick={() => {
-                  //   // setIsInfoPressed(true);
-                  //   // setpressedID(hozla._id);
-                  // }}
-                  circular="true"
-                  iconOnly="true"
-                  size="medium"
-                >
-                  <Icon>filter_alt</Icon>
-                </MDButton>
                 <MDButton
                   variant="gradient"
                   onClick={() => setToAddFile(true)}
@@ -303,7 +291,23 @@ const towingOrdersTable = () => {
                   <Icon>add</Icon>
                 </MDButton>
               </Grid>
+              <Grid style={{ position: "absolute", top: "7%" }}>
+                <MDButton
+                  variant="gradient"
+                  onClick={() => setFilterOpen(!filterOpen)}
+                  // onClick={() => {
+                  //   // setIsInfoPressed(true);
+                  //   // setpressedID(hozla._id);
+                  // }}
+                  // circular="true"
+                  size="small"
+                >
+                  סינון
+                  <Icon>filter_alt</Icon>
+                </MDButton>
+              </Grid>
             </MDBox>
+
             {filterOpen === true ? (
               <MDBox mx={2} mt={1} px={2}>
                 <Row>
