@@ -147,7 +147,7 @@ const towingOrdersTable = () => {
     >
       <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
         <DialogContent>
-          <TowingOrderForm task="create" />
+          <TowingOrderForm task="add" towingOrderData={{}}/>
         </DialogContent>
       </MDBox>
     </Dialog>

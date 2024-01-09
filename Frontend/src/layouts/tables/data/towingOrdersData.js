@@ -58,10 +58,13 @@ export default function data(status, area, fromDate, toDate) {
   const [isError, setIsError] = useState(false);
   const [requestDB, setRequestDB] = useState([]);
   const [originaldata, setOriginaldata] = useState([]);
+  const [carTypesData, setCarTypesData] = useState([]);
+  const [garagesData, setGaragesData] = useState([]);
   const [isInfoPressed, setIsInfoPressed] = useState(false);
   const [pressedID, setpressedID] = useState("");
   const [changeRoleW, setChangeRoleW] = useState(false);
   const [toEditFile, setToEditFile] = useState(false);
+
   const [user, setUser] = useState(isAuthenticated());
   const MINUTE_MS = 100000;
 
@@ -182,6 +185,24 @@ export default function data(status, area, fromDate, toDate) {
       });
   }, []);
 
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/TowingLogApi/Garages`)
+      .then((response) => {
+        setGaragesData(response.data);
+      })
+      .catch((error) => {});
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/TowingLogApi/CarTypes`)
+      .then((response) => {
+        setCarTypesData(response.data);
+      })
+      .catch((error) => {});
+  }, []);
+
   const Progress = ({ color, value }) => (
     <MDBox display="flex" alignItems="center">
       <MDTypography variant="caption" color="text" fontWeight="medium">
@@ -260,40 +281,31 @@ export default function data(status, area, fromDate, toDate) {
     }
     return [typeName, color];
   };
-  const setTypeSourceHoli = (sourceHoli) => {
-    let typeName = "";
-    if (sourceHoli === "1") {
-      typeName = 'אגד טנ"א ארצי';
-    } else if (sourceHoli === "2") {
-      typeName = 'חט"ל';
-    } else if (sourceHoli === "3") {
-      typeName = 'רפ"ט';
-    } else if (sourceHoli === "4") {
-      typeName = 'מש"א';
-    } else if (sourceHoli === "5") {
-      typeName = "תעשייה";
-    }
-    return typeName;
+  const getGarage = (garage) => {
+    console.log(garage);
+    const filtered = garagesData.filter((garageEl) => garageEl._id.toString() === garage);
+    console.log(filtered);
+    return filtered;
   };
   // const convertNum = (num) => {
   //   parseInt()
   // }
-  // const editFile = (towingOrder) => (
-  //   <Dialog
-  //     px={5}
-  //     open={toEditFile}
-  //     onClose={() => setToEditFile(false)}
-  //     aria-labelledby="alert-dialog-title"
-  //     aria-describedby="alert-dialog-description"
-  //     maxWidth="xl"
-  //   >
-  //     <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
-  //       <DialogContent>
-  //       <TowingOrderForm task="edit" orderData={towingOrder}/>
-  //       </DialogContent>
-  //     </MDBox>
-  //   </Dialog>
-  // );
+  const editFile = (towingOrder) => (
+    <Dialog
+      px={5}
+      open={toEditFile}
+      onClose={() => setToEditFile(false)}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      maxWidth="xl"
+    >
+      <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
+        <DialogContent>
+          <TowingOrderForm task="update" towingOrderData={towingOrder} />
+        </DialogContent>
+      </MDBox>
+    </Dialog>
+  );
   const dbRows = requestDB.map((towingOrder, index) => ({
     // fileID: towingOrder._id,
     reference: towingOrder.reference,
@@ -310,11 +322,19 @@ export default function data(status, area, fromDate, toDate) {
     area: towingOrder.area,
     status: towingOrder.status,
     editPower: (
-      <Link to={`/towingorders/${towingOrder._id}`} key={towingOrder._id}>
-        <MDButton variant="gradient" color="mekatnar" circular="true" iconOnly="true" size="medium">
-          <Icon>edit</Icon>
-        </MDButton>
-      </Link>
+      <MDButton
+        variant="gradient"
+        color="mekatnar"
+        circular="true"
+        iconOnly="true"
+        size="medium"
+        onClick={() => {
+          setToEditFile(true);
+        }}
+      >
+        {editFile(towingOrder._id)}
+        <Icon>edit</Icon>
+      </MDButton>
     ),
   }));
 
