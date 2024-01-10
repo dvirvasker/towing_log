@@ -257,7 +257,10 @@ const TowingOrderFormDB = () => {
   }
 
   useEffect(async () => {
-    setChosenCarNumber(data.carnumber);
+    if(carData.length > 0)
+    {
+      setChosenCarNumber(data.carnumber);
+    }
   }, [carData]);
 
   const handleClientJourneyChange = (evt, key) => {

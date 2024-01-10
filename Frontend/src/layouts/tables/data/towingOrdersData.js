@@ -45,7 +45,7 @@ import TowingOrderFormDB from "layouts/Forms/towingOrder/towingOrderFormDB";
 // import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 // import logoInvesion from "assets/images/small-logos/logo-invision.svg";
 
-export default function data(status, area, fromDate, toDate) {
+export default function data(status, area, fromDate, toDate, erorrInfo, carsList, isCarFiltered) {
   // const Project = ({ image, name }) => (
   //   <MDBox display="flex" alignItems="center" lineHeight={1}>
   //     <MDAvatar src={image} name={name} size="sm" variant="rounded" />
@@ -79,6 +79,15 @@ export default function data(status, area, fromDate, toDate) {
     // timeZoneName: 'short', // or 'long'
   };
 
+  const doShare = (arr1, arr2) => {
+    let res = false;
+    arr1.forEach((el1) => {
+      if (arr2.includes(el1)) {
+        res = true;
+      }
+    });
+    return res;
+  };
   const filteruse = () => {
     const beforfilter = originaldata;
     // console.log(beforfilter);
@@ -118,9 +127,20 @@ export default function data(status, area, fromDate, toDate) {
     // } else if (visitWanted === "false") {
     //   filter3 = filter2.filter((el) => el.visitWanted === false);
     // }
+    // console.log("Filtered error : ");
+    // console.log(erorrInfo);
 
-    // let filter4 = [];
-
+    console.log(filter3);
+    const filter4 =
+      erorrInfo.length === 0
+        ? filter3
+        : filter3.filter((order) => doShare(order.erorrInfo, erorrInfo));
+    // console.log("Cars Filter: ");
+    // console.log(carsList);
+    const carsNumberList = carsList.map((carInfo) => carInfo.carnumber);
+    const filter5 = !isCarFiltered
+      ? filter4
+      : filter4.filter((order) => carsNumberList.includes(order.carnumber));
     // if (dead === "בחר" || dead === undefined) {
     //   filter4 = filter3;
     // } else if (dead === "true") {
@@ -159,12 +179,12 @@ export default function data(status, area, fromDate, toDate) {
     //   filter6 = filter5.filter((el) => el.classReport === typeclass.classReport.id);
     // }
 
-    setRequestDB(filter3);
+    setRequestDB(filter5);
   };
 
   useEffect(async () => {
     filteruse();
-  }, [status, area, fromDate, toDate]);
+  }, [status, area, fromDate, toDate, erorrInfo, carsList, isCarFiltered]);
 
   useEffect(() => {
     axios
