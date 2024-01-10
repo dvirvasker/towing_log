@@ -64,14 +64,14 @@ const routes = [
     route: "/towingorders",
     component: <TowingOrders typeTable="towingorders" />,
   },
-  {
-    type: "collapse",
-    name: "דשבורד",
-    key: "dashboard",
-    icon: <Icon fontSize="small">dashboard</Icon>,
-    route: "/dashboard",
-    component: <KshirotMisgrot />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "דשבורד",
+  //   key: "dashboard",
+  //   icon: <Icon fontSize="small">dashboard</Icon>,
+  //   route: "/dashboard",
+  //   component: <KshirotMisgrot />,
+  // },
   {
     type: "collapse",
     name: "מסך נחיתה",
