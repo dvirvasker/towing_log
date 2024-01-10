@@ -57,7 +57,6 @@ import { CardBody, Col, Container, Form, FormGroup, FormText, Input, Label, Row 
 const towingOrdersTable = (props) => {
   const { pathname } = useLocation();
   const { typeTable } = props;
-  const tableTittle = "הזמנות גרירה";
   const [filterOpen, setFilterOpen] = useState(false);
   const [status, setStatus] = useState("בחר");
   const [area, setArea] = useState("בחר");
@@ -145,7 +144,7 @@ const towingOrdersTable = (props) => {
   }, [chosenPikod, chosenOgda, chosenHativa, chosenGdod, carData]);
   console.log("Cars List: ");
   console.log(carsList);
-  
+
   const options = {
     // weekday: 'long', // or 'short', 'narrow'
     year: "numeric",
@@ -156,7 +155,7 @@ const towingOrdersTable = (props) => {
     // second: 'numeric',
     // timeZoneName: 'short', // or 'long'
   };
-  
+
   const errorResArr = [
     "לא מניע",
     "מערכות בטיחות (הגה, בלמים)",
@@ -577,7 +576,6 @@ const towingOrdersTable = (props) => {
                       }}
                     >
                       {errorResArr.map((errorRes) => (
-                      
                         <MenuItem value={errorRes}>{errorRes}</MenuItem>
                       ))}
                     </TextField>
