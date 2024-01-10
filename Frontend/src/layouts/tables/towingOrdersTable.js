@@ -314,7 +314,7 @@ const towingOrdersTable = (props) => {
                   <Icon>add</Icon>
                 </MDButton>
               </Grid>
-              <Grid style={{ position: "absolute", top: "7%" }}>
+              <Grid style={{ position: "static", top: "7px" }}>
                 <MDButton
                   variant="gradient"
                   onClick={() => setFilterOpen(!filterOpen)}

@@ -175,14 +175,14 @@ export default function data(typeTable, urlType, currentDate, status, area, from
         if (urlType === "landing") {
           setRequestDB(
             response.data.filter(
-              (element) =>
-                element.orderDate.split("T")[0] === currentDate.toISOString().split("T")[0]
+              (elOrder) =>
+                elOrder.orderDate.split("T")[0] === currentDate.toISOString().split("T")[0]
             )
           );
           setOriginaldata(
             response.data.filter(
-              (element) =>
-                element.orderDate.split("T")[0] === currentDate.toISOString().split("T")[0]
+              (elOrder) =>
+                elOrder.orderDate.split("T")[0] === currentDate.toISOString().split("T")[0]
             )
           );
         } else if (urlType === "towingorders") {
