@@ -221,13 +221,13 @@ const TowingOrderFormDB = () => {
         delete response.data.__v;
         delete response.data._id;
         delete response.data.createdAt;
-         
+
         const fixedDate = response.data.orderDate.split("T")[0];
         response.data.orderDate = fixedDate;
         const fixedDemandDate = response.data.demandDate.split("T")[0];
         response.data.demandDate = fixedDemandDate;
         const fixedTransferOrderDate = response.data.transferOrderDate.split("T")[0];
-        response.data.transferOrderDate = fixedTransferOrderDate
+        response.data.transferOrderDate = fixedTransferOrderDate;
 
         console.log(response.data);
         setData(response.data);
@@ -257,8 +257,7 @@ const TowingOrderFormDB = () => {
   }
 
   useEffect(async () => {
-    if(carData.length > 0)
-    {
+    if (carData.length > 0) {
       setChosenCarNumber(data.carnumber);
     }
   }, [carData]);

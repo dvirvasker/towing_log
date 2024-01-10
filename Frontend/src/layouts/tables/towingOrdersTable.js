@@ -144,20 +144,15 @@ const towingOrdersTable = () => {
     } else if (chosenOgda !== "בחר") {
       setCarsList(carData.filter((carInfo) => carInfo.ogdaId === chosenOgda));
       setIsCarFiltered(true);
-
     } else if (chosenPikod !== "בחר") {
       setCarsList(carData.filter((carInfo) => carInfo.pikodId === chosenPikod));
       setIsCarFiltered(true);
-
-    }
-    else
-    {
+    } else {
       setCarsList([]);
       setIsCarFiltered(false);
-
     }
   }, [chosenPikod, chosenOgda, chosenHativa, chosenGdod, carData]);
-  console.log("Cars List: ")
+  console.log("Cars List: ");
   console.log(carsList);
   const errorResArr = [
     "לא מניע",
@@ -221,7 +216,15 @@ const towingOrdersTable = () => {
     rows: pRows,
     dbError: dbe,
     setDBerror: setDbe,
-  } = towingOrdersData(status, area, data.fromDate, data.toDate, data.erorrInfo, carsList, isCarFiltered);
+  } = towingOrdersData(
+    status,
+    area,
+    data.fromDate,
+    data.toDate,
+    data.erorrInfo,
+    carsList,
+    isCarFiltered
+  );
 
   const handleErrorClose = () => {
     setDbError(true);
@@ -538,8 +541,8 @@ const towingOrdersTable = () => {
                     </FormGroup>
                   </Col>
                 </Row>
-                <Row >
-                  <Col >
+                <Row>
+                  <Col>
                     <h6>מהות התקלה</h6>
                     <TextField
                       label="מהות תקלה"
@@ -553,6 +556,7 @@ const towingOrdersTable = () => {
                       }}
                     >
                       {errorResArr.map((errorRes) => (
+                      
                         <MenuItem value={errorRes}>{errorRes}</MenuItem>
                       ))}
                     </TextField>
