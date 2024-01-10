@@ -46,9 +46,18 @@ import { element } from "prop-types";
 // import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 // import logoInvesion from "assets/images/small-logos/logo-invision.svg";
 
-
-export default function data(typeTable, urlType, currentDate, status, area, fromDate, toDate, erorrInfo, carsList, isCarFiltered) {
-
+export default function data(
+  typeTable,
+  urlType,
+  currentDate,
+  status,
+  area,
+  fromDate,
+  toDate,
+  erorrInfo,
+  carsList,
+  isCarFiltered
+) {
   // const Project = ({ image, name }) => (
   //   <MDBox display="flex" alignItems="center" lineHeight={1}>
   //     <MDAvatar src={image} name={name} size="sm" variant="rounded" />
