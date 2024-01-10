@@ -4,6 +4,8 @@
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
+/* eslint-disable no-param-reassign */
+
 /**
 =========================================================
 * Material Dashboard 2 React - v2.1.0
@@ -23,7 +25,13 @@ Coded by www.creative-tim.com
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
 import Icon from "@mui/material/Icon";
-
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import Chip from "@mui/material/Chip";
+import { useTheme } from "@mui/material/styles";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
@@ -37,7 +45,7 @@ import DataTable from "examples/Tables/DataTable";
 import TowingOrderForm from "layouts/Forms/towingOrder/towingOrderForm";
 
 // Data
-import { Dialog, DialogContent, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { Dialog, DialogContent, Box, TextField } from "@mui/material";
 import towingOrdersData from "layouts/tables/data/towingOrdersData";
 import { useEffect, useState } from "react";
 
@@ -49,11 +57,30 @@ import { CardBody, Col, Container, Form, FormGroup, FormText, Input, Label, Row 
 const towingOrdersTable = (props) => {
   const { pathname } = useLocation();
   const { typeTable } = props;
+  const tableTittle = "הזמנות גרירה";
   const [filterOpen, setFilterOpen] = useState(false);
   const [status, setStatus] = useState("בחר");
   const [area, setArea] = useState("בחר");
   const [dbError, setDbError] = useState(false);
   const [toAddFile, setToAddFile] = useState(false);
+  const usedTheme = useTheme();
+
+  const [bankData, setBankData] = useState({});
+  const [pikods, setPikods] = useState([]);
+  const [ogdas, setOgdas] = useState([]);
+  const [hativas, setHativas] = useState([]);
+  const [gdods, setGdods] = useState([]);
+
+  const [chosenPikod, setChosenPikod] = useState("בחר");
+  const [chosenOgda, setChosenOgda] = useState("בחר");
+  const [chosenHativa, setChosenHativa] = useState("בחר");
+  const [chosenGdod, setChosenGdod] = useState("בחר");
+  const [isCarFiltered, setIsCarFiltered] = useState(false);
+
+  const [carData, setCarData] = useState([]);
+
+  const [carsList, setCarsList] = useState([]);
+
   const [data, setData] = useState({
     fromDate: "",
     toDate: "",
@@ -67,6 +94,58 @@ const towingOrdersTable = (props) => {
     status: "",
     commanderNotes: "",
   });
+
+  const filteredOgdas = ogdas.filter((ogda) => ogda.pikodId === chosenPikod);
+  const filteredHativas = hativas.filter((hativa) => hativa.ogdaId === chosenOgda);
+  const filteredGdods = gdods.filter((gdod) => gdod.hativaId === chosenHativa);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/TowingLogApi/CarDatas`)
+      .then((response) => {
+        response.data.forEach((carDataInfo) => {
+          const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId];
+          carDataInfo.gdodName = gdod.name;
+          carDataInfo.hativaId = gdod.hativaId;
+          const hativa = bankData.Unit_bank.hativas[carDataInfo.hativaId];
+          carDataInfo.hativaName = hativa.name;
+          carDataInfo.ogdaId = hativa.ogdaId;
+          const ogda = bankData.Unit_bank.ogdas[carDataInfo.ogdaId];
+          carDataInfo.ogdaName = ogda.name;
+          carDataInfo.pikodId = ogda.pikodId;
+          const pikod = bankData.Unit_bank.pikods[carDataInfo.pikodId];
+          carDataInfo.pikodName = pikod.name;
+          // console.log(carDataInfo);
+        });
+        setCarData(response.data);
+      })
+      .catch((error) => {});
+  }, [bankData]);
+
+  useEffect(() => {
+    // console.log("ubit filter: ");
+    // console.log(carData);
+    if (chosenGdod !== "בחר") {
+      setCarsList(carData.filter((carInfo) => carInfo.gdodId === chosenGdod));
+      setIsCarFiltered(true);
+    } else if (chosenHativa !== "בחר") {
+      setIsCarFiltered(true);
+
+      setCarsList(carData.filter((carInfo) => carInfo.hativaId === chosenHativa));
+    } else if (chosenOgda !== "בחר") {
+      setCarsList(carData.filter((carInfo) => carInfo.ogdaId === chosenOgda));
+      setIsCarFiltered(true);
+    } else if (chosenPikod !== "בחר") {
+      setCarsList(carData.filter((carInfo) => carInfo.pikodId === chosenPikod));
+      setIsCarFiltered(true);
+    } else {
+      setCarsList([]);
+      setIsCarFiltered(false);
+    }
+  }, [chosenPikod, chosenOgda, chosenHativa, chosenGdod, carData]);
+  console.log("Cars List: ");
+  console.log(carsList);
+  
   const options = {
     // weekday: 'long', // or 'short', 'narrow'
     year: "numeric",
@@ -77,6 +156,7 @@ const towingOrdersTable = (props) => {
     // second: 'numeric',
     // timeZoneName: 'short', // or 'long'
   };
+  
   const errorResArr = [
     "לא מניע",
     "מערכות בטיחות (הגה, בלמים)",
@@ -112,12 +192,58 @@ const towingOrdersTable = (props) => {
     }
   }, []);
 
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/TowingLogApi/get_banks`)
+      .then((response) => {
+        console.log("מדפיס מערך פיקודים");
+        setBankData(response.data.data);
+        setPikods(
+          Object.entries(response.data.data.Unit_bank.pikods).map(([key, value]) => ({
+            ...value,
+            id: key,
+          }))
+        );
+        setOgdas(
+          Object.entries(response.data.data.Unit_bank.ogdas).map(([key, value]) => ({
+            ...value,
+            id: key,
+          }))
+        );
+        setHativas(
+          Object.entries(response.data.data.Unit_bank.hativas).map(([key, value]) => ({
+            ...value,
+            id: key,
+          }))
+        );
+        setGdods(
+          Object.entries(response.data.data.Unit_bank.gdods).map(([key, value]) => ({
+            ...value,
+            id: key,
+          }))
+        );
+      })
+      .catch((error) => {});
+  }, []);
+
   const {
     columns: pColumns,
     rows: pRows,
     dbError: dbe,
     setDBerror: setDbe,
-  } = towingOrdersData(typeTable, urlType, currentDate, status, area, data.fromDate, data.toDate);
+  } = towingOrdersData(
+    typeTable,
+    urlType,
+    currentDate,
+    status,
+    area,
+    data.fromDate,
+    data.toDate,
+    data.erorrInfo,
+    carsList,
+    isCarFiltered
+  );
+
   const handleErrorClose = () => {
     setDbError(true);
     setDbe(false);
@@ -157,6 +283,12 @@ const towingOrdersTable = (props) => {
       setArea(value);
     } else if (name === "fromDate" || name === "toDate") {
       setData({ ...data, [name]: value });
+    } else if (name === "erorrInfo") {
+      // console.log("sets error array");
+      setData((prev) => ({
+        ...prev,
+        [name]: typeof value === "string" ? value.split(",") : value,
+      }));
     }
   };
   const addFile = () => (
@@ -280,6 +412,26 @@ const towingOrdersTable = (props) => {
   //     </MDBox>
   //   </Dialog>
   // );
+  // const handleErrorInfoChange = (event) => {
+  //   const {
+  //     target: { value },
+  //   } = event;
+  //   const res =  typeof value === 'string' ? value.split(',') : value;
+  //   setData(
+  //     // On autofill we get a stringified value.
+  //     (prev) => ({...data, erorrInfo : res})
+  //   );
+  // };
+
+  // function getStyles(name, personName, theme) {
+  //   return {
+  //     fontWeight:
+  //       personName.indexOf(name) === -1
+  //         ? theme.typography.fontWeightRegular
+  //         : theme.typography.fontWeightMedium,
+  //   };
+  // }
+  // console.log(data.erorrInfo);
   const table = () => (
     <MDBox pt={6} pb={3}>
       <Grid container spacing={6}>
@@ -413,7 +565,23 @@ const towingOrdersTable = (props) => {
                 <Row>
                   <Col>
                     <h6>מהות התקלה</h6>
-                    <div style={{ display: "flex", flexWrap: "wrap" }}>
+                    <TextField
+                      label="מהות תקלה"
+                      select
+                      onChange={handleChange}
+                      name="erorrInfo"
+                      value={data.erorrInfo}
+                      fullWidth
+                      SelectProps={{
+                        multiple: true,
+                      }}
+                    >
+                      {errorResArr.map((errorRes) => (
+                      
+                        <MenuItem value={errorRes}>{errorRes}</MenuItem>
+                      ))}
+                    </TextField>
+                    {/* <div style={{ display: "flex", flexWrap: "wrap" }}>
                       {errorResArr.map((res) => errorInput(res))}
                       {data.erorrInfo.includes("אחר") && (
                         <>
@@ -432,7 +600,92 @@ const towingOrdersTable = (props) => {
                           </Row>
                         </>
                       )}
-                    </div>
+                    </div> */}
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <FormGroup>
+                      <h6>פיקוד</h6>
+                      <Input
+                        placeholder="פיקוד"
+                        type="select"
+                        name="pikod"
+                        value={chosenPikod}
+                        onChange={(evt) => {
+                          setChosenPikod(evt.target.value);
+                        }}
+                        disabled={chosenOgda !== "בחר"}
+                      >
+                        <option value="בחר">בחר</option>
+                        {pikods.map((pikod) => (
+                          <option value={pikod.id}>{pikod.name}</option>
+                        ))}
+                      </Input>
+                    </FormGroup>
+                  </Col>
+
+                  <Col>
+                    <FormGroup>
+                      <h6>אוגדה</h6>
+                      <Input
+                        placeholder="אוגדה"
+                        type="select"
+                        name="ogda"
+                        value={chosenOgda}
+                        onChange={(evt) => {
+                          setChosenOgda(evt.target.value);
+                        }}
+                        disabled={chosenHativa !== "בחר" || chosenPikod === "בחר"}
+                      >
+                        <option value="בחר">בחר</option>
+                        {filteredOgdas.map((ogda) => (
+                          <option value={ogda.id}>{ogda.name}</option>
+                        ))}
+                      </Input>
+                    </FormGroup>
+                  </Col>
+
+                  <Col>
+                    <FormGroup>
+                      <h6>חטיבה</h6>
+                      <Input
+                        placeholder="חטיבה"
+                        type="select"
+                        name="hativa"
+                        value={chosenHativa}
+                        onChange={(evt) => {
+                          setChosenHativa(evt.target.value);
+                        }}
+                        disabled={chosenGdod !== "בחר" || chosenOgda === "בחר"}
+                      >
+                        <option value="בחר">בחר</option>
+                        {filteredHativas.map((hativa) => (
+                          <option value={hativa.id}>{hativa.name}</option>
+                        ))}
+                      </Input>
+                    </FormGroup>
+                  </Col>
+
+                  <Col>
+                    <FormGroup>
+                      <h6>גדוד</h6>
+                      <Input
+                        placeholder="גדוד"
+                        type="select"
+                        name="gdod"
+                        value={chosenGdod}
+                        onChange={(evt) => {
+                          setChosenGdod(evt.target.value);
+                        }}
+                        disabled={chosenHativa === "בחר"}
+                      >
+                        <option value="בחר">בחר</option>
+                        {filteredGdods.map((gdod) => (
+                          <option value={gdod.id}>{gdod.name}</option>
+                        ))}
+                      </Input>
+                    </FormGroup>
                   </Col>
                 </Row>
               </MDBox>
