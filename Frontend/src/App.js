@@ -60,7 +60,10 @@ import { default as UserRoutes, default as routes } from "routes/userRoutes";
 import { setMiniSidenav, setOpenConfigurator, useMaterialUIController } from "context";
 
 // ! ---------------Project Brand Images and info---------------------------
-import { default as brandDark, default as brandWhite } from "assets/images/unitsimg/tne.png";
+import {
+  default as brandDark,
+  default as brandWhite,
+} from "assets/images/projectLogoImages/TowingLogo.png";
 // ! ------------------------------------------
 
 import WebsiteLoader from "components/WebsiteLoader/WebsiteLoader";
