@@ -67,7 +67,7 @@ const AdminRoutes = [
     key: "towingorders",
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/towingorders",
-    component: <TowingOrders />,
+    component: <TowingOrders typeTable="towingorders" />,
   },
   {
     type: "collapse",
@@ -83,7 +83,7 @@ const AdminRoutes = [
     key: "landing",
     icon: <Icon fontSize="small">toys</Icon>,
     route: "/landing",
-    component: <Halfim />,
+    component: <TowingOrders typeTable="landing" />,
   },
   {
     type: "divider",

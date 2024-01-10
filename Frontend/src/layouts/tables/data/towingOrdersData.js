@@ -36,6 +36,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Dialog, DialogContent } from "@mui/material";
 import TowingOrderFormDB from "layouts/Forms/towingOrder/towingOrderFormDB";
+import { element } from "prop-types";
 
 // Images
 // import LogoAsana from "assets/images/small-logos/logo-asana.svg";
@@ -45,7 +46,9 @@ import TowingOrderFormDB from "layouts/Forms/towingOrder/towingOrderFormDB";
 // import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 // import logoInvesion from "assets/images/small-logos/logo-invision.svg";
 
-export default function data(status, area, fromDate, toDate, erorrInfo, carsList, isCarFiltered) {
+
+export default function data(typeTable, urlType, currentDate, status, area, fromDate, toDate, erorrInfo, carsList, isCarFiltered) {
+
   // const Project = ({ image, name }) => (
   //   <MDBox display="flex" alignItems="center" lineHeight={1}>
   //     <MDAvatar src={image} name={name} size="sm" variant="rounded" />
@@ -191,9 +194,25 @@ export default function data(status, area, fromDate, toDate, erorrInfo, carsList
       .get(`http://localhost:5000/TowingLogApi/TowingOrder`)
       .then((response) => {
         console.log(response.data);
+        if (urlType === "landing") {
+          setRequestDB(
+            response.data.filter(
+              (elOrder) =>
+                elOrder.orderDate.split("T")[0] === currentDate.toISOString().split("T")[0]
+            )
+          );
+          setOriginaldata(
+            response.data.filter(
+              (elOrder) =>
+                elOrder.orderDate.split("T")[0] === currentDate.toISOString().split("T")[0]
+            )
+          );
+        } else if (urlType === "towingorders") {
+          setRequestDB(response.data);
+          setOriginaldata(response.data);
+        }
         // if (response.data !== null) {
-        setRequestDB(response.data);
-        setOriginaldata(response.data);
+
         // }
         // else {
         //   setRequestDB(response.data.filter((u) => u.admin !== "0"));
@@ -203,7 +222,7 @@ export default function data(status, area, fromDate, toDate, erorrInfo, carsList
         // console.log(error);
         setIsError(true);
       });
-  }, []);
+  }, [typeTable]);
 
   useEffect(() => {
     axios
@@ -342,7 +361,7 @@ export default function data(status, area, fromDate, toDate, erorrInfo, carsList
     area: towingOrder.area,
     status: towingOrder.status,
     editPower: (
-      <Link to={`/towingorders/${towingOrder._id}`} key={towingOrder._id}>
+      <Link to={`/${urlType}/${towingOrder._id}`} key={towingOrder._id}>
         <MDButton
           variant="gradient"
           color="mekatnar"

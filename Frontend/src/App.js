@@ -273,6 +273,10 @@ export default function App() {
                     <Route path=":id" element={<TowingOrderFormDB />} />
                   </Route>
 
+                  <Route path="/landing">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
+                  </Route>
+
                   {/* <Route path="/casualtiesFamily/profile/">
                     <Route path=":id" element={<CasualtiesFamilyFormDB />} />
                   </Route>
@@ -286,7 +290,7 @@ export default function App() {
                   </Route> */}
 
                   <Route path="/Error404" element={<Error404 />} />
-                  <Route path="/" element={<Navigate to="/dashboard" />} />
+                  <Route path="/" element={<Navigate to="/towingorders" />} />
                   <Route path="*" element={<Error404 />} />
                 </Routes>
               ) : user.user.admin === "1" ? (
@@ -305,12 +309,20 @@ export default function App() {
                     <Route path=":id" element={<SoldierHalalFormDB />} />
                   </Route> */}
 
-                  <Route path="/authentication/admin/edituser">
+                  {/* <Route path="/authentication/admin/edituser">
                     <Route path=":id" element={<EditUser />} />
+                  </Route> */}
+
+                  <Route path="/towingorders">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
+                  </Route>
+
+                  <Route path="/landing">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
                   </Route>
 
                   <Route path="/Error404" element={<Error404 />} />
-                  <Route path="/" element={<Navigate to="/dashboard" />} />
+                  <Route path="/" element={<Navigate to="/towingorders" />} />
                   <Route path="*" element={<Error404 />} />
                 </Routes>
               ) : (
@@ -320,6 +332,13 @@ export default function App() {
                   <Route path="/authentication/admin/edituser">
                     <Route path=":id" element={<EditUser />} />
                   </Route> */}
+                  <Route path="/towingorders">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
+                  </Route>
+
+                  <Route path="/landing">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
+                  </Route>
 
                   {/* <Route path="/soldiersKeva/profile/">
                     <Route path=":id" element={<SoldierKevaFormDB />} />
@@ -330,7 +349,7 @@ export default function App() {
                   </Route>
  */}
                   <Route path="/Error404" element={<Error404 />} />
-                  <Route path="/" element={<Navigate to="/dashboard" />} />
+                  <Route path="/" element={<Navigate to="/towingorders" />} />
                   <Route path="*" element={<Error404 />} />
                 </Routes>
               )

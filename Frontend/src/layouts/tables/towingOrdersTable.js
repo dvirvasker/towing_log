@@ -51,21 +51,12 @@ import { useEffect, useState } from "react";
 
 import { authenticate, isAuthenticated, signin } from "auth/index";
 import axios from "axios";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { CardBody, Col, Container, Form, FormGroup, FormText, Input, Label, Row } from "reactstrap";
 
-// const ITEM_HEIGHT = 48;
-// const ITEM_PADDING_TOP = 8;
-// const MenuProps = {
-//   PaperProps: {
-//     style: {
-//       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-//       width: 250,
-//     },
-//   },
-// };
-
-const towingOrdersTable = () => {
+const towingOrdersTable = (props) => {
+  const { pathname } = useLocation();
+  const { typeTable } = props;
   const tableTittle = "הזמנות גרירה";
   const [filterOpen, setFilterOpen] = useState(false);
   const [status, setStatus] = useState("בחר");
@@ -154,6 +145,18 @@ const towingOrdersTable = () => {
   }, [chosenPikod, chosenOgda, chosenHativa, chosenGdod, carData]);
   console.log("Cars List: ");
   console.log(carsList);
+  
+  const options = {
+    // weekday: 'long', // or 'short', 'narrow'
+    year: "numeric",
+    month: "numeric", // or 'short', 'narrow'
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    // second: 'numeric',
+    // timeZoneName: 'short', // or 'long'
+  };
+  
   const errorResArr = [
     "לא מניע",
     "מערכות בטיחות (הגה, בלמים)",
@@ -169,6 +172,18 @@ const towingOrdersTable = () => {
     "קודן",
     "אחר",
   ];
+  const currentDate = new Date();
+  let tableTittle = "";
+  let urlType = "";
+  if (typeTable === "landing") {
+    tableTittle = `גרירות מוזמנות להיום - ${
+      currentDate.toLocaleDateString(undefined, options).split(", ")[0]
+    }`;
+    urlType = "landing";
+  } else if (typeTable === "towingorders") {
+    tableTittle = "הזמנות גרירה";
+    urlType = "towingorders";
+  }
   //   const { columns, rows } = authorsTableData();
   // eslint-disable-next-line consistent-return
   useEffect(() => {
@@ -217,6 +232,9 @@ const towingOrdersTable = () => {
     dbError: dbe,
     setDBerror: setDbe,
   } = towingOrdersData(
+    typeTable,
+    urlType,
+    currentDate,
     status,
     area,
     data.fromDate,
@@ -448,7 +466,7 @@ const towingOrdersTable = () => {
                   <Icon>add</Icon>
                 </MDButton>
               </Grid>
-              <Grid style={{ position: "absolute", top: "7%" }}>
+              <Grid style={{ position: "static", top: "7px" }}>
                 <MDButton
                   variant="gradient"
                   onClick={() => setFilterOpen(!filterOpen)}
@@ -515,32 +533,35 @@ const towingOrdersTable = () => {
                     </Input>
                   </Col>
                 </Row>
-                <Row>
-                  <Col>
-                    <FormGroup>
-                      <h6 style={{}}>מתאריך</h6>
-                      <Input
-                        placeholder="מתאריך"
-                        type="date"
-                        name="fromDate"
-                        value={data.fromDate}
-                        onChange={handleChange}
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col>
-                    <FormGroup>
-                      <h6 style={{}}>עד תאריך</h6>
-                      <Input
-                        placeholder="עד תאריך"
-                        type="date"
-                        name="toDate"
-                        value={data.toDate}
-                        onChange={handleChange}
-                      />
-                    </FormGroup>
-                  </Col>
-                </Row>
+                {urlType === "towingorders" ? (
+                  <Row>
+                    <Col>
+                      <FormGroup>
+                        <h6 style={{}}>מתאריך</h6>
+                        <Input
+                          placeholder="מתאריך"
+                          type="date"
+                          name="fromDate"
+                          value={data.fromDate}
+                          onChange={handleChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col>
+                      <FormGroup>
+                        <h6 style={{}}>עד תאריך</h6>
+                        <Input
+                          placeholder="עד תאריך"
+                          type="date"
+                          name="toDate"
+                          value={data.toDate}
+                          onChange={handleChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                ) : null}
+
                 <Row>
                   <Col>
                     <h6>מהות התקלה</h6>
