@@ -45,6 +45,7 @@ Coded by www.creative-tim.com
 import Dashboard from "layouts/dashboard/Tene/dashMain";
 import TowingOrders from "layouts/tables/towingOrdersTable";
 import KshirotMisgrot from "layouts/dashboard/kshirotMisgrot";
+import TowingDashboard from "layouts/dashboard/towinglog/";
 import Pagedamagedtools from "layouts/dashboard/damagedtools";
 import Halfim from "layouts/dashboard/halfim";
 import HomePage from "layouts/home";
@@ -69,14 +70,22 @@ const AdminRoutes = [
     route: "/towingorders",
     component: <TowingOrders typeTable="towingorders" />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "דשבורד",
-  //   key: "dashboard",
-  //   icon: <Icon fontSize="small">dashboard</Icon>,
-  //   route: "/dashboard",
-  //   component: <KshirotMisgrot />,
-  // },
+  {
+    type: "collapse",
+    name: "דשבורד דוגמא",
+    key: "dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/dashboardExample",
+    component: <KshirotMisgrot />,
+  },
+  {
+    type: "collapse",
+    name: "דשבורד",
+    key: "dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/dashboard",
+    component: <TowingDashboard />,
+  },
   {
     type: "collapse",
     name: "מסך נחיתה",
