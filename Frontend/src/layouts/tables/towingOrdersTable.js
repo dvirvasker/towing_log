@@ -65,6 +65,8 @@ const towingOrdersTable = (props) => {
   const usedTheme = useTheme();
 
   const [bankData, setBankData] = useState({});
+  const [garagesData, setGaragesData] = useState([]);
+
   const [pikods, setPikods] = useState([]);
   const [ogdas, setOgdas] = useState([]);
   const [hativas, setHativas] = useState([]);
@@ -74,6 +76,8 @@ const towingOrdersTable = (props) => {
   const [chosenOgda, setChosenOgda] = useState("בחר");
   const [chosenHativa, setChosenHativa] = useState("בחר");
   const [chosenGdod, setChosenGdod] = useState("בחר");
+  const [garage, setGarage] = useState("בחר");
+  const [executiveBody, setExecutiveBody] = useState("בחר");
   const [isCarFiltered, setIsCarFiltered] = useState(false);
 
   const [carData, setCarData] = useState([]);
@@ -83,6 +87,7 @@ const towingOrdersTable = (props) => {
   const [data, setData] = useState({
     fromDate: "",
     toDate: "",
+    orderDate: "",
     erorrInfo: [],
     errInfoOther: "",
     //
@@ -122,6 +127,15 @@ const towingOrdersTable = (props) => {
   }, [bankData]);
 
   useEffect(() => {
+    axios
+      .get(`http://localhost:5000/TowingLogApi/Garages`)
+      .then((response) => {
+        setGaragesData(response.data);
+      })
+      .catch((error) => {});
+  }, []);
+
+  useEffect(() => {
     // console.log("ubit filter: ");
     // console.log(carData);
     if (chosenGdod !== "בחר") {
@@ -142,8 +156,6 @@ const towingOrdersTable = (props) => {
       setIsCarFiltered(false);
     }
   }, [chosenPikod, chosenOgda, chosenHativa, chosenGdod, carData]);
-  console.log("Cars List: ");
-  console.log(carsList);
 
   const options = {
     // weekday: 'long', // or 'short', 'narrow'
@@ -239,8 +251,11 @@ const towingOrdersTable = (props) => {
     data.fromDate,
     data.toDate,
     data.erorrInfo,
+    data.orderDate,
     carsList,
-    isCarFiltered
+    isCarFiltered,
+    garage,
+    executiveBody
   );
 
   const handleErrorClose = () => {
@@ -280,14 +295,19 @@ const towingOrdersTable = (props) => {
       setStatus(value);
     } else if (name === "area") {
       setArea(value);
-    } else if (name === "fromDate" || name === "toDate") {
+    } else if (name === "fromDate" || name === "toDate" || name === "orderDate") {
       setData({ ...data, [name]: value });
+      console.log(value);
     } else if (name === "erorrInfo") {
       // console.log("sets error array");
       setData((prev) => ({
         ...prev,
         [name]: typeof value === "string" ? value.split(",") : value,
       }));
+    } else if (name === "garage") {
+      setGarage(value);
+    } else if (name === "executiveBody") {
+      setExecutiveBody(value);
     }
   };
   const addFile = () => (
@@ -449,22 +469,23 @@ const towingOrdersTable = (props) => {
               <MDTypography variant="h3" color="white">
                 {tableTittle}
               </MDTypography>
-
-              <Grid container justifyContent="flex-end">
-                <MDButton
-                  variant="gradient"
-                  onClick={() => setToAddFile(true)}
-                  // onClick={() => {
-                  //   // setIsInfoPressed(true);
-                  //   // setpressedID(hozla._id);
-                  // }}
-                  circular="true"
-                  iconOnly="true"
-                  size="medium"
-                >
-                  <Icon>add</Icon>
-                </MDButton>
-              </Grid>
+              {urlType === "towingorders" ? (
+                <Grid container justifyContent="flex-end">
+                  <MDButton
+                    variant="gradient"
+                    onClick={() => setToAddFile(true)}
+                    // onClick={() => {
+                    //   // setIsInfoPressed(true);
+                    //   // setpressedID(hozla._id);
+                    // }}
+                    circular="true"
+                    iconOnly="true"
+                    size="medium"
+                  >
+                    <Icon>add</Icon>
+                  </MDButton>
+                </Grid>
+              ) : null}
               <Grid style={{ position: "static", top: "7px" }}>
                 <MDButton
                   variant="gradient"
@@ -531,36 +552,42 @@ const towingOrdersTable = (props) => {
                       <option value="איו''ש">איוש</option>
                     </Input>
                   </Col>
+                  <Col>
+                    <FormGroup>
+                      <h6 style={{}}>לגרור ל</h6>
+                      <Input
+                        placeholder="לגרור ל"
+                        type="select"
+                        name="garage"
+                        value={garage}
+                        onChange={handleChange}
+                      >
+                        <option value="בחר">בחר</option>
+                        {garagesData.map((garageEl) => (
+                          <option value={garageEl._id}>{garageEl.garageName}</option>
+                        ))}
+                      </Input>
+                    </FormGroup>
+                  </Col>
+                  <Col>
+                    <FormGroup>
+                      <h6>גוף מבצע</h6>
+                      <Input
+                        placeholder="גוף מבצע"
+                        type="select"
+                        name="executiveBody"
+                        value={executiveBody}
+                        onChange={handleChange}
+                      >
+                        <option value="בחר">בחר</option>
+                        <option value="חברה אזרחית - גרירה">חברה אזרחית - גרירה</option>
+                        <option value="חברה אזרחית – ניידת שירות">חברה אזרחית – ניידת שירות</option>
+                        <option value="צבאי">צבאי</option>
+                        <option value="מוביל כננת">מוביל כננת</option>
+                      </Input>
+                    </FormGroup>
+                  </Col>
                 </Row>
-                {urlType === "towingorders" ? (
-                  <Row>
-                    <Col>
-                      <FormGroup>
-                        <h6 style={{}}>מתאריך</h6>
-                        <Input
-                          placeholder="מתאריך"
-                          type="date"
-                          name="fromDate"
-                          value={data.fromDate}
-                          onChange={handleChange}
-                        />
-                      </FormGroup>
-                    </Col>
-                    <Col>
-                      <FormGroup>
-                        <h6 style={{}}>עד תאריך</h6>
-                        <Input
-                          placeholder="עד תאריך"
-                          type="date"
-                          name="toDate"
-                          value={data.toDate}
-                          onChange={handleChange}
-                        />
-                      </FormGroup>
-                    </Col>
-                  </Row>
-                ) : null}
-
                 <Row>
                   <Col>
                     <h6>מהות התקלה</h6>
@@ -574,33 +601,54 @@ const towingOrdersTable = (props) => {
                       SelectProps={{
                         multiple: true,
                       }}
+                      variant="standard"
                     >
                       {errorResArr.map((errorRes) => (
                         <MenuItem value={errorRes}>{errorRes}</MenuItem>
                       ))}
                     </TextField>
-                    {/* <div style={{ display: "flex", flexWrap: "wrap" }}>
-                      {errorResArr.map((res) => errorInput(res))}
-                      {data.erorrInfo.includes("אחר") && (
-                        <>
-                          <p>הערות: </p>
-                          <Row>
-                            <Col>
-                              <Input
-                                // style={{display:'inline', width:'320px'}}
-                                placeholder="הערות"
-                                name="errInfoOther"
-                                value={data.errInfoOther}
-                                onChange={handleChange}
-                                type="text"
-                              />
-                            </Col>
-                          </Row>
-                        </>
-                      )}
-                    </div> */}
                   </Col>
                 </Row>
+                {urlType === "towingorders" ? (
+                  <Row>
+                    {/* <Col>
+                      <FormGroup>
+                        <h6 style={{}}>תאריך הזמנה</h6>
+                        <Input
+                          placeholder="תאריך הזמנה"
+                          type="date"
+                          name="orderDate"
+                          value={data.orderDate}
+                          onChange={handleChange}
+                        />
+                      </FormGroup>
+                    </Col> */}
+                    <Col>
+                      <FormGroup>
+                        <h6 style={{}}>מתאריך ביצוע מבוקש</h6>
+                        <Input
+                          placeholder="מתאריך"
+                          type="date"
+                          name="fromDate"
+                          value={data.fromDate}
+                          onChange={handleChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col>
+                      <FormGroup>
+                        <h6 style={{}}>עד תאריך ביצוע מבוקש</h6>
+                        <Input
+                          placeholder="עד תאריך"
+                          type="date"
+                          name="toDate"
+                          value={data.toDate}
+                          onChange={handleChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                ) : null}
                 <Row>
                   <Col>
                     <FormGroup>
