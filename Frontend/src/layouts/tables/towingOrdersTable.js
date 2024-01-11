@@ -87,7 +87,8 @@ const towingOrdersTable = (props) => {
   const [data, setData] = useState({
     fromDate: "",
     toDate: "",
-    orderDate: "",
+    fromOrderDate: "",
+    toOrderDate: "",
     erorrInfo: [],
     errInfoOther: "",
     //
@@ -251,7 +252,8 @@ const towingOrdersTable = (props) => {
     data.fromDate,
     data.toDate,
     data.erorrInfo,
-    data.orderDate,
+    data.fromOrderDate,
+    data.toOrderDate,
     carsList,
     isCarFiltered,
     garage,
@@ -295,7 +297,12 @@ const towingOrdersTable = (props) => {
       setStatus(value);
     } else if (name === "area") {
       setArea(value);
-    } else if (name === "fromDate" || name === "toDate" || name === "orderDate") {
+    } else if (
+      name === "fromDate" ||
+      name === "toDate" ||
+      name === "fromOrderDate" ||
+      name === "toOrderDate"
+    ) {
       setData({ ...data, [name]: value });
       console.log(value);
     } else if (name === "erorrInfo") {
@@ -610,44 +617,63 @@ const towingOrdersTable = (props) => {
                   </Col>
                 </Row>
                 {urlType === "towingorders" ? (
-                  <Row>
-                    {/* <Col>
-                      <FormGroup>
-                        <h6 style={{}}>תאריך הזמנה</h6>
-                        <Input
-                          placeholder="תאריך הזמנה"
-                          type="date"
-                          name="orderDate"
-                          value={data.orderDate}
-                          onChange={handleChange}
-                        />
-                      </FormGroup>
-                    </Col> */}
-                    <Col>
-                      <FormGroup>
-                        <h6 style={{}}>מתאריך ביצוע מבוקש</h6>
-                        <Input
-                          placeholder="מתאריך"
-                          type="date"
-                          name="fromDate"
-                          value={data.fromDate}
-                          onChange={handleChange}
-                        />
-                      </FormGroup>
-                    </Col>
-                    <Col>
-                      <FormGroup>
-                        <h6 style={{}}>עד תאריך ביצוע מבוקש</h6>
-                        <Input
-                          placeholder="עד תאריך"
-                          type="date"
-                          name="toDate"
-                          value={data.toDate}
-                          onChange={handleChange}
-                        />
-                      </FormGroup>
-                    </Col>
-                  </Row>
+                  <>
+                    <Row>
+                      <Col>
+                        <h6 style={{}}>טווח תאריכי הזמנה</h6>
+                      </Col>
+                      <Col>
+                        <h6 style={{}}>טווח תאריכי ביצוע מבוקש</h6>
+                      </Col>
+                    </Row>
+
+                    <Row>
+                      <Col>
+                        <FormGroup>
+                          <Input
+                            placeholder="מתאריך הזמנה"
+                            type="date"
+                            name="fromOrderDate"
+                            value={data.fromOrderDate}
+                            onChange={handleChange}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col>
+                        <FormGroup>
+                          <Input
+                            placeholder="עד תאריך הזמנה"
+                            type="date"
+                            name="toOrderDate"
+                            value={data.toOrderDate}
+                            onChange={handleChange}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col>
+                        <FormGroup>
+                          <Input
+                            placeholder="מתאריך"
+                            type="date"
+                            name="fromDate"
+                            value={data.fromDate}
+                            onChange={handleChange}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col>
+                        <FormGroup>
+                          <Input
+                            placeholder="עד תאריך"
+                            type="date"
+                            name="toDate"
+                            value={data.toDate}
+                            onChange={handleChange}
+                          />
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                  </>
                 ) : null}
                 <Row>
                   <Col>

@@ -54,8 +54,9 @@ export default function data(
   area,
   fromDate,
   toDate,
-  orderDate,
   erorrInfo,
+  fromOrderDate,
+  toOrderDate,
   carsList,
   isCarFiltered,
   garage,
@@ -159,13 +160,17 @@ export default function data(
       filter7 = filter6.filter((el) => el.executiveBody === executiveBody);
     }
     // console.log(orderDate);
-    // let filter8 = [];
-    // if (orderDate) {
-    //   filter8 = filter7.filter((el) => el.orderDate.split("T")[0] === orderDate);
-    // } else {
-    //   filter8 = filter7;
-    //   console.log(orderDate);
-    // }
+    let filter8 = [];
+    if (fromOrderDate || toOrderDate) {
+      filter8 = filter7.filter(
+        (el) =>
+          new Date(el.orderDate).setHours(0, 0, 0, 0) >=
+            new Date(fromOrderDate).setHours(0, 0, 0, 0) &&
+          new Date(el.orderDate).setHours(0, 0, 0, 0) <= new Date(toOrderDate).setHours(0, 0, 0, 0)
+      );
+    } else {
+      filter8 = filter7;
+    }
     // if (dead === "בחר" || dead === undefined) {
     //   filter4 = filter3;
     // } else if (dead === "true") {
@@ -204,7 +209,7 @@ export default function data(
     //   filter6 = filter5.filter((el) => el.classReport === typeclass.classReport.id);
     // }
 
-    setRequestDB(filter7);
+    setRequestDB(filter8);
   };
 
   useEffect(async () => {
@@ -214,7 +219,7 @@ export default function data(
     area,
     fromDate,
     toDate,
-    orderDate,
+    toOrderDate,
     erorrInfo,
     carsList,
     isCarFiltered,
