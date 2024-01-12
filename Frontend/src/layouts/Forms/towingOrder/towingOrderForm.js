@@ -65,10 +65,16 @@ import {
   Modal,
   Select,
   TextField,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 
 // user and auth import
 import { authenticate, isAuthenticated, signin } from "auth/index";
+
+// import Toast from "components/Toast/Toast";
+// import useToast from "components/Toast/useToast";
+
 const { user } = isAuthenticated();
 
 const digitsOnly = (str) => /^\d+$/.test(str);
@@ -91,6 +97,10 @@ const TowingOrderForm = () => {
   const [chosenHativa, setChosenHativa] = useState("בחר");
   const [chosenGdod, setChosenGdod] = useState("בחר");
   const date = new Date().toISOString().split("T")[0];
+  // const [errorMessage, setErrorMessage] = useState("");
+  // const [toastOpen, setToastOpen] = useState(false);
+
+  // const { isOpen, showToast, text, textType, setIsOpen } = useToast();
   // const [htivas, setHtivas]
 
   const [data, setData] = useState({
@@ -116,7 +126,7 @@ const TowingOrderForm = () => {
     phoneNumber: "",
     otherPhoneNumber: "",
     transferOrderDate: new Date().toISOString().split("T")[0],
-    transferOrderTime: "",
+    transferOrderTime: new Date().toISOString().split("T")[1].split(".")[0].slice(0, 5),
     reciveName: "",
     executiveBody: "",
     garageOther: "",
@@ -225,10 +235,18 @@ const TowingOrderForm = () => {
   }, [bankData]);
 
   useEffect(() => {
+    function sortArrayByHebrewAlphabet(array) {
+      return array.sort((a, b) =>
+        a.garageName.localeCompare(b.garageName, "he", { sensitivity: "base" })
+      );
+    }
+
     axios
       .get(`http://localhost:5000/TowingLogApi/Garages`)
       .then((response) => {
-        setGaragesData(response.data);
+        const garagesArray = response.data;
+        const sorted = sortArrayByHebrewAlphabet(garagesArray);
+        setGaragesData(sorted);
       })
       .catch((error) => {});
   }, []);
@@ -286,6 +304,82 @@ const TowingOrderForm = () => {
 
     return isValidFormat;
   }
+  // const CheckFormData = () => {
+  //   let flag = true;
+  //   const ErrorReason = [];
+  //   const AddError = (error) => {
+  //     flag = false;
+  //     ErrorReason.push(error);
+  //   };
+  //   // if (!data.orderDate) {
+  //   //   AddError("תאריך ריק");
+  //   // }
+  //   // if (!data.orderTime || data.orderDate === "") {
+  //   //   AddError("שעה ריקה");
+  //   // }
+  //   // if (data.serviceName === "") {
+  //   //   AddError("שם נציג שירות ריק");
+  //   // }
+  //   // if (data.carnumber === "") {
+  //   //   AddError("צ' ריק");
+  //   // } else
+  //   if(data.carnumber !== "")
+  //   {
+  //     if (!(digitsOnly(data.carnumber) && data.carnumber.length <= 9)) {
+  //       AddError("צ' לא תקין");
+  //     }
+  //     }
+  //   // if (data.erorrInfo.length === 0) {
+  //   //   AddError("לא רשומה סיבת תקלה");
+  //   // }
+  //   // if (data.erorrInfo.includes("אחר")) {
+  //   //   if (data.errInfoOther.trim() === "") {
+  //   //     AddError("הערות ריק");
+  //   //   }
+  //   // }
+  //   // if (data.garage === "" || data.garage === "בחר") {
+  //   //   AddError("מוסך ריק");
+  //   // }
+  //   // if (data.garage === "אחר" && data.garageOther.trim() === "") {
+  //   //   AddError("מוסך ריק (אחר)");
+  //   // }
+  //   if(data.phoneNumber !== "")
+  //   {
+  //     if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
+  //       AddError("מספר טלפון לא תקין");
+  //     }
+  //   }
+  //   if(data.otherPhoneNumber !== "")
+  //   {
+  //     if (!isValidIsraeliPhoneNumber(data.otherPhoneNumber)) {
+  //       AddError("מספר טלפון נוסף לא תקין");
+  //     }
+  //   }
+  //   // if (data.location.trim === "") {
+  //   //   AddError("מיקום ריק");
+  //   // }
+  //   // if (data.garage === "" || data.garage === "בחר") {
+  //   //   AddError("לגרור ל, ריק");
+  //   // }
+  //   // if (data.fullName.trim() === "") {
+  //   //   AddError("שם מלא ריק");
+  //   // }
+  //   // if (!data.phoneNumber.length)
+  //   if (flag !== true) {
+  //     // if (data.personalnumber === "" || data.personalnumber === undefined) {
+  //     //   flag = false;
+  //     //   ErrorReason.push("מספר אישי ריק");
+  //     // }
+
+  //     ErrorReason.forEach((reason) => {
+  //       toast.error(reason);
+  //       return false;
+  //     });
+  //   } else {
+  //     console.log("Valid");
+  //     return true;
+  //   }
+  // };
   const CheckFormData = () => {
     let flag = true;
     const ErrorReason = [];
@@ -321,11 +415,16 @@ const TowingOrderForm = () => {
     if (data.garage === "אחר" && data.garageOther.trim() === "") {
       AddError("מוסך ריק (אחר)");
     }
-    if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
-      AddError("מספר טלפון לא תקין");
+    if (data.phoneNumber !== "") {
+      if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
+        AddError("מספר טלפון לא תקין");
+      }
     }
-    if (!isValidIsraeliPhoneNumber(data.otherPhoneNumber)) {
-      AddError("מספר טלפון נוסף לא תקין");
+
+    if (data.otherPhoneNumber !== "") {
+      if (!isValidIsraeliPhoneNumber(data.otherPhoneNumber)) {
+        AddError("מספר טלפון נוסף לא תקין");
+      }
     }
 
     // if (data.location.trim === "") {
@@ -346,12 +445,12 @@ const TowingOrderForm = () => {
 
       ErrorReason.forEach((reason) => {
         toast.error(reason);
-        return false;
+        // showToast(reason, "error");
       });
-    } else {
-      console.log("Valid");
-      return true;
+      return false;
     }
+    console.log("Valid");
+    return true;
   };
 
   const SendFormData = (event) => {
@@ -404,7 +503,7 @@ const TowingOrderForm = () => {
         });
       })
       .catch((error) => {
-        // console.log(error);
+        console.log(error);
         setData({
           ...data,
           errortype: error.response,
@@ -693,6 +792,7 @@ const TowingOrderForm = () => {
                       <Input
                         placeholder="שעה"
                         type="time"
+                        step={60 * 1000}
                         name="orderTime"
                         value={data.orderTime}
                         onChange={handleChange}
@@ -839,9 +939,9 @@ const TowingOrderForm = () => {
                   </Col>
                   <Col>
                     <FormGroup>
-                      <h6 style={{}}>משקל מילוי אוטומטי</h6>
+                      <h6 style={{}}>משקל בק"ג</h6>
                       <Input
-                        placeholder="משקל מילוי אוטומטי"
+                        placeholder={`משקל בק"ג`}
                         type="text"
                         name="weight"
                         value={data.weight}
@@ -1069,7 +1169,7 @@ const TowingOrderForm = () => {
                         name="transferOrderDate"
                         value={data.transferOrderDate}
                         onChange={handleChange}
-                        min={date}
+                        // min={date}
                       />
                     </FormGroup>
                   </Col>
@@ -1079,6 +1179,7 @@ const TowingOrderForm = () => {
                       <Input
                         placeholder="שעת העברת הזמנה"
                         type="time"
+                        step={60 * 1000}
                         name="transferOrderTime"
                         value={data.transferOrderTime}
                         onChange={handleChange}
