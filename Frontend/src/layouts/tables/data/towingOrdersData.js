@@ -55,8 +55,12 @@ export default function data(
   fromDate,
   toDate,
   erorrInfo,
+  fromOrderDate,
+  toOrderDate,
   carsList,
-  isCarFiltered
+  isCarFiltered,
+  garage,
+  executiveBody
 ) {
   // const Project = ({ image, name }) => (
   //   <MDBox display="flex" alignItems="center" lineHeight={1}>
@@ -71,6 +75,7 @@ export default function data(
   const [requestDB, setRequestDB] = useState([]);
   const [originaldata, setOriginaldata] = useState([]);
   const [carTypesData, setCarTypesData] = useState([]);
+  const [carDatas, setCarDatas] = useState([]);
   const [garagesData, setGaragesData] = useState([]);
   const [isInfoPressed, setIsInfoPressed] = useState(false);
   const [pressedID, setpressedID] = useState("");
@@ -123,36 +128,49 @@ export default function data(
     if (fromDate && toDate) {
       filter3 = filter2.filter(
         (el) =>
-          new Date(el.orderDate).setHours(0, 0, 0, 0) >= new Date(fromDate).setHours(0, 0, 0, 0) &&
-          new Date(el.orderDate).setHours(0, 0, 0, 0) <= new Date(toDate).setHours(0, 0, 0, 0)
+          new Date(el.demandDate).setHours(0, 0, 0, 0) >= new Date(fromDate).setHours(0, 0, 0, 0) &&
+          new Date(el.demandDate).setHours(0, 0, 0, 0) <= new Date(toDate).setHours(0, 0, 0, 0)
       );
     } else {
       filter3 = filter2;
     }
 
-    // let filter3 = [];
-
-    // if (visitWanted === "בחר" || visitWanted === undefined) {
-    //   filter3 = filter2;
-    // } else if (visitWanted === "true") {
-    //   filter3 = filter2.filter((el) => el.visitWanted === true);
-    // } else if (visitWanted === "false") {
-    //   filter3 = filter2.filter((el) => el.visitWanted === false);
-    // }
-    // console.log("Filtered error : ");
-    // console.log(erorrInfo);
-
-    console.log(filter3);
     const filter4 =
       erorrInfo.length === 0
         ? filter3
         : filter3.filter((order) => doShare(order.erorrInfo, erorrInfo));
-    // console.log("Cars Filter: ");
-    // console.log(carsList);
     const carsNumberList = carsList.map((carInfo) => carInfo.carnumber);
     const filter5 = !isCarFiltered
       ? filter4
       : filter4.filter((order) => carsNumberList.includes(order.carnumber));
+
+    let filter6 = [];
+
+    if (garage === "בחר" || garage === undefined) {
+      filter6 = filter5;
+    } else if (garage) {
+      filter6 = filter5.filter((el) => el.garage === garage);
+    }
+
+    let filter7 = [];
+
+    if (executiveBody === "בחר" || executiveBody === undefined) {
+      filter7 = filter6;
+    } else if (executiveBody) {
+      filter7 = filter6.filter((el) => el.executiveBody === executiveBody);
+    }
+    // console.log(orderDate);
+    let filter8 = [];
+    if (fromOrderDate || toOrderDate) {
+      filter8 = filter7.filter(
+        (el) =>
+          new Date(el.orderDate).setHours(0, 0, 0, 0) >=
+            new Date(fromOrderDate).setHours(0, 0, 0, 0) &&
+          new Date(el.orderDate).setHours(0, 0, 0, 0) <= new Date(toOrderDate).setHours(0, 0, 0, 0)
+      );
+    } else {
+      filter8 = filter7;
+    }
     // if (dead === "בחר" || dead === undefined) {
     //   filter4 = filter3;
     // } else if (dead === "true") {
@@ -191,12 +209,23 @@ export default function data(
     //   filter6 = filter5.filter((el) => el.classReport === typeclass.classReport.id);
     // }
 
-    setRequestDB(filter5);
+    setRequestDB(filter8);
   };
 
   useEffect(async () => {
     filteruse();
-  }, [status, area, fromDate, toDate, erorrInfo, carsList, isCarFiltered]);
+  }, [
+    status,
+    area,
+    fromDate,
+    toDate,
+    toOrderDate,
+    erorrInfo,
+    carsList,
+    isCarFiltered,
+    garage,
+    executiveBody,
+  ]);
 
   useEffect(() => {
     axios
@@ -207,18 +236,19 @@ export default function data(
           setRequestDB(
             response.data.filter(
               (elOrder) =>
-                elOrder.orderDate.split("T")[0] === currentDate.toISOString().split("T")[0]
+                elOrder.demandDate.split("T")[0] === currentDate.toISOString().split("T")[0]
             )
           );
           setOriginaldata(
             response.data.filter(
               (elOrder) =>
-                elOrder.orderDate.split("T")[0] === currentDate.toISOString().split("T")[0]
+                elOrder.demandDate.split("T")[0] === currentDate.toISOString().split("T")[0]
             )
           );
         } else if (urlType === "towingorders") {
           setRequestDB(response.data);
           setOriginaldata(response.data);
+          console.log(response.data);
         }
         // if (response.data !== null) {
 
@@ -247,6 +277,15 @@ export default function data(
       .get(`http://localhost:5000/TowingLogApi/CarTypes`)
       .then((response) => {
         setCarTypesData(response.data);
+      })
+      .catch((error) => {});
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/TowingLogApi/CarDatas`)
+      .then((response) => {
+        setCarDatas(response.data);
       })
       .catch((error) => {});
   }, []);
@@ -287,57 +326,49 @@ export default function data(
     return [stutus, color];
   };
 
-  const handleChange = () => {
-    // axios.post(`http://localhost:5000/TowingLogApi/updateApproved`, ).then((res) => {
-    //   // toast.success(`הטופס נשלח בהצלחה`);
-    //   // history.push(`/signin`);
-    //   console.log(res.data);
-    //   // setToraHeilitVolume(response.data.toraHeilitVolumes);
-    // });
+  const setTypeStatus = (orderStatus) => {
+    let color = "mekatnar";
+    if (orderStatus === "פתוח") {
+      color = "mekatnar";
+    } else if (orderStatus === "סגור") {
+      color = "secondary";
+    } else if (orderStatus === "מבוטל") {
+      color = "error";
+    } else if (orderStatus === "מוקפא") {
+      color = "warning";
+    } else if (orderStatus === "ממתין לאישור") {
+      color = "light";
+    }
+    return color;
   };
 
-  const setTypeUser = (admin) => {
-    let typeName = "";
-    let color = "mekatnar";
-    if (admin === "0") {
-      typeName = "מנהל מערכת";
-      color = "mekatnar";
-    } else if (admin === "1") {
-      typeName = "משתמש רגיל";
-      color = "info";
-    } else if (admin === "2") {
-      typeName = "משתמש כוח אדם";
-      color = "primary";
-    } else if (admin === "3") {
-      typeName = "משתמש תא חיזוי";
-      color = "primary";
-    } else if (admin === "4") {
-      typeName = "משתמש תא כשירות המסגרת";
-      color = "primary";
-    } else if (admin === "5") {
-      typeName = "משתמש תא אחזקות בתעשייה";
-      color = "primary";
-    } else if (admin === "6") {
-      typeName = "משתמש חלפים";
-      color = "primary";
-    } else if (admin === "7") {
-      typeName = 'משתמש תא אמל"ח וטכנולגיות';
-      color = "primary";
-    } else if (admin === "8") {
-      typeName = 'משתמש תא משקים מטכל"ים';
-      color = "primary";
+  const setCarType = (carType) => {
+    let nameCarType = "";
+    carDatas.forEach((carEl) => {
+      if (carEl.carnumber === carType) {
+        carTypesData.forEach((typeEl) => {
+          if (typeEl._id === carEl.carTypeId) {
+            nameCarType = typeEl;
+          }
+        });
+      }
+    });
+    return nameCarType;
+  };
+
+  const setGarage = (garage) => {
+    let nameOfGarage = "";
+    const garageData = garagesData.forEach((garageEl) => {
+      if (garageEl._id.toString() === garage) {
+        nameOfGarage = garageEl;
+      }
+    });
+    if (garageData === "") {
+      nameOfGarage = garage;
     }
-    return [typeName, color];
+    return nameOfGarage;
   };
-  const getGarage = (garage) => {
-    console.log(garage);
-    const filtered = garagesData.filter((garageEl) => garageEl._id.toString() === garage);
-    console.log(filtered);
-    return filtered;
-  };
-  // const convertNum = (num) => {
-  //   parseInt()
-  // }
+
   const editFile = (towingOrder) => (
     <Dialog
       px={5}
@@ -361,14 +392,26 @@ export default function data(
       .toLocaleDateString(undefined, options)
       .split(", ")[0],
     carnumber: towingOrder.carnumber,
+    carType: setCarType(towingOrder.carnumber).carType,
     location: towingOrder.location,
-    garage: towingOrder.garage,
+    garage:
+      setGarage(towingOrder.garage).garageName && setGarage(towingOrder.garage).garageArea
+        ? `${setGarage(towingOrder.garage).garageName} ב${setGarage(towingOrder.garage).garageArea}`
+        : setGarage(towingOrder.garage).garageName
+        ? setGarage(towingOrder.garage).garageName
+        : towingOrder.garage,
     executiveBody: towingOrder.executiveBody,
     demandDate: new Date(towingOrder.demandDate)
       .toLocaleDateString(undefined, options)
       .split(", ")[0],
     area: towingOrder.area,
-    status: towingOrder.status,
+    status: (
+      <MDBadge
+        badgeContent={towingOrder.status}
+        color={setTypeStatus(towingOrder.status)}
+        container
+      />
+    ),
     editPower: (
       <Link to={`/${urlType}/${towingOrder._id}`} key={towingOrder._id}>
         <MDButton
@@ -395,7 +438,7 @@ export default function data(
       { Header: "אסמכתא", accessor: "reference", align: "center" },
       { Header: "תאריך", accessor: "orderDate", align: "center" },
       { Header: "צ'", accessor: "carnumber", align: "center" },
-      { Header: "סוג רכב נגרר", accessor: "editsPower", align: "center" },
+      { Header: "סוג רכב נגרר", accessor: "carType", align: "center" },
       { Header: "מיקום", accessor: "location", align: "center" },
       { Header: "מוסך", accessor: "garage", align: "center" },
       { Header: "גוף מבצע", accessor: "executiveBody", align: "center" },

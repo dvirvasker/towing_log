@@ -58,6 +58,14 @@ import Pagedamagedtools from "layouts/dashboard/damagedtools";
 const routes = [
   {
     type: "collapse",
+    name: "מסך הבית",
+    key: "landing",
+    icon: <Icon fontSize="small">toys</Icon>,
+    route: "/landing",
+    component: <TowingOrders typeTable="landing" />,
+  },
+  {
+    type: "collapse",
     name: "הזמנות גרירה",
     key: "towingorders",
     icon: <Icon fontSize="small">table_view</Icon>,
@@ -72,14 +80,6 @@ const routes = [
   //   route: "/dashboard",
   //   component: <KshirotMisgrot />,
   // },
-  {
-    type: "collapse",
-    name: "מסך נחיתה",
-    key: "landing",
-    icon: <Icon fontSize="small">toys</Icon>,
-    route: "/landing",
-    component: <TowingOrders typeTable="landing" />,
-  },
 ];
 
 export default routes;

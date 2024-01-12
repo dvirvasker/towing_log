@@ -3,6 +3,7 @@
 /* eslint-disable import/newline-after-import */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
+/* eslint no-return-assign: "error" */
 /**
 =========================================================
 * Material Dashboard 2 React - v2.1.0
@@ -21,7 +22,7 @@ Coded by www.creative-tim.com
 import { useEffect, useState } from "react";
 
 // react-router-dom components
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, Navigate } from "react-router-dom";
 
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
@@ -56,7 +57,7 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { Collapse } from "@mui/material";
 import NGTeamLogo from "assets/images/NewNGlogoWhite.svg";
 import hozlaLogo from "assets/images/hozlaLogo.png";
-import EgedArziLogo from "assets/images/unitsimg/EgedArzi.png";
+import team100white from "assets/images/team100_white.png";
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
@@ -363,9 +364,10 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       <List>{renderRoutes}</List>
       <MDBox
         component="img"
-        src={EgedArziLogo}
-        alt="EgedArziLogo"
-        width="70px"
+        src={team100white}
+        onClick={() => (window.location.href = "/AboutPage")}
+        alt="team100white"
+        width="100px"
         alignSelf="center"
         sx={{
           marginTop: "auto",
