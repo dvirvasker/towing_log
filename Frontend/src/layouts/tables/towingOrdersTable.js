@@ -184,7 +184,29 @@ const towingOrdersTable = (props) => {
     "קודן",
     "אחר",
   ];
+
   const currentDate = new Date();
+  useEffect(() => {
+    setFilterOpen(false);
+    setExecutiveBody("בחר");
+    setGarage("בחר");
+    setChosenGdod("בחר");
+    setChosenHativa("בחר");
+    setChosenOgda("בחר");
+    setChosenPikod("בחר");
+    setStatus("בחר");
+    setArea("בחר");
+    setData({
+      ...data,
+      fromDate: "",
+      toDate: "",
+      fromOrderDate: "",
+      toOrderDate: "",
+      erorrInfo: [],
+      errInfoOther: "",
+    });
+  }, [typeTable]);
+
   let tableTittle = "";
   let urlType = "";
   if (typeTable === "landing") {
