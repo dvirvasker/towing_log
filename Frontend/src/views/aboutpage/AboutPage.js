@@ -20,8 +20,8 @@ import {
 } from "reactstrap";
 import axios from "axios";
 
-import HozlaAbout from "./HozlaAbout";
-import TeamNGComp from "./TeamNGComp";
+import ProjectAbout from "./ProjectAbout";
+import TeamMea from "./Team100Comp";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -43,10 +43,10 @@ function AboutPage() {
         <Grid container spacing={1} justifyContent="center" alignItems="top" height="100%">
           <Grid item xs={11} sm={9} md={7} lg={5} xl={5}>
             <MDBox pt={4} pb={5} px={3}>
-              <HozlaAbout />
+              <ProjectAbout />
             </MDBox>
             <MDBox pt={4} pb={3} px={3}>
-              <TeamNGComp />
+              <TeamMea />
             </MDBox>
           </Grid>
         </Grid>

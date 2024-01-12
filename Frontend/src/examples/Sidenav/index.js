@@ -3,6 +3,7 @@
 /* eslint-disable import/newline-after-import */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
+/* eslint no-return-assign: "error" */
 /**
 =========================================================
 * Material Dashboard 2 React - v2.1.0
@@ -21,7 +22,7 @@ Coded by www.creative-tim.com
 import { useEffect, useState } from "react";
 
 // react-router-dom components
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, Navigate } from "react-router-dom";
 
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
@@ -364,6 +365,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       <MDBox
         component="img"
         src={team100white}
+        onClick={() => (window.location.href = "/AboutPage")}
         alt="team100white"
         width="100px"
         alignSelf="center"

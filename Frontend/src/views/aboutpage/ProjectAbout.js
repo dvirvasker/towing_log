@@ -28,7 +28,7 @@ import {
   Col,
   Collapse,
 } from "reactstrap";
-import hozlaLogo from "assets/images/hozlaLogo.png";
+import TowingLogo from "assets/images/projectLogoImages/TowingLogo.png";
 
 function HozlaAbout() {
   return (
@@ -44,14 +44,14 @@ function HozlaAbout() {
         mb={1}
         textAlign="center"
       >
-        <MDBox component="img" src={hozlaLogo} alt="hozlaLogo" width="12rem" alignSelf="center" />
+        <MDBox component="img" src={TowingLogo} alt="TowingLogo" width="10rem" alignSelf="center" />
         {/* <MDTypography variant="h4" fontWeight="medium"    mt={1}>מערכת הוצל"א</MDTypography> */}
       </MDBox>
       <MDBox pt={4} pb={3} px={3}>
         <MDTypography variant="h5" fontWeight="medium" mt={1}>
-          מערכת הוצל"א היא מערכת שמסייעת בניהול של הזמנות הצילום בצה"ל. המערכת מאפשרת קבלת הזמנת
-          צילומים, ניהול כלל ההזמנות שהתקבלו, אפשרויות מעקב אחר ההזמנות וקבלת דוחות שונים על סמך
-          הזמננות אלו.
+          מערכת יומן גרירות ייעוד המערכת הינו ניהול ותיעוד הזמנות הגרירות ליחידה 791 באגד טנ"א ארצי.
+          תהליכים זמינים למשתמש במערכת: הזנת טופס הזמנת גרירה עדכון וצפייה בטפסי הזמנות גרירה צפייה
+          בדשבורד גרירה המציג את סטטוס ההזמנות, ההזמנות להיום, ועוד.
         </MDTypography>
       </MDBox>
     </Card>
