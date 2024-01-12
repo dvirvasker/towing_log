@@ -329,7 +329,7 @@ export default function data(
   const setTypeStatus = (orderStatus) => {
     let color = "mekatnar";
     if (orderStatus === "פתוח") {
-      color = "mekatnar";
+      color = "success";
     } else if (orderStatus === "סגור") {
       color = "secondary";
     } else if (orderStatus === "מבוטל") {
@@ -393,7 +393,7 @@ export default function data(
       .split(", ")[0],
     carnumber: towingOrder.carnumber,
     carType: setCarType(towingOrder.carnumber).carType,
-    location: towingOrder.location,
+    location: towingOrder.location ? towingOrder.location : "-",
     garage:
       setGarage(towingOrder.garage).garageName && setGarage(towingOrder.garage).garageArea
         ? `${setGarage(towingOrder.garage).garageName} ב${setGarage(towingOrder.garage).garageArea}`
