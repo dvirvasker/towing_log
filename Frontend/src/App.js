@@ -293,7 +293,8 @@ export default function App() {
                   </Route> */}
 
                   <Route path="/Error404" element={<Error404 />} />
-                  <Route path="/" element={<Navigate to="/towingorders" />} />
+                  <Route path="/AboutPage" element={<AboutPage />} />
+                  <Route path="/" element={<Navigate to="/landing" />} />
                   <Route path="*" element={<Error404 />} />
                 </Routes>
               ) : user.user.admin === "1" ? (
@@ -325,7 +326,7 @@ export default function App() {
                   </Route>
 
                   <Route path="/Error404" element={<Error404 />} />
-                  <Route path="/" element={<Navigate to="/towingorders" />} />
+                  <Route path="/" element={<Navigate to="/landing" />} />
                   <Route path="*" element={<Error404 />} />
                 </Routes>
               ) : (
@@ -352,7 +353,7 @@ export default function App() {
                   </Route>
  */}
                   <Route path="/Error404" element={<Error404 />} />
-                  <Route path="/" element={<Navigate to="/towingorders" />} />
+                  <Route path="/" element={<Navigate to="/landing" />} />
                   <Route path="*" element={<Error404 />} />
                 </Routes>
               )

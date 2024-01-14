@@ -128,7 +128,7 @@ function SignUpUser() {
   // eslint-disable-next-line react/no-unstable-nested-components
   function NavigateUser() {
     if (signUpData.NavigateToReferrer) {
-      navigate("/dashboard");
+      navigate("/landing");
     }
   }
 

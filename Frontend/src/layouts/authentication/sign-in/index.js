@@ -109,7 +109,7 @@ function signIn() {
   // eslint-disable-next-line react/no-unstable-nested-components
   function NavigateUser() {
     if (signInData.NavigateToReferrer) {
-      navigate("/dashboard");
+      navigate("/landing");
     }
   }
 

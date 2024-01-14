@@ -188,11 +188,9 @@ const TowingOrderFormDB = () => {
 
   useEffect(() => {
     function sortArrayByHebrewAlphabet(array) {
-      return array.sort((a, b) =>
-        a.garageName.localeCompare(b.garageName, "he", { sensitivity: "base" })
-      );
+      return array.sort((a, b) => a.garageName.localeCompare(b.garageName, 'he', { sensitivity: 'base' }));
     }
-
+    
     axios
       .get(`http://localhost:5000/TowingLogApi/Garages`)
       .then((response) => {
@@ -340,11 +338,16 @@ const TowingOrderFormDB = () => {
     if (data.garage === "אחר" && data.garageOther.trim() === "") {
       AddError("מוסך ריק (אחר)");
     }
-    if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
-      AddError("מספר טלפון לא תקין");
+    if (data.phoneNumber !== "") {
+      if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
+        AddError("מספר טלפון לא תקין");
+      }
     }
-    if (!isValidIsraeliPhoneNumber(data.otherPhoneNumber)) {
-      AddError("מספר טלפון נוסף לא תקין");
+
+    if (data.otherPhoneNumber !== "") {
+      if (!isValidIsraeliPhoneNumber(data.otherPhoneNumber)) {
+        AddError("מספר טלפון נוסף לא תקין");
+      }
     }
 
     // if (data.location.trim === "") {
@@ -372,6 +375,82 @@ const TowingOrderFormDB = () => {
       return true;
     }
   };
+  // const CheckFormData = () => {
+  //   let flag = true;
+  //   const ErrorReason = [];
+  //   const AddError = (error) => {
+  //     flag = false;
+  //     ErrorReason.push(error);
+  //   };
+  //   // if (!data.orderDate) {
+  //   //   AddError("תאריך ריק");
+  //   // }
+  //   // if (!data.orderTime || data.orderDate === "") {
+  //   //   AddError("שעה ריקה");
+  //   // }
+  //   // if (data.serviceName === "") {
+  //   //   AddError("שם נציג שירות ריק");
+  //   // }
+  //   // if (data.carnumber === "") {
+  //   //   AddError("צ' ריק");
+  //   // } else 
+  //   if(data.carnumber !== "")
+  //   {
+  //     if (!(digitsOnly(data.carnumber) && data.carnumber.length <= 9)) {
+  //       AddError("צ' לא תקין");
+  //     }
+  //     }
+  //   // if (data.erorrInfo.length === 0) {
+  //   //   AddError("לא רשומה סיבת תקלה");
+  //   // }
+  //   // if (data.erorrInfo.includes("אחר")) {
+  //   //   if (data.errInfoOther.trim() === "") {
+  //   //     AddError("הערות ריק");
+  //   //   }
+  //   // }
+  //   // if (data.garage === "" || data.garage === "בחר") {
+  //   //   AddError("מוסך ריק");
+  //   // }
+  //   // if (data.garage === "אחר" && data.garageOther.trim() === "") {
+  //   //   AddError("מוסך ריק (אחר)");
+  //   // }
+  //   if(data.phoneNumber !== "")
+  //   {
+  //     if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
+  //       AddError("מספר טלפון לא תקין");
+  //     }
+  //   }
+  //   if(data.otherPhoneNumber !== "")
+  //   {    
+  //     if (!isValidIsraeliPhoneNumber(data.otherPhoneNumber)) {
+  //       AddError("מספר טלפון נוסף לא תקין");
+  //     }
+  //   }
+  //   // if (data.location.trim === "") {
+  //   //   AddError("מיקום ריק");
+  //   // }
+  //   // if (data.garage === "" || data.garage === "בחר") {
+  //   //   AddError("לגרור ל, ריק");
+  //   // }
+  //   // if (data.fullName.trim() === "") {
+  //   //   AddError("שם מלא ריק");
+  //   // }
+  //   // if (!data.phoneNumber.length)
+  //   if (flag !== true) {
+  //     // if (data.personalnumber === "" || data.personalnumber === undefined) {
+  //     //   flag = false;
+  //     //   ErrorReason.push("מספר אישי ריק");
+  //     // }
+
+  //     ErrorReason.forEach((reason) => {
+  //       toast.error(reason);
+  //       return false;
+  //     });
+  //   } else {
+  //     console.log("Valid");
+  //     return true;
+  //   }
+  // };
 
   const SendFormData = (event) => {
     event.preventDefault();
@@ -694,6 +773,7 @@ const TowingOrderFormDB = () => {
                       <Input
                         placeholder="שעה"
                         type="time"
+                        step={60 * 1000}
                         name="orderTime"
                         value={data.orderTime}
                         onChange={handleChange}
@@ -840,9 +920,9 @@ const TowingOrderFormDB = () => {
                   </Col>
                   <Col>
                     <FormGroup>
-                      <h6 style={{}}>משקל מילוי אוטומטי</h6>
+                      <h6 style={{}}>משקל בק"ג</h6>
                       <Input
-                        placeholder="משקל מילוי אוטומטי"
+                        placeholder={`משקל בק"ג`}
                         type="text"
                         name="weight"
                         value={data.weight}
@@ -1070,7 +1150,7 @@ const TowingOrderFormDB = () => {
                         name="transferOrderDate"
                         value={data.transferOrderDate}
                         onChange={handleChange}
-                        min={date}
+                        // min={date}
                       />
                     </FormGroup>
                   </Col>
@@ -1080,6 +1160,7 @@ const TowingOrderFormDB = () => {
                       <Input
                         placeholder="שעת העברת הזמנה"
                         type="time"
+                        step={60 * 1000}
                         name="transferOrderTime"
                         value={data.transferOrderTime}
                         onChange={handleChange}

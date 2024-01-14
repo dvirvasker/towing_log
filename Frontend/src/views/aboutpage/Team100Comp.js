@@ -15,6 +15,8 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
+import team100 from "assets/images/team100.png";
+
 // Authentication layout components
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 
@@ -50,16 +52,13 @@ function TeamNGComp() {
         <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
           המערכת פותחה ע"י
         </MDTypography>
-        <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-          צוות NG
-        </MDTypography>
+        <MDBox component="img" src={team100} alt="team100" width="5rem" alignSelf="center" />
         {/* <MDBox component="img" src={teamNGogo} alt="hozlaLogo" width="5rem" alignSelf="center" /> */}
       </MDBox>
       <MDBox pt={4} pb={3} px={3}>
         <MDTypography variant="h5" fontWeight="medium" mt={1}>
-          צוות NG הוא צוות שעוסק בפיתוח מערכות במפקדת קצין הטכנולוגיה והאחזקה הראשי. הצוות ממוקם
-          במדור NG בענף תו"ן ומפתח מערכות ייעודיות לחיל הטכנולוגיה והאחזקה בסביבת הWeb בשיתוף פעולה
-          עם רפ"ט.
+          צוות מא"ה הוא צוות שעוסק בפיתוח מערכות במפקדת קצין הטכנולוגיה והאחזקה הראשי. הצוות ממוקם
+          בענף תו"ן ומפתח מערכות ייעודיות לחיל הטכנולוגיה והאחזקה בסביבת הWeb.
         </MDTypography>
       </MDBox>
     </Card>
