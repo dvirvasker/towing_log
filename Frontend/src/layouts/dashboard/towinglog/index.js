@@ -19,6 +19,7 @@ Coded by www.creative-tim.com
 */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -50,6 +51,7 @@ import MDButton from "components/MDButton";
 
 // Dashboard components
 import VerticalBarChart from "examples/Charts/BarCharts/VerticalBarChart";
+import DefaultDoughnutChart from "examples/Charts/DoughnutCharts/DefaultDoughnutChart"
 
 import { CardBody, Col, Container, Form, FormGroup, FormText, Input, Label, Row } from "reactstrap";
 
@@ -306,8 +308,28 @@ function Dashboard() {
     }
   })
 
+// מערך הזמנות לפי גוף מבצע
+
+const indexObject ={
+  "חברה אזרחית-גרירה" : 0,
+  "חברה אזרחית – ניידת שירות" : 1,
+  "צבאי" : 2,
+  "מוביל כננת" : 3, 
+  "": 4
+  
+}
+
+const executiveBodyArr = [0,0,0,0,0];
+
+filteredOrders.forEach(order => {
+  // console.log(`${order.executiveBody} : ${indexObject[order.executiveBody]}`);
+  const index = indexObject[order.executiveBody];
+  executiveBodyArr[index] += 1;
+})
+console.log(executiveBodyArr);
   // מערך ההזמנות לפי סוג רכב
-//   const carTypes 
+const carTypesId = [];
+
 
   const dashboard = () => (
     <>
@@ -385,8 +407,11 @@ function Dashboard() {
 
           <Row>
             <Col>
-              <h5>תאריך פתיחת ההזמנה</h5>
+              <h6>תאריך פתיחת ההזמנה</h6>
             </Col>
+            <Col>
+              <h6>תאריך מבוקש</h6>
+            </Col>            
           </Row>
 
           <Row>
@@ -414,15 +439,7 @@ function Dashboard() {
                 />
               </FormGroup>
             </Col>
-          </Row>
 
-          <Row>
-            <Col>
-              <h5>תאריך מבוקש</h5>
-            </Col>
-          </Row>
-
-          <Row>
             <Col>
               <FormGroup>
                 <h6 style={{}}>מתאריך</h6>
@@ -546,16 +563,31 @@ function Dashboard() {
             value={filteredOrders.length}
             />
             </Grid>
-            <Grid item xs={6}/>
+            <Grid item xs={6}>
+              <DefaultDoughnutChart
+              icon={{color: "mekatnar", component : "assignment"}}
+              title="גוף מבצע"
+              description="אחוזי הזמנות לפי גוף מבצע"
+              chart={{
+                labels: ["חברה אזרחית-גרירה", "חברה אזרחית – ניידת שירות", "צבאי", "מוביל כננת", "לא מוגדר"],
+                datasets: {
+                  label: "גוף מבצע",
+                  backgroundColors: ["primary", "dark", "info", "mekatnar", "error"],
+                  data: executiveBodyArr,
+                },
+                
+              }}
+              />
+            </Grid>
             <Grid item xs={6}>
                 <VerticalBarChart
-                    icon={{ color: "mekatnar", component: "leaderboard" }}
-                    title="כמות הזמנות לפי יום"
-                    description="כמות ההזמנות הגרירה לפי כל יום בשבוע"
+                    icon={{ color: "mekatnar", component: "event" }}
+                    title="כמות הזמנות לפי יום בשבוע"
+                    description="כמות ההזמנות הגרירה לפי כל יום בשבוע בשבוע הנוכחי"  
                     chart={{
                         labels: ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"],
                         datasets: [{
-                        label: "Sales by age",
+                        label: "orders by day",
                         color: "mekatnar",
                         data: daysArray,
                         }],
