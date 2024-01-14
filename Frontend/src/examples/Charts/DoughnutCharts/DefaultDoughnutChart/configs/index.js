@@ -14,6 +14,8 @@ Coded by www.creative-tim.com
 */
 
 /* eslint-disable no-dupe-keys */
+/* eslint-disable consistent-return */
+
 // Material Dashboard 2 React base styles
 import colors from "assets/theme/base/colors";
 
@@ -60,7 +62,21 @@ function configs(labels, datasets, cutout = 60) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: false,
+          display: true,
+        },
+        datalabels: {
+          font: {
+            size: 14,
+            weight: "bold",
+          },
+          textAlign: "center",
+          textFont: "Rubik",
+          color: "rgb(246, 241, 238)",
+          formatter: (value) => {
+            if (value === 0) {
+              return "";
+            }
+          },
         },
       },
       interaction: {
