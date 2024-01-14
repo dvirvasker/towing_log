@@ -225,10 +225,18 @@ const TowingOrderForm = () => {
   }, [bankData]);
 
   useEffect(() => {
+    function sortArrayByHebrewAlphabet(array) {
+      return array.sort((a, b) =>
+        a.garageName.localeCompare(b.garageName, "he", { sensitivity: "base" })
+      );
+    }
+
     axios
       .get(`http://localhost:5000/TowingLogApi/Garages`)
       .then((response) => {
-        setGaragesData(response.data);
+        const garagesArray = response.data;
+        const sorted = sortArrayByHebrewAlphabet(garagesArray);
+        setGaragesData(sorted);
       })
       .catch((error) => {});
   }, []);

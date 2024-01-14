@@ -203,10 +203,18 @@ function Dashboard() {
 
   // מקבל את כל המוסכים מהמסד נתונים
   useEffect(() => {
+    function sortArrayByHebrewAlphabet(array) {
+      return array.sort((a, b) =>
+        a.garageName.localeCompare(b.garageName, "he", { sensitivity: "base" })
+      );
+    }
+
     axios
       .get(`http://localhost:5000/TowingLogApi/Garages`)
       .then((response) => {
-        setGarages(response.data);
+        const garagesArray = response.data;
+        const sorted = sortArrayByHebrewAlphabet(garagesArray);
+        setGarages(sorted);
       })
       .catch((error) => {});
   }, []);
