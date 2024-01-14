@@ -44,9 +44,10 @@ Coded by www.creative-tim.com
 // import SystemAlerts from "layouts/SystemAlerts";
 import Dashboard from "layouts/dashboard/Tene/dashMain";
 import TowingOrders from "layouts/tables/towingOrdersTable";
-import KshirotMisgrot from "layouts/dashboard/kshirotMisgrot";
+import KshirotMisgrot from "layouts/dashboard/halfim";
+import TowingDashboard from "layouts/dashboard/towinglog";
 import Pagedamagedtools from "layouts/dashboard/damagedtools";
-import Halfim from "layouts/dashboard/halfim";
+// import Halfim from "layouts/dashboard/halfim";
 import HomePage from "layouts/home";
 // import RequiredProjects from "layouts/requiedProjects";
 import AdminManagementTable from "layouts/tables/userManagementTable";
@@ -77,14 +78,14 @@ const AdminRoutes = [
     route: "/towingorders",
     component: <TowingOrders typeTable="towingorders" />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "דשבורד",
-  //   key: "dashboard",
-  //   icon: <Icon fontSize="small">dashboard</Icon>,
-  //   route: "/dashboard",
-  //   component: <KshirotMisgrot />,
-  // },
+  {
+    type: "collapse",
+    name: "דשבורד",
+    key: "dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/dashboard",
+    component: <TowingDashboard />,
+  },
   {
     type: "divider",
   },

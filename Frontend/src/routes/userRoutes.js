@@ -48,6 +48,7 @@ import Dashboard from "layouts/dashboard/Tene/dashMain";
 import Halfim from "layouts/dashboard/halfim";
 import HomePage from "layouts/home";
 import AdminManagementTable from "layouts/tables/userManagementTable";
+import TowingDashboard from "layouts/dashboard/towinglog";
 // @mui icons
 import Icon from "@mui/material/Icon";
 //my components
@@ -66,20 +67,20 @@ const routes = [
   },
   {
     type: "collapse",
+    name: "דשבורד",
+    key: "dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/dashboard",
+    component: <TowingDashboard />,
+  },
+  {
+    type: "collapse",
     name: "הזמנות גרירה",
     key: "towingorders",
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/towingorders",
     component: <TowingOrders typeTable="towingorders" />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "דשבורד",
-  //   key: "dashboard",
-  //   icon: <Icon fontSize="small">dashboard</Icon>,
-  //   route: "/dashboard",
-  //   component: <KshirotMisgrot />,
-  // },
 ];
 
 export default routes;
