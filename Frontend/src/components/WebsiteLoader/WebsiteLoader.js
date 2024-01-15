@@ -6,7 +6,7 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/function-component-definition */
 /* eslint-disable arrow-body-style */
-import TneLogo from "assets/images/projectLogoImages/TowingLogo.png";
+import TneLogo from "assets/images/projectLogoImages/towinglog.odd";
 // import CasualtiesLogo from "assets/images/projectLogoImages/CasualtiesLogo.png";
 import { motion } from "framer-motion";
 import React from "react";
