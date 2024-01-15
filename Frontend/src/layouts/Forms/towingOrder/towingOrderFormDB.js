@@ -1325,9 +1325,9 @@ const TowingOrderFormDB = () => {
                         className="btn-new-blue"
                         type="submit"
                         style={{ marginLeft: "3%" }}
+                        startIcon={<Icon fontSize="small">check</Icon>}
                       >
                         עדכן טופס גרירה
-                        <Icon fontSize="small">check</Icon>&nbsp;
                       </MDButton>
                       <MDButton
                         color="error"
@@ -1335,9 +1335,9 @@ const TowingOrderFormDB = () => {
                         onClick={() => navigate(-1)}
                         className="btn-new-blue"
                         style={{ marginRight: "3%" }}
+                        startIcon={<Icon fontSize="small">clear</Icon>}
                       >
                         צא ללא שינויים
-                        <Icon fontSize="small">clear</Icon>&nbsp;
                       </MDButton>
                     </div>
                   </Col>

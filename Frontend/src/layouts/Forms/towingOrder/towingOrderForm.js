@@ -1337,9 +1337,9 @@ const TowingOrderForm = () => {
                     onClick={onSubmit}
                     className="btn-new-blue"
                     type="submit"
+                    startIcon={<Icon fontSize="small">upload</Icon>}
                   >
                     שלח טופס גרירה
-                    <Icon fontSize="small">upload</Icon>&nbsp;
                   </MDButton>
                 </div>
               </Form>
