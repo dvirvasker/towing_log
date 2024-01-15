@@ -5,6 +5,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
+/* eslint no-underscore-dangle: ["error", { "allow": ["foo_", "_id"] }] */
 
 /**
 =========================================================
@@ -128,10 +129,27 @@ const towingOrdersTable = (props) => {
   }, [bankData]);
 
   useEffect(() => {
+    function sortArrayByHebrewAlphabet(array) {
+      return array.sort((a, b) =>
+        a.garageFullName.trim().localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
+      );
+    }
+
     axios
       .get(`http://localhost:5000/TowingLogApi/Garages`)
       .then((response) => {
-        setGaragesData(response.data);
+        const garagesArray = response.data;
+        const fixedData = garagesArray.map((garageEl) => {
+          const res = {
+            ...garageEl,
+            garageFullName: (garageEl.garageArea && garageEl.garageArea !== "")
+              ? `${garageEl.garageName.trim()} - ${garageEl.garageArea.trim()}`
+              : garageEl.garageName.trim(),
+          };
+          return res;
+        });
+        const sorted = sortArrayByHebrewAlphabet(fixedData);
+        setGaragesData(sorted);
       })
       .catch((error) => {});
   }, []);
@@ -593,7 +611,7 @@ const towingOrdersTable = (props) => {
                       >
                         <option value="בחר">בחר</option>
                         {garagesData.map((garageEl) => (
-                          <option value={garageEl._id}>{garageEl.garageName}</option>
+                          <option value={garageEl._id}>{garageEl.garageFullName}</option>
                         ))}
                       </Input>
                     </FormGroup>

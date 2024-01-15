@@ -167,50 +167,69 @@ const TowingOrderFormDB = () => {
     axios
       .get(`http://localhost:5000/TowingLogApi/CarDatas`)
       .then((response) => {
-        response.data.forEach((carDataInfo) => {
+        if(Object.keys(bankData).length === 0)
+          return;
+        const toSet = response.data.map((carDataInfo) => {
           const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId];
-          carDataInfo.gdodName = gdod.name;
-          carDataInfo.hativaId = gdod.hativaId;
-          const hativa = bankData.Unit_bank.hativas[carDataInfo.hativaId];
-          carDataInfo.hativaName = hativa.name;
-          carDataInfo.ogdaId = hativa.ogdaId;
-          const ogda = bankData.Unit_bank.ogdas[carDataInfo.ogdaId];
-          carDataInfo.ogdaName = ogda.name;
-          carDataInfo.pikodId = ogda.pikodId;
-          const pikod = bankData.Unit_bank.pikods[carDataInfo.pikodId];
-          carDataInfo.pikodName = pikod.name;
+          if(!gdod)
+            return carDataInfo;
+          const hativa = bankData.Unit_bank.hativas[gdod.hativaId];
+          const ogda = bankData.Unit_bank.ogdas[hativa.ogdaId];
+          const pikod = bankData.Unit_bank.pikods[ogda.pikodId];
+          return {
+            ... carDataInfo,
+            gdodName : gdod.name,
+            hativaId : gdod.hativaId,
+            hativaName : hativa.name,
+            ogdaId : hativa.ogdaId,
+            ogdaName : ogda.name,
+            pikodId : ogda.pikodId,
+            pikodName : pikod.name
+          }
           // console.log(carDataInfo);
         });
-        setCarData(response.data);
+        if(toSet && toSet.length > 0)
+          setCarData(toSet);
       })
       .catch((error) => {});
   }, [bankData]);
 
   useEffect(() => {
     function sortArrayByHebrewAlphabet(array) {
-      return array.sort((a, b) => a.garageName.localeCompare(b.garageName, 'he', { sensitivity: 'base' }));
+      return array.sort((a, b) =>
+        a.garageFullName.trim().localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
+      );
     }
-    
+
     axios
       .get(`http://localhost:5000/TowingLogApi/Garages`)
       .then((response) => {
         const garagesArray = response.data;
-        const sorted = sortArrayByHebrewAlphabet(garagesArray);
+        const fixedData = garagesArray.map((garage) => {
+          const res = {
+            ...garage,
+            garageFullName: (garage.garageArea && garage.garageArea !== "")
+              ? `${garage.garageName.trim()} - ${garage.garageArea.trim()}`
+              : garage.garageName.trim(),
+          };
+          return res;
+        });
+        const sorted = sortArrayByHebrewAlphabet(fixedData);
         setGaragesData(sorted);
       })
       .catch((error) => {});
-  }, []);
+  // }, []);
 
-  useEffect(() => {
+  // useEffect(() => {
     axios
       .get(`http://localhost:5000/TowingLogApi/CarTypes`)
       .then((response) => {
         setCarTypesData(response.data);
       })
       .catch((error) => {});
-  }, []);
+  // }, []);
 
-  useEffect(() => {
+  // useEffect(() => {
     axios
       .get(`http://localhost:5000/TowingLogApi/TowingOrder`)
       .then((response) => {
@@ -338,21 +357,32 @@ const TowingOrderFormDB = () => {
     if (data.garage === "אחר" && data.garageOther.trim() === "") {
       AddError("מוסך ריק (אחר)");
     }
-    if (data.phoneNumber !== "") {
-      if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
-        AddError("מספר טלפון לא תקין");
-      }
+    if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
+      AddError(data.phoneNumber !== "" ? "מספר טלפון לא תקין" : "מספר טלפון ריק");
     }
-
     if (data.otherPhoneNumber !== "") {
       if (!isValidIsraeliPhoneNumber(data.otherPhoneNumber)) {
         AddError("מספר טלפון נוסף לא תקין");
       }
     }
 
-    // if (data.location.trim === "") {
-    //   AddError("מיקום ריק");
-    // }
+    if (data.location.trim() === "") {
+      AddError("מיקום ריק");
+    }
+    if(data.executiveBody === "בחר" || data.executiveBody === "")
+    {
+      AddError("גוף מבצע ריק")
+    }
+    else
+    {
+      if(data.executiveBody === "חברה אזרחית - גרירה" || data.executiveBody === "חברה אזרחית – ניידת שירות")
+      {
+        if(data.turnNumber.trim() === "")
+        {
+          AddError("מספר הזמנה ריק")
+        }
+      }
+    }
     // if (data.garage === "" || data.garage === "בחר") {
     //   AddError("לגרור ל, ריק");
     // }
@@ -1076,7 +1106,7 @@ const TowingOrderFormDB = () => {
                       >
                         <option value="בחר">בחר</option>
                         {garagesData.map((garage) => (
-                          <option value={garage._id}>{garage.garageName}</option>
+                          <option value={garage._id}>{garage.garageFullName}</option>
                         ))}
                         <option value="אחר">אחר</option>
                       </Input>

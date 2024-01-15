@@ -59,7 +59,7 @@ import Pagedamagedtools from "layouts/dashboard/damagedtools";
 const routes = [
   {
     type: "collapse",
-    name: "מסך הבית",
+    name: `דו"ח יומי`,
     key: "landing",
     icon: <Icon fontSize="small">toys</Icon>,
     route: "/landing",

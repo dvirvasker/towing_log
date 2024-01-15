@@ -62,7 +62,7 @@ const colors = {
   },
   mekatnar: {
     main: "#2596be",
-    focus: "#c6c626",
+    focus: "#9bc2e9",
   },
 
   success: {
@@ -119,7 +119,7 @@ const colors = {
     },
     mekatnar: {
       main: "#2596be",
-      state: "#c6c626",
+      state: "#9bc2e9",
     },
 
     success: {
@@ -226,7 +226,7 @@ const colors = {
       text: "#095bc6",
     },
     mekatnar: {
-      background: "#c6c626",
+      background: "#9bc2e9",
       text: "#2596be",
     },
 

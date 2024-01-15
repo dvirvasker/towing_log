@@ -356,15 +356,15 @@ export default function data(
     return nameCarType;
   };
 
-  const setGarage = (garage) => {
+  const setGarage = (garageId) => {
     let nameOfGarage = "";
     const garageData = garagesData.forEach((garageEl) => {
-      if (garageEl._id.toString() === garage) {
+      if (garageEl._id.toString() === garageId) {
         nameOfGarage = garageEl;
       }
     });
     if (garageData === "") {
-      nameOfGarage = garage;
+      nameOfGarage = garageId;
     }
     return nameOfGarage;
   };

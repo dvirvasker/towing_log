@@ -37,6 +37,8 @@ import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
+
+import SimpleInfoCard from "examples/Cards/InfoCards/SimpleInfoCard";
 import DefaultInfoCard from "examples/Cards/InfoCards/DefaultInfoCard";
 import PieChart from "examples/Charts/PieChart";
 import HorizontalBarChart from "examples/Charts/BarCharts/HorizontalBarChart";
@@ -180,32 +182,60 @@ function Dashboard() {
     axios
       .get(`http://localhost:5000/TowingLogApi/CarDatas`)
       .then((response) => {
-        response.data.forEach((carDataInfo) => {
+        if(Object.keys(bankData).length === 0)
+          return;
+        const toSet = response.data.map((carDataInfo) => {
           const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId];
-          carDataInfo.gdodName = gdod.name;
-          carDataInfo.hativaId = gdod.hativaId;
-          const hativa = bankData.Unit_bank.hativas[carDataInfo.hativaId];
-          carDataInfo.hativaName = hativa.name;
-          carDataInfo.ogdaId = hativa.ogdaId;
-          const ogda = bankData.Unit_bank.ogdas[carDataInfo.ogdaId];
-          carDataInfo.ogdaName = ogda.name;
-          carDataInfo.pikodId = ogda.pikodId;
-          const pikod = bankData.Unit_bank.pikods[carDataInfo.pikodId];
-          carDataInfo.pikodName = pikod.name;
+          if(!gdod)
+            return carDataInfo;
+          const hativa = bankData.Unit_bank.hativas[gdod.hativaId];
+          const ogda = bankData.Unit_bank.ogdas[hativa.ogdaId];
+          const pikod = bankData.Unit_bank.pikods[ogda.pikodId];
+          return {
+            ... carDataInfo,
+            gdodName : gdod.name,
+            hativaId : gdod.hativaId,
+            hativaName : hativa.name,
+            ogdaId : hativa.ogdaId,
+            ogdaName : ogda.name,
+            pikodId : ogda.pikodId,
+            pikodName : pikod.name
+          }
           // console.log(carDataInfo);
         });
-        setCarData(response.data);
+        if(toSet && toSet.length > 0)
+          setCarData(toSet);
       })
       .catch((error) => {});
   }, [bankData]);
 
   console.log(carData);
 
-  // מקבל את כל המוסכים מהמסד נתונים
+  // // מקבל את כל המוסכים מהמסד נתונים
+  // useEffect(() => {
+  //   function sortArrayByHebrewAlphabet(array) {
+  //     return array.sort((a, b) =>
+  //       a.garageName.localeCompare(b.garageName, "he", { sensitivity: "base" })
+  //     );
+  //   }
+
+  //   axios
+  //     .get(`http://localhost:5000/TowingLogApi/Garages`)
+  //     .then((response) => {
+  //       const garagesArray = response.data;
+  //       const sorted = sortArrayByHebrewAlphabet(garagesArray);
+  //       setGarages(sorted);
+  //     })
+  //     .catch((error) => {});
+  // }, []);
+
+
+
   useEffect(() => {
+    // מקבל את כל המוסכים מהמסד נתונים
     function sortArrayByHebrewAlphabet(array) {
       return array.sort((a, b) =>
-        a.garageName.localeCompare(b.garageName, "he", { sensitivity: "base" })
+        a.garageFullName.trim().localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
       );
     }
 
@@ -213,24 +243,29 @@ function Dashboard() {
       .get(`http://localhost:5000/TowingLogApi/Garages`)
       .then((response) => {
         const garagesArray = response.data;
-        const sorted = sortArrayByHebrewAlphabet(garagesArray);
+        const fixedData = garagesArray.map((garageEl) => {
+          const res = {
+            ...garageEl,
+            garageFullName: (garageEl.garageArea && garageEl.garageArea !== "")
+              ? `${garageEl.garageName.trim()} - ${garageEl.garageArea.trim()}`
+              : garageEl.garageName.trim(),
+          };
+          return res;
+        });
+        const sorted = sortArrayByHebrewAlphabet(fixedData);
         setGarages(sorted);
       })
       .catch((error) => {});
-  }, []);
 
-  // מקבל את כל סוגי הרכבים ממסד הנתונים
-  useEffect(() => {
+      // מקבל את כל סוגי הרכבים ממסד הנתונים
     axios
       .get(`http://localhost:5000/TowingLogApi/CarTypes`)
       .then((response) => {
         setCarTypesData(response.data);
       })
       .catch((error) => {});
-  }, []);
 
   // מקבל את כל הגרירות מהמסד נתונים
-  useEffect(() => {
     axios
       .get(`http://localhost:5000/TowingLogApi/TowingOrder`)
       .then((response) => {
@@ -333,13 +368,13 @@ function Dashboard() {
 
   // מערך ההזמנות לפי כל יום בשבוע האחרון
   const daysArray = [0, 0, 0, 0, 0, 0, 0];
-  filteredOrders.forEach((order) => {
-    const date = new Date(order.demandDate);
-    if (isInThisWeek(date)) {
-      const day = date.getDay();
-      daysArray[day] += 1;
-    }
-  });
+  // filteredOrders.forEach((order) => {
+  //   const date = new Date(order.demandDate);
+  //   if (isInThisWeek(date)) {
+  //     const day = date.getDay();
+  //     daysArray[day] += 1;
+  //   }
+  // });
 
   // מערך הזמנות לפי גוף מבצע
 
@@ -353,15 +388,27 @@ function Dashboard() {
 
   const executiveBodyArr = [0, 0, 0, 0, 0];
 
-  filteredOrders.forEach((order) => {
-    // console.log(`${order.executiveBody} : ${indexObject[order.executiveBody]}`);
-    const index = indexObject[order.executiveBody];
-    executiveBodyArr[index] += 1;
-  });
+  // filteredOrders.forEach((order) => {
+  //   // console.log(`${order.executiveBody} : ${indexObject[order.executiveBody]}`);
+  //   const index = indexObject[order.executiveBody];
+  //   executiveBodyArr[index] += 1;
+  // });
   console.log(executiveBodyArr);
+  let today = 0;
+  let open = 0;
   // מערך ההזמנות לפי סוג רכב
   const carTypesCount = {};
   filteredOrders.forEach((order) => {
+
+    const date = new Date(order.demandDate);
+    if (isInThisWeek(date)) {
+      const day = date.getDay();
+      daysArray[day] += 1;
+    }
+
+    const index = indexObject[order.executiveBody];
+    executiveBodyArr[index] += 1;
+
     const car = carData.find((carEl) => carEl.carnumber === order.carnumber);
     if (car) {
       if (carTypesCount[car.carTypeId]) {
@@ -369,6 +416,14 @@ function Dashboard() {
       } else {
         carTypesCount[car.carTypeId] = 1;
       }
+    }
+    if (order.orderDate.split("T")[0] === new Date().toISOString().split("T")[0])
+    {
+      today += 1;
+    }
+    if (order.status === "פתוח")
+    {
+      open += 1;
     }
   });
 
@@ -470,7 +525,7 @@ function Dashboard() {
               >
                 <option value="בחר">בחר</option>
                 {garages.map((garage) => (
-                  <option value={garage._id}>{garage.garageName}</option>
+                  <option value={garage._id}>{garage.garageFullName}</option>
                 ))}
                 <option value="אחר">אחר</option>
               </Input>
@@ -717,14 +772,35 @@ function Dashboard() {
         </MDBox>
       )}
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+      <Grid item xs={6}>
+        <Grid container spacing={1}>
+        <Grid item xs={12}>
           <DefaultInfoCard
             icon="table_view"
-            title="הזמנות גרריה"
+            title="הזמנות גרירה"
             description="מספר הזמנות הגרירה שקיימות"
             value={filteredOrders.length}
-          />
+          />      
         </Grid>
+        <Grid item xs={6}>
+          <SimpleInfoCard
+            icon="today"
+            title="הזמנות שנפתחו היום"
+            value={today}
+          /> 
+        </Grid>
+        <Grid item xs={6}>
+          <SimpleInfoCard
+            icon="table_view"
+            title="הזמנות עם סטטוס פתוח"
+            value={open}
+          /> 
+        </Grid>
+        
+        </Grid>
+      </Grid>
+
+
         <Grid item xs={6}>
           <DefaultDoughnutChart
             icon={{ color: "mekatnar", component: "assignment" }}
