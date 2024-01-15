@@ -461,9 +461,10 @@ function Dashboard() {
         // }}
         // circular="true"
         size="medium"
+        startIcon={<Icon>filter_alt</Icon>}
       >
         סינון
-        <Icon>filter_alt</Icon>
+        
       </MDButton>
       {filterOpen && (
         <MDBox py={3}>

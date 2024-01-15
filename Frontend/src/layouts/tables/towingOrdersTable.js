@@ -543,9 +543,9 @@ const towingOrdersTable = (props) => {
                   // }}
                   // circular="true"
                   size="small"
+                  startIcon={<Icon>filter_alt</Icon>}
                 >
                   סינון
-                  <Icon>filter_alt</Icon>
                 </MDButton>
               </Grid>
             </MDBox>
