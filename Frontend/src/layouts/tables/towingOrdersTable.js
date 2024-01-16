@@ -131,7 +131,9 @@ const towingOrdersTable = (props) => {
   useEffect(() => {
     function sortArrayByHebrewAlphabet(array) {
       return array.sort((a, b) =>
-        a.garageFullName.trim().localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
+        a.garageFullName
+          .trim()
+          .localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
       );
     }
 
@@ -142,9 +144,10 @@ const towingOrdersTable = (props) => {
         const fixedData = garagesArray.map((garageEl) => {
           const res = {
             ...garageEl,
-            garageFullName: (garageEl.garageArea && garageEl.garageArea !== "")
-              ? `${garageEl.garageName.trim()} - ${garageEl.garageArea.trim()}`
-              : garageEl.garageName.trim(),
+            garageFullName:
+              garageEl.garageArea && garageEl.garageArea !== ""
+                ? `${garageEl.garageName.trim()} - ${garageEl.garageArea.trim()}`
+                : garageEl.garageName.trim(),
           };
           return res;
         });
@@ -233,7 +236,7 @@ const towingOrdersTable = (props) => {
     }`;
     urlType = "landing";
   } else if (typeTable === "towingorders") {
-    tableTittle = "הזמנות גרירה";
+    tableTittle = "הזמנות שירות";
     urlType = "towingorders";
   }
   //   const { columns, rows } = authorsTableData();
@@ -819,7 +822,7 @@ const towingOrdersTable = (props) => {
                 </MDTypography>
               ) : (
                 <MDTypography mx={30} variant="h3" color="mekatnar" textGradient={true}>
-                  לא קיימות הזמנות גרירה
+                  לא קיימות הזמנות שירות
                 </MDTypography>
               )}
             </MDBox>

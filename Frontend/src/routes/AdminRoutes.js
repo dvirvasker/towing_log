@@ -80,7 +80,7 @@ const AdminRoutes = [
   },
   {
     type: "collapse",
-    name: "הזמנות גרירה",
+    name: "הזמנות שירות",
     key: "towingorders",
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/towingorders",

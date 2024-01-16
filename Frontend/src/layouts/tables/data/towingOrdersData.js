@@ -236,13 +236,15 @@ export default function data(
           setRequestDB(
             response.data.filter(
               (elOrder) =>
-                elOrder.demandDate.split("T")[0] === currentDate.toISOString().split("T")[0]
+                elOrder.demandDate.split("T")[0] === currentDate.toISOString().split("T")[0] &&
+                (elOrder.status === "פתוח" || elOrder.status === "ממתין לאישור")
             )
           );
           setOriginaldata(
             response.data.filter(
               (elOrder) =>
-                elOrder.demandDate.split("T")[0] === currentDate.toISOString().split("T")[0]
+                elOrder.demandDate.split("T")[0] === currentDate.toISOString().split("T")[0] &&
+                (elOrder.status === "פתוח" || elOrder.status === "ממתין לאישור")
             )
           );
         } else if (urlType === "towingorders") {
@@ -369,6 +371,12 @@ export default function data(
     return nameOfGarage;
   };
 
+  // const penOrderTime = (time) => {
+  //   let nameOfGarage = "";
+
+  //   return nameOfGarage;
+  // };
+
   const editFile = (towingOrder) => (
     <Dialog
       px={5}
@@ -405,6 +413,7 @@ export default function data(
       .toLocaleDateString(undefined, options)
       .split(", ")[0],
     area: towingOrder.area,
+    openOrder: towingOrder.updatedAt,
     status: (
       <MDBadge
         badgeContent={towingOrder.status}
@@ -444,6 +453,7 @@ export default function data(
       { Header: "גוף מבצע", accessor: "executiveBody", align: "center" },
       { Header: "תאריך ביצוע מבוקש", accessor: "demandDate", align: "center" },
       { Header: "מרחב", accessor: "area", align: "center" },
+      { Header: "זמן מפתיחת הזמנה", accessor: "openOrder", align: "center" },
       { Header: "סטטוס", accessor: "status", align: "center" },
       { Header: "עדכון", accessor: "editPower", align: "center" },
     ],
