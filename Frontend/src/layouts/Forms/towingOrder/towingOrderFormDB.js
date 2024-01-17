@@ -32,7 +32,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, } from "react";
 import { Link, Navigate, Outlet, useParams, useNavigate } from "react-router-dom";
 // import { Upload } from "antd-upload";
 // import { multipleFilesUpload } from "../../data/api";
@@ -96,6 +96,7 @@ const TowingOrderFormDB = () => {
   const [chosenHativa, setChosenHativa] = useState("בחר");
   const [chosenGdod, setChosenGdod] = useState("בחר");
   const date = new Date().toISOString().split("T")[0];
+  const [initialStatus, setInitialStatus] = useState();
   // const [htivas, setHtivas]
 
   const [data, setData] = useState({
@@ -255,11 +256,12 @@ const TowingOrderFormDB = () => {
         response.data.transferOrderDate = fixedTransferOrderDate;
 
         console.log(response.data);
+        setInitialStatus(response.data.status);
         setData(response.data);
       })
       .catch((error) => {});
   }, []);
-
+  console.log(`Initial status: ${initialStatus}`);
   function setChosenCarNumber(value) {
     const carNumber = value;
     console.log(carNumber);
@@ -313,6 +315,7 @@ const TowingOrderFormDB = () => {
     //   SendFormData(event);
     // }
     event.preventDefault();
+    console.log("submit");
     const form = event.currentTarget;
     // console.log(form.elements);
     if (form.elements.carnumber === document.activeElement) {
@@ -705,7 +708,7 @@ const TowingOrderFormDB = () => {
     console.log("used set data");
   };
   const journey = data.clientJourney;
-  console.log(journey);
+  // console.log(journey);
 
   const toggleError = (evt) => {
     const errorInfo = [...data.erorrInfo];
@@ -749,8 +752,8 @@ const TowingOrderFormDB = () => {
     "קודן",
     "אחר",
   ];
-  console.log("מערך סיבות טעות");
-  console.log(data.erorrInfo);
+  // console.log("מערך סיבות טעות");
+  // console.log(data.erorrInfo);
 
   const SearchCarNumber = (carNumber) => {
     console.log(ordersData);
@@ -807,7 +810,7 @@ const TowingOrderFormDB = () => {
                         name="orderDate"
                         value={data.orderDate}
                         onChange={handleChange}
-                        min={date}
+                        // min={date}
                       />
                     </FormGroup>
                   </Col>
