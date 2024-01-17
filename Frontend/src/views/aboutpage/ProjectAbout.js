@@ -28,7 +28,7 @@ import {
   Col,
   Collapse,
 } from "reactstrap";
-import TowingLogo from "assets/images/projectLogoImages/TowingLogo.png";
+import TowingLogo from "assets/images/projectLogoImages/towinglog.odd";
 
 function HozlaAbout() {
   return (

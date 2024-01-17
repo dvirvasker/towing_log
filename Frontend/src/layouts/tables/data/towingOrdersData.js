@@ -371,11 +371,28 @@ export default function data(
     return nameOfGarage;
   };
 
-  // const penOrderTime = (time) => {
-  //   let nameOfGarage = "";
+  const openOrderTime = (status, time) => {
+    let nameOfGarage = "יום שונה";
+    let color = "mekatnar";
+    if (status === "פתוח") {
+      if (time.split("T")[0] === currentDate.toISOString().split("T")[0]) {
+        // if(time.split("T")[0].split(".")[0] )
+        let milliseconds = new Date(currentDate).getTime() - new Date(time).getTime();
+        if (milliseconds < 1800000) {
+          nameOfGarage = "עד 3 שעות";
+          color = "success";
+        } else if (milliseconds > 1800000) {
+          nameOfGarage = "מעל 3 שעות";
+          color = "error";
+        }
+      }
+    } else {
+      nameOfGarage = "סטטוס לא פתוח";
+      color = "dark";
+    }
 
-  //   return nameOfGarage;
-  // };
+    return [nameOfGarage, color];
+  };
 
   const editFile = (towingOrder) => (
     <Dialog
@@ -413,7 +430,15 @@ export default function data(
       .toLocaleDateString(undefined, options)
       .split(", ")[0],
     area: towingOrder.area,
-    openOrder: towingOrder.updatedAt,
+    openOrder: (
+      <MDTypography
+        variant="caption"
+        fontWeight="bold"
+        color={openOrderTime(towingOrder.status, towingOrder.updatedAt)[1]}
+      >
+        {openOrderTime(towingOrder.status, towingOrder.updatedAt)[0]}
+      </MDTypography>
+    ),
     status: (
       <MDBadge
         badgeContent={towingOrder.status}
@@ -464,5 +489,6 @@ export default function data(
     changeRoleW,
     setChangeRoleW,
     pressedID,
+    dataRow: requestDB,
   };
 }

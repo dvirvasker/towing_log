@@ -377,14 +377,13 @@ function Dashboard() {
   // מערך הזמנות לפי גוף מבצע
 
   const indexObject = {
-    "חברה אזרחית-גרירה": 0,
+    "חברה אזרחית - גרירה": 0,
     "חברה אזרחית – ניידת שירות": 1,
-    צבאי: 2,
+    ["צבאי"]: 2,
     "מוביל כננת": 3,
-    "": 4,
   };
 
-  const executiveBodyArr = [0, 0, 0, 0, 0];
+  const executiveBodyArr = [0, 0, 0, 0];
 
   // filteredOrders.forEach((order) => {
   //   // console.log(`${order.executiveBody} : ${indexObject[order.executiveBody]}`);
@@ -792,16 +791,10 @@ function Dashboard() {
             title="גוף מבצע"
             description="אחוזי הזמנות לפי גוף מבצע"
             chart={{
-              labels: [
-                "חברה אזרחית-גרירה",
-                "חברה אזרחית – ניידת שירות",
-                "צבאי",
-                "מוביל כננת",
-                "לא מוגדר",
-              ],
+              labels: ["חברה אזרחית-גרירה", "חברה אזרחית – ניידת שירות", "צבאי", "מוביל כננת"],
               datasets: {
                 label: "גוף מבצע",
-                backgroundColors: ["primary", "dark", "info", "mekatnar", "error"],
+                backgroundColors: ["primary", "dark", "info", "mekatnar"],
                 data: executiveBodyArr,
               },
             }}
