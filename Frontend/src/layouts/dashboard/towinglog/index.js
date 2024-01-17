@@ -182,29 +182,26 @@ function Dashboard() {
     axios
       .get(`http://localhost:5000/TowingLogApi/CarDatas`)
       .then((response) => {
-        if(Object.keys(bankData).length === 0)
-          return;
+        if (Object.keys(bankData).length === 0) return;
         const toSet = response.data.map((carDataInfo) => {
           const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId];
-          if(!gdod)
-            return carDataInfo;
+          if (!gdod) return carDataInfo;
           const hativa = bankData.Unit_bank.hativas[gdod.hativaId];
           const ogda = bankData.Unit_bank.ogdas[hativa.ogdaId];
           const pikod = bankData.Unit_bank.pikods[ogda.pikodId];
           return {
-            ... carDataInfo,
-            gdodName : gdod.name,
-            hativaId : gdod.hativaId,
-            hativaName : hativa.name,
-            ogdaId : hativa.ogdaId,
-            ogdaName : ogda.name,
-            pikodId : ogda.pikodId,
-            pikodName : pikod.name
-          }
+            ...carDataInfo,
+            gdodName: gdod.name,
+            hativaId: gdod.hativaId,
+            hativaName: hativa.name,
+            ogdaId: hativa.ogdaId,
+            ogdaName: ogda.name,
+            pikodId: ogda.pikodId,
+            pikodName: pikod.name,
+          };
           // console.log(carDataInfo);
         });
-        if(toSet && toSet.length > 0)
-          setCarData(toSet);
+        if (toSet && toSet.length > 0) setCarData(toSet);
       })
       .catch((error) => {});
   }, [bankData]);
@@ -229,13 +226,13 @@ function Dashboard() {
   //     .catch((error) => {});
   // }, []);
 
-
-
   useEffect(() => {
     // מקבל את כל המוסכים מהמסד נתונים
     function sortArrayByHebrewAlphabet(array) {
       return array.sort((a, b) =>
-        a.garageFullName.trim().localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
+        a.garageFullName
+          .trim()
+          .localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
       );
     }
 
@@ -246,9 +243,10 @@ function Dashboard() {
         const fixedData = garagesArray.map((garageEl) => {
           const res = {
             ...garageEl,
-            garageFullName: (garageEl.garageArea && garageEl.garageArea !== "")
-              ? `${garageEl.garageName.trim()} - ${garageEl.garageArea.trim()}`
-              : garageEl.garageName.trim(),
+            garageFullName:
+              garageEl.garageArea && garageEl.garageArea !== ""
+                ? `${garageEl.garageName.trim()} - ${garageEl.garageArea.trim()}`
+                : garageEl.garageName.trim(),
           };
           return res;
         });
@@ -257,7 +255,7 @@ function Dashboard() {
       })
       .catch((error) => {});
 
-      // מקבל את כל סוגי הרכבים ממסד הנתונים
+    // מקבל את כל סוגי הרכבים ממסד הנתונים
     axios
       .get(`http://localhost:5000/TowingLogApi/CarTypes`)
       .then((response) => {
@@ -265,7 +263,7 @@ function Dashboard() {
       })
       .catch((error) => {});
 
-  // מקבל את כל הגרירות מהמסד נתונים
+    // מקבל את כל הגרירות מהמסד נתונים
     axios
       .get(`http://localhost:5000/TowingLogApi/TowingOrder`)
       .then((response) => {
@@ -379,14 +377,13 @@ function Dashboard() {
   // מערך הזמנות לפי גוף מבצע
 
   const indexObject = {
-    "חברה אזרחית-גרירה": 0,
+    "חברה אזרחית - גרירה": 0,
     "חברה אזרחית – ניידת שירות": 1,
-    צבאי: 2,
+    ["צבאי"]: 2,
     "מוביל כננת": 3,
-    "": 4,
   };
 
-  const executiveBodyArr = [0, 0, 0, 0, 0];
+  const executiveBodyArr = [0, 0, 0, 0];
 
   // filteredOrders.forEach((order) => {
   //   // console.log(`${order.executiveBody} : ${indexObject[order.executiveBody]}`);
@@ -399,7 +396,6 @@ function Dashboard() {
   // מערך ההזמנות לפי סוג רכב
   const carTypesCount = {};
   filteredOrders.forEach((order) => {
-
     const date = new Date(order.demandDate);
     if (isInThisWeek(date)) {
       const day = date.getDay();
@@ -417,12 +413,10 @@ function Dashboard() {
         carTypesCount[car.carTypeId] = 1;
       }
     }
-    if (order.orderDate.split("T")[0] === new Date().toISOString().split("T")[0])
-    {
+    if (order.orderDate.split("T")[0] === new Date().toISOString().split("T")[0]) {
       today += 1;
     }
-    if (order.status === "פתוח")
-    {
+    if (order.status === "פתוח") {
       open += 1;
     }
   });
@@ -464,7 +458,6 @@ function Dashboard() {
         startIcon={<Icon>filter_alt</Icon>}
       >
         סינון
-        
       </MDButton>
       {filterOpen && (
         <MDBox py={3}>
@@ -773,34 +766,24 @@ function Dashboard() {
         </MDBox>
       )}
       <Grid container spacing={3}>
-      <Grid item xs={6}>
-        <Grid container spacing={1}>
-        <Grid item xs={12}>
-          <DefaultInfoCard
-            icon="table_view"
-            title="הזמנות גרירה"
-            description="מספר הזמנות הגרירה שקיימות"
-            value={filteredOrders.length}
-          />      
-        </Grid>
         <Grid item xs={6}>
-          <SimpleInfoCard
-            icon="today"
-            title="הזמנות שנפתחו היום"
-            value={today}
-          /> 
+          <Grid container spacing={1}>
+            <Grid item xs={12}>
+              <DefaultInfoCard
+                icon="table_view"
+                title="הזמנות שירות"
+                description="מספר הזמנות הגרירה שקיימות"
+                value={filteredOrders.length}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <SimpleInfoCard icon="today" title="הזמנות שנפתחו היום" value={today} />
+            </Grid>
+            <Grid item xs={6}>
+              <SimpleInfoCard icon="table_view" title="הזמנות עם סטטוס פתוח" value={open} />
+            </Grid>
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <SimpleInfoCard
-            icon="table_view"
-            title="הזמנות עם סטטוס פתוח"
-            value={open}
-          /> 
-        </Grid>
-        
-        </Grid>
-      </Grid>
-
 
         <Grid item xs={6}>
           <DefaultDoughnutChart
@@ -808,16 +791,10 @@ function Dashboard() {
             title="גוף מבצע"
             description="אחוזי הזמנות לפי גוף מבצע"
             chart={{
-              labels: [
-                "חברה אזרחית-גרירה",
-                "חברה אזרחית – ניידת שירות",
-                "צבאי",
-                "מוביל כננת",
-                "לא מוגדר",
-              ],
+              labels: ["חברה אזרחית-גרירה", "חברה אזרחית – ניידת שירות", "צבאי", "מוביל כננת"],
               datasets: {
                 label: "גוף מבצע",
-                backgroundColors: ["primary", "dark", "info", "mekatnar", "error"],
+                backgroundColors: ["primary", "dark", "info", "mekatnar"],
                 data: executiveBodyArr,
               },
             }}

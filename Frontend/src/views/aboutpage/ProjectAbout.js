@@ -28,7 +28,7 @@ import {
   Col,
   Collapse,
 } from "reactstrap";
-import TowingLogo from "assets/images/projectLogoImages/TowingLogo.png";
+import TowingLogo from "assets/images/projectLogoImages/towinglog.odd";
 
 function HozlaAbout() {
   return (
@@ -50,7 +50,7 @@ function HozlaAbout() {
       <MDBox pt={4} pb={3} px={3}>
         <MDTypography variant="h5" fontWeight="medium" mt={1}>
           מערכת יומן גרירות ייעוד המערכת הינו ניהול ותיעוד הזמנות הגרירות ליחידה 791 באגד טנ"א ארצי.
-          תהליכים זמינים למשתמש במערכת: הזנת טופס הזמנת גרירה עדכון וצפייה בטפסי הזמנות גרירה צפייה
+          תהליכים זמינים למשתמש במערכת: הזנת טופס הזמנת גרירה עדכון וצפייה בטפסי הזמנות שירות צפייה
           בדשבורד גרירה המציג את סטטוס ההזמנות, ההזמנות להיום, ועוד.
         </MDTypography>
       </MDBox>

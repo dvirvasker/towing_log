@@ -67,7 +67,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "דשבורד",
+    name: "מסך הבית",
     key: "dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
@@ -75,7 +75,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "הזמנות גרירה",
+    name: "הזמנות שירות",
     key: "towingorders",
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/towingorders",

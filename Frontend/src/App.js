@@ -63,7 +63,7 @@ import { setMiniSidenav, setOpenConfigurator, useMaterialUIController } from "co
 import {
   default as brandDark,
   default as brandWhite,
-} from "assets/images/projectLogoImages/TowingLogo.png";
+} from "assets/images/projectLogoImages/towinglog.odd";
 // ! ------------------------------------------
 
 import WebsiteLoader from "components/WebsiteLoader/WebsiteLoader";
