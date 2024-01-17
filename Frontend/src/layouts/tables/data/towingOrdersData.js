@@ -27,24 +27,17 @@ import MDBadge from "components/MDBadge";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 // import MDAvatar from "components/MDAvatar";
-import Switch from "@mui/material/Switch";
-import { authenticate, isAuthenticated, signin, signout, updateRefreshCount } from "auth/index";
+// import Switch from "@mui/material/Switch";
+// import { authenticate, isAuthenticated, signin, signout, updateRefreshCount } from "auth/index";
 import axios from "axios";
 import MDButton from "components/MDButton";
 import MDProgress from "components/MDProgress";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Dialog, DialogContent } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
 import TowingOrderFormDB from "layouts/Forms/towingOrder/towingOrderFormDB";
-import { element } from "prop-types";
-
-// Images
-// import LogoAsana from "assets/images/small-logos/logo-asana.svg";
-// import logoGithub from "assets/images/small-logos/github.svg";
-// import logoAtlassian from "assets/images/small-logos/logo-atlassian.svg";
-// import logoSlack from "assets/images/small-logos/logo-slack.svg";
-// import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
-// import logoInvesion from "assets/images/small-logos/logo-invision.svg";
+// import { element } from "prop-types";
 
 export default function data(
   typeTable,
@@ -78,11 +71,11 @@ export default function data(
   const [carDatas, setCarDatas] = useState([]);
   const [garagesData, setGaragesData] = useState([]);
   const [isInfoPressed, setIsInfoPressed] = useState(false);
-  const [pressedID, setpressedID] = useState("");
-  const [changeRoleW, setChangeRoleW] = useState(false);
+  // const [pressedID, setpressedID] = useState("");
+  // const [changeRoleW, setChangeRoleW] = useState(false);
   const [toEditFile, setToEditFile] = useState(false);
 
-  const [user, setUser] = useState(isAuthenticated());
+  // const [user, setUser] = useState(isAuthenticated());
   const MINUTE_MS = 100000;
 
   const options = {
@@ -372,7 +365,7 @@ export default function data(
   };
 
   const openOrderTime = (statusOrder, time) => {
-    let nameOfGarage = "יום שונה";
+    let nameOfGarage = "";
     let color = "mekatnar";
     if (time && statusOrder === "פתוח") {
       if (
@@ -389,7 +382,7 @@ export default function data(
         }
       }
     } else {
-      nameOfGarage = "סטטוס לא פתוח";
+      nameOfGarage = "";
       color = "dark";
     }
 
@@ -450,19 +443,21 @@ export default function data(
     ),
     editPower: (
       <Link to={`/${urlType}/${towingOrder._id}`} key={towingOrder._id}>
-        <MDButton
-          variant="gradient"
-          color="mekatnar"
-          circular="true"
-          iconOnly="true"
-          size="medium"
-          onClick={() => {
-            setToEditFile(true);
-          }}
-        >
-          {editFile(towingOrder._id)}
-          <Icon>edit</Icon>
-        </MDButton>
+        <Tooltip title="עדכן טופס" arrow>
+          <MDButton
+            variant="gradient"
+            color="mekatnar"
+            circular="true"
+            iconOnly="true"
+            size="medium"
+            onClick={() => {
+              setToEditFile(true);
+            }}
+          >
+            {editFile(towingOrder._id)}
+            <Icon>edit</Icon>
+          </MDButton>
+        </Tooltip>
       </Link>
     ),
   }));
@@ -488,9 +483,6 @@ export default function data(
     rows: dbRows,
     dbError: isError,
     setDBerror: setIsError,
-    changeRoleW,
-    setChangeRoleW,
-    pressedID,
     dataRow: requestDB,
   };
 }

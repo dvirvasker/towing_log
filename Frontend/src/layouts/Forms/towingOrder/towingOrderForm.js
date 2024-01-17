@@ -112,7 +112,7 @@ const TowingOrderForm = () => {
       .replace(/:/g, "")
       .split(".")[0],
     orderDate: new Date().toISOString().split("T")[0],
-    orderTime: new Date().toISOString().split("T")[1].split(".")[0].slice(0, 5),
+    orderTime: new Date().toLocaleString("en-IL").split(", ")[1].split(".")[0].slice(0, 5),
     serviceName: `${user.firstName} ${user.lastName}`,
     ahmashNotes: "",
     clientJourney: [],
@@ -126,7 +126,7 @@ const TowingOrderForm = () => {
     phoneNumber: "",
     otherPhoneNumber: "",
     transferOrderDate: new Date().toISOString().split("T")[0],
-    transferOrderTime: new Date().toISOString().split("T")[1].split(".")[0].slice(0, 5),
+    transferOrderTime: new Date().toLocaleString("en-IL").split(", ")[1].split(".")[0].slice(0, 5),
     reciveName: "",
     executiveBody: "",
     garageOther: "",

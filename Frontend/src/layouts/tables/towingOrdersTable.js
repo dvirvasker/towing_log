@@ -26,13 +26,8 @@ Coded by www.creative-tim.com
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
 import Icon from "@mui/material/Icon";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import Chip from "@mui/material/Chip";
-import { useTheme } from "@mui/material/styles";
+// import { useTheme } from "@mui/material/styles";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
@@ -47,16 +42,16 @@ import TowingOrderForm from "layouts/Forms/towingOrder/towingOrderForm";
 
 // Data
 import { Dialog, DialogContent, Box, TextField } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
 import towingOrdersData from "layouts/tables/data/towingOrdersData";
 import { useEffect, useState } from "react";
 
-import { authenticate, isAuthenticated, signin } from "auth/index";
 import axios from "axios";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { CardBody, Col, Container, Form, FormGroup, FormText, Input, Label, Row } from "reactstrap";
+import { Navigate, Outlet } from "react-router-dom";
+import { Col, FormGroup, FormText, Input, Label, Row } from "reactstrap";
 
 const towingOrdersTable = (props) => {
-  const { pathname } = useLocation();
+  // const { pathname } = useLocation();
   const { typeTable } = props;
 
   // eslint-disable-next-line global-require
@@ -67,7 +62,7 @@ const towingOrdersTable = (props) => {
   const [area, setArea] = useState("בחר");
   const [dbError, setDbError] = useState(false);
   const [toAddFile, setToAddFile] = useState(false);
-  const usedTheme = useTheme();
+  // const usedTheme = useTheme();
 
   const [bankData, setBankData] = useState({});
   const [garagesData, setGaragesData] = useState([]);
@@ -241,13 +236,6 @@ const towingOrdersTable = (props) => {
     tableTittle = "הזמנות שירות";
     urlType = "towingorders";
   }
-  //   const { columns, rows } = authorsTableData();
-  // eslint-disable-next-line consistent-return
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      return <Navigate to="/towingorders" />;
-    }
-  }, []);
 
   useEffect(() => {
     axios
@@ -382,8 +370,18 @@ const towingOrdersTable = (props) => {
 
   function FixDataAndExportToExcel() {
     let tempdata_to_excel = [];
+    let tempdata_to_excelrow = [];
     for (let i = 0; i < requestDB.length; i++) {
       tempdata_to_excel.push({ ...requestDB[i] });
+    }
+
+    for (let i = 0; i < pRows.length; i++) {
+      tempdata_to_excelrow.push({ ...pRows[i] });
+    }
+    for (let i = 0; i < tempdata_to_excelrow.length; i++) {
+      tempdata_to_excelrow[i].garage
+        ? (tempdata_to_excel[i].garage_m = tempdata_to_excelrow[i].garage)
+        : (tempdata_to_excel[i].garage_m = " ");
     }
 
     for (let i = 0; i < tempdata_to_excel.length; i++) {
@@ -392,7 +390,7 @@ const towingOrdersTable = (props) => {
         : (tempdata_to_excel[i].reference_m = " ");
 
       tempdata_to_excel[i].orderDate
-        ? (tempdata_to_excel[i].orderDate_m = tempdata_to_excel[i].orderDate)
+        ? (tempdata_to_excel[i].orderDate_m = tempdata_to_excel[i].orderDate.split("T")[0])
         : (tempdata_to_excel[i].orderDate_m = " ");
 
       tempdata_to_excel[i].orderTime
@@ -407,6 +405,14 @@ const towingOrdersTable = (props) => {
         ? (tempdata_to_excel[i].ahmashNotes_m = tempdata_to_excel[i].ahmashNotes)
         : (tempdata_to_excel[i].ahmashNotes_m = " ");
 
+      tempdata_to_excel[i].clientJourney
+        ? (tempdata_to_excel[i].clientJourney_m = tempdata_to_excel[i].clientJourney)
+        : (tempdata_to_excel[i].clientJourney_m = " ");
+
+      tempdata_to_excel[i].erorrInfo
+        ? (tempdata_to_excel[i].erorrInfo_m = tempdata_to_excel[i].erorrInfo)
+        : (tempdata_to_excel[i].erorrInfo_m = " ");
+
       tempdata_to_excel[i].carnumber
         ? (tempdata_to_excel[i].carnumber_m = tempdata_to_excel[i].carnumber)
         : (tempdata_to_excel[i].carnumber_m = " ");
@@ -415,9 +421,9 @@ const towingOrdersTable = (props) => {
         ? (tempdata_to_excel[i].location_m = tempdata_to_excel[i].location)
         : (tempdata_to_excel[i].location_m = " ");
 
-      tempdata_to_excel[i].garage
-        ? (tempdata_to_excel[i].garage_m = tempdata_to_excel[i].garage)
-        : (tempdata_to_excel[i].garage_m = " ");
+      // tempdata_to_excel[i].garage
+      //   ? (tempdata_to_excel[i].garage_m = tempdata_to_excel[i].garage)
+      //   : (tempdata_to_excel[i].garage_m = " ");
 
       tempdata_to_excel[i].fullName
         ? (tempdata_to_excel[i].fullName_m = tempdata_to_excel[i].fullName)
@@ -432,7 +438,8 @@ const towingOrdersTable = (props) => {
         : (tempdata_to_excel[i].otherPhoneNumber_m = " ");
 
       tempdata_to_excel[i].transferOrderDate
-        ? (tempdata_to_excel[i].transferOrderDate_m = tempdata_to_excel[i].transferOrderDate)
+        ? (tempdata_to_excel[i].transferOrderDate_m =
+            tempdata_to_excel[i].transferOrderDate.split("T")[0])
         : (tempdata_to_excel[i].transferOrderDate_m = " ");
 
       tempdata_to_excel[i].transferOrderTime
@@ -452,7 +459,7 @@ const towingOrdersTable = (props) => {
         : (tempdata_to_excel[i].turnNumber_m = " ");
 
       tempdata_to_excel[i].demandDate
-        ? (tempdata_to_excel[i].demandDate_m = tempdata_to_excel[i].demandDate)
+        ? (tempdata_to_excel[i].demandDate_m = tempdata_to_excel[i].demandDate.split("T")[0])
         : (tempdata_to_excel[i].demandDate_m = " ");
 
       tempdata_to_excel[i].area
@@ -466,6 +473,24 @@ const towingOrdersTable = (props) => {
       tempdata_to_excel[i].commanderNotes
         ? (tempdata_to_excel[i].commanderNotes_m = tempdata_to_excel[i].commanderNotes)
         : (tempdata_to_excel[i].commanderNotes_m = " ");
+
+      tempdata_to_excel[i].openOrderTime
+        ? (tempdata_to_excel[i].openOrderTime_m = new Date(
+            tempdata_to_excel[i].openOrderTime
+          ).toLocaleString("en-IL"))
+        : (tempdata_to_excel[i].openOrderTime_m = " ");
+
+      tempdata_to_excel[i].closeOrderTime
+        ? (tempdata_to_excel[i].closeOrderTime_m = new Date(
+            tempdata_to_excel[i].closeOrderTime
+          ).toLocaleString("en-IL"))
+        : (tempdata_to_excel[i].closeOrderTime_m = " ");
+
+      tempdata_to_excel[i].waitForApproveTime
+        ? (tempdata_to_excel[i].waitForApproveTime_m = new Date(
+            tempdata_to_excel[i].waitForApproveTime
+          ).toLocaleString("en-IL"))
+        : (tempdata_to_excel[i].waitForApproveTime_m = " ");
     }
 
     // export to excel -fix
@@ -496,7 +521,11 @@ const towingOrdersTable = (props) => {
       delete tempdata_to_excel[i].status;
       delete tempdata_to_excel[i].commanderNotes;
       delete tempdata_to_excel[i].turnNumber;
+      delete tempdata_to_excel[i].erorrInfo;
       delete tempdata_to_excel[i].errInfoOther;
+      delete tempdata_to_excel[i].openOrderTime;
+      delete tempdata_to_excel[i].closeOrderTime;
+      delete tempdata_to_excel[i].waitForApproveTime;
 
       // delete tempdata_to_excel[i].otherPhoneNumber;
       // delete tempdata_to_excel[i].transferOrderDate;
@@ -517,6 +546,8 @@ const towingOrdersTable = (props) => {
       reference_m: "אסמכתא",
       orderDate_m: "תאריך",
       orderTime_m: "שעה",
+      clientJourney_m: "מסע לקוח",
+      erorrInfo_m: "מהות התקלה",
       serviceName_m: "שם נציג שירות",
       ahmashNotes_m: "הערות אחמש",
       carnumber_m: "צ'",
@@ -534,6 +565,9 @@ const towingOrdersTable = (props) => {
       area_m: "מרחב",
       status_m: "סטטוס",
       commanderNotes_m: "הערות מפקד",
+      openOrderTime_m: "זמן פתיחת הזמנה",
+      closeOrderTime_m: "זמן סגירת הזמנה",
+      waitForApproveTime_m: "זמן המתנת הזמנה",
 
       // transferOrderDate_m: "חטיבה",
       // transferOrderTime_m: "גדוד",
@@ -599,10 +633,10 @@ const towingOrdersTable = (props) => {
             >
               <MDTypography variant="h3" color="white">
                 {tableTittle}
-              </MDTypography>
-              {urlType === "towingorders" ? (
-                <Grid container justifyContent="flex-end">
-                  <Grid item xs={2} md={1} xl={0.5}>
+              </MDTypography>{" "}
+              <Grid container justifyContent="flex-end">
+                <Grid item xs={2} md={1} xl={0.5}>
+                  <Tooltip title="הורדת קובץ אקסל" arrow>
                     <MDButton
                       circular="true"
                       iconOnly="true"
@@ -611,24 +645,28 @@ const towingOrdersTable = (props) => {
                     >
                       <Icon>download</Icon>
                     </MDButton>
-                  </Grid>
-                  <Grid item xs={2} md={1} xl={0.5}>
-                    <MDButton
-                      variant="gradient"
-                      onClick={() => setToAddFile(true)}
-                      // onClick={() => {
-                      //   // setIsInfoPressed(true);
-                      //   // setpressedID(hozla._id);
-                      // }}
-                      circular="true"
-                      iconOnly="true"
-                      size="medium"
-                    >
-                      <Icon>add</Icon>
-                    </MDButton>
-                  </Grid>
+                  </Tooltip>
                 </Grid>
-              ) : null}
+                {urlType === "towingorders" ? (
+                  <Grid item xs={2} md={1} xl={0.4}>
+                    <Tooltip title="הוסף הזמנה חדשה" arrow>
+                      <MDButton
+                        variant="gradient"
+                        onClick={() => setToAddFile(true)}
+                        // onClick={() => {
+                        //   // setIsInfoPressed(true);
+                        //   // setpressedID(hozla._id);
+                        // }}
+                        circular="true"
+                        iconOnly="true"
+                        size="medium"
+                      >
+                        <Icon>add</Icon>
+                      </MDButton>
+                    </Tooltip>
+                  </Grid>
+                ) : null}
+              </Grid>
               <Grid style={{ position: "static", top: "7px" }}>
                 <MDButton
                   variant="gradient"
@@ -905,7 +943,7 @@ const towingOrdersTable = (props) => {
                   table={{ columns: pColumns, rows: pRows }}
                   isSorted={true}
                   canSearch={true}
-                  entriesPerPage={false}
+                  entriesPerPage={true}
                   showTotalEntries={true}
                   noEndBorder={false}
                 />

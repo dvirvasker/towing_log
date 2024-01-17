@@ -88,10 +88,10 @@ function DataTable({
     state: { pageIndex, pageSize, globalFilter },
   } = tableInstance;
 
-  // Set the default value for the entries per page when component mounts
+  // Set the default value for the שורות לעמוד when component mounts
   useEffect(() => setPageSize(defaultValue || 10), [defaultValue]);
 
-  // Set the entries per page value based on the select value
+  // Set the שורות לעמוד value based on the select value
   const setEntriesPerPage = (value) => setPageSize(value);
 
   // Render the paginations
@@ -157,6 +157,20 @@ function DataTable({
     <TableContainer sx={{ boxShadow: "none" }}>
       {entriesPerPage || canSearch ? (
         <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
+          {canSearch && (
+            <MDBox width="12rem" dir="rtl">
+              <MDInput
+                label="חפש"
+                value={search}
+                size="small"
+                fullWidth
+                onChange={({ currentTarget }) => {
+                  setSearch(search);
+                  onSearchChange(currentTarget.value);
+                }}
+              />
+            </MDBox>
+          )}
           {entriesPerPage && (
             <MDBox display="flex" alignItems="center">
               <Autocomplete
@@ -171,22 +185,8 @@ function DataTable({
                 renderInput={(params) => <MDInput {...params} />}
               />
               <MDTypography variant="caption" color="secondary">
-                &nbsp;&nbsp;entries per page
+                &nbsp;&nbsp;שורות לעמוד
               </MDTypography>
-            </MDBox>
-          )}
-          {canSearch && (
-            <MDBox width="12rem" dir="rtl">
-              <MDInput
-                label="חפש"
-                value={search}
-                size="small"
-                fullWidth
-                onChange={({ currentTarget }) => {
-                  setSearch(search);
-                  onSearchChange(currentTarget.value);
-                }}
-              />
             </MDBox>
           )}
         </MDBox>
