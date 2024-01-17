@@ -27,6 +27,11 @@ const towingOrderSchema = new mongoose.Schema(
     area: { type: String },
     status: { type: String },
     commanderNotes: { type: String },
+    ///
+    openOrderTime : {type: Date},
+    waitForApproveTime : {type: Date},
+    closeOrderTime : {type: Date}
+    
   },
   { timestamps: true }
 );
