@@ -64,7 +64,7 @@ import AboutPage from "views/aboutpage/AboutPage";
 //   // },
 //   // {
 //   //   type: "collapse",
-//   //   name: "דשבורד",
+//   //   name: "מסך הבית",
 //   //   key: "dashboard",
 //   //   icon: <Icon fontSize="small">dashboard</Icon>,
 //   //   route: "/dashboard",

@@ -58,6 +58,10 @@ import { CardBody, Col, Container, Form, FormGroup, FormText, Input, Label, Row 
 const towingOrdersTable = (props) => {
   const { pathname } = useLocation();
   const { typeTable } = props;
+
+  // eslint-disable-next-line global-require
+  const XLSX = require("xlsx");
+
   const [filterOpen, setFilterOpen] = useState(false);
   const [status, setStatus] = useState("בחר");
   const [area, setArea] = useState("בחר");
@@ -131,7 +135,9 @@ const towingOrdersTable = (props) => {
   useEffect(() => {
     function sortArrayByHebrewAlphabet(array) {
       return array.sort((a, b) =>
-        a.garageFullName.trim().localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
+        a.garageFullName
+          .trim()
+          .localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
       );
     }
 
@@ -142,9 +148,10 @@ const towingOrdersTable = (props) => {
         const fixedData = garagesArray.map((garageEl) => {
           const res = {
             ...garageEl,
-            garageFullName: (garageEl.garageArea && garageEl.garageArea !== "")
-              ? `${garageEl.garageName.trim()} - ${garageEl.garageArea.trim()}`
-              : garageEl.garageName.trim(),
+            garageFullName:
+              garageEl.garageArea && garageEl.garageArea !== ""
+                ? `${garageEl.garageName.trim()} - ${garageEl.garageArea.trim()}`
+                : garageEl.garageName.trim(),
           };
           return res;
         });
@@ -233,7 +240,7 @@ const towingOrdersTable = (props) => {
     }`;
     urlType = "landing";
   } else if (typeTable === "towingorders") {
-    tableTittle = "הזמנות גרירה";
+    tableTittle = "הזמנות שירות";
     urlType = "towingorders";
   }
   //   const { columns, rows } = authorsTableData();
@@ -283,6 +290,7 @@ const towingOrdersTable = (props) => {
     rows: pRows,
     dbError: dbe,
     setDBerror: setDbe,
+    dataRow: requestDB,
   } = towingOrdersData(
     typeTable,
     urlType,
@@ -373,6 +381,178 @@ const towingOrdersTable = (props) => {
       </MDBox>
     </Dialog>
   );
+
+  function FixDataAndExportToExcel() {
+    let tempdata_to_excel = [];
+    for (let i = 0; i < requestDB.length; i++) {
+      tempdata_to_excel.push({ ...requestDB[i] });
+    }
+
+    for (let i = 0; i < tempdata_to_excel.length; i++) {
+      tempdata_to_excel[i].reference
+        ? (tempdata_to_excel[i].reference_m = tempdata_to_excel[i].reference)
+        : (tempdata_to_excel[i].reference_m = " ");
+
+      tempdata_to_excel[i].orderDate
+        ? (tempdata_to_excel[i].orderDate_m = tempdata_to_excel[i].orderDate)
+        : (tempdata_to_excel[i].orderDate_m = " ");
+
+      tempdata_to_excel[i].orderTime
+        ? (tempdata_to_excel[i].orderTime_m = tempdata_to_excel[i].orderTime)
+        : (tempdata_to_excel[i].orderTime_m = " ");
+
+      tempdata_to_excel[i].serviceName
+        ? (tempdata_to_excel[i].serviceName_m = tempdata_to_excel[i].serviceName)
+        : (tempdata_to_excel[i].serviceName_m = " ");
+
+      tempdata_to_excel[i].ahmashNotes
+        ? (tempdata_to_excel[i].ahmashNotes_m = tempdata_to_excel[i].ahmashNotes)
+        : (tempdata_to_excel[i].ahmashNotes_m = " ");
+
+      tempdata_to_excel[i].carnumber
+        ? (tempdata_to_excel[i].carnumber_m = tempdata_to_excel[i].carnumber)
+        : (tempdata_to_excel[i].carnumber_m = " ");
+
+      tempdata_to_excel[i].location
+        ? (tempdata_to_excel[i].location_m = tempdata_to_excel[i].location)
+        : (tempdata_to_excel[i].location_m = " ");
+
+      tempdata_to_excel[i].garage
+        ? (tempdata_to_excel[i].garage_m = tempdata_to_excel[i].garage)
+        : (tempdata_to_excel[i].garage_m = " ");
+
+      tempdata_to_excel[i].fullName
+        ? (tempdata_to_excel[i].fullName_m = tempdata_to_excel[i].fullName)
+        : (tempdata_to_excel[i].fullName_m = " ");
+
+      tempdata_to_excel[i].phoneNumber
+        ? (tempdata_to_excel[i].phoneNumber_m = tempdata_to_excel[i].phoneNumber)
+        : (tempdata_to_excel[i].phoneNumber_m = " ");
+
+      tempdata_to_excel[i].otherPhoneNumber
+        ? (tempdata_to_excel[i].otherPhoneNumber_m = tempdata_to_excel[i].otherPhoneNumber)
+        : (tempdata_to_excel[i].otherPhoneNumber_m = " ");
+
+      tempdata_to_excel[i].transferOrderDate
+        ? (tempdata_to_excel[i].transferOrderDate_m = tempdata_to_excel[i].transferOrderDate)
+        : (tempdata_to_excel[i].transferOrderDate_m = " ");
+
+      tempdata_to_excel[i].transferOrderTime
+        ? (tempdata_to_excel[i].transferOrderTime_m = tempdata_to_excel[i].transferOrderTime)
+        : (tempdata_to_excel[i].transferOrderTime_m = " ");
+
+      tempdata_to_excel[i].reciveName
+        ? (tempdata_to_excel[i].reciveName_m = tempdata_to_excel[i].reciveName)
+        : (tempdata_to_excel[i].reciveName_m = " ");
+
+      tempdata_to_excel[i].executiveBody
+        ? (tempdata_to_excel[i].executiveBody_m = tempdata_to_excel[i].executiveBody)
+        : (tempdata_to_excel[i].executiveBody_m = " ");
+
+      tempdata_to_excel[i].turnNumber
+        ? (tempdata_to_excel[i].turnNumber_m = tempdata_to_excel[i].turnNumber)
+        : (tempdata_to_excel[i].turnNumber_m = " ");
+
+      tempdata_to_excel[i].demandDate
+        ? (tempdata_to_excel[i].demandDate_m = tempdata_to_excel[i].demandDate)
+        : (tempdata_to_excel[i].demandDate_m = " ");
+
+      tempdata_to_excel[i].area
+        ? (tempdata_to_excel[i].area_m = tempdata_to_excel[i].area)
+        : (tempdata_to_excel[i].area_m = " ");
+
+      tempdata_to_excel[i].status
+        ? (tempdata_to_excel[i].status_m = tempdata_to_excel[i].status)
+        : (tempdata_to_excel[i].status_m = " ");
+
+      tempdata_to_excel[i].commanderNotes
+        ? (tempdata_to_excel[i].commanderNotes_m = tempdata_to_excel[i].commanderNotes)
+        : (tempdata_to_excel[i].commanderNotes_m = " ");
+    }
+
+    // export to excel -fix
+    for (let i = 0; i < tempdata_to_excel.length; i++) {
+      // delete unwanted fields
+      delete tempdata_to_excel[i]._id;
+      delete tempdata_to_excel[i].__v;
+      delete tempdata_to_excel[i].updatedAt;
+      delete tempdata_to_excel[i].createdAt;
+      delete tempdata_to_excel[i].clientJourney;
+      delete tempdata_to_excel[i].reference;
+      delete tempdata_to_excel[i].orderDate;
+      delete tempdata_to_excel[i].orderTime;
+      delete tempdata_to_excel[i].serviceName;
+      delete tempdata_to_excel[i].ahmashNotes;
+      delete tempdata_to_excel[i].carnumber;
+      delete tempdata_to_excel[i].location;
+      delete tempdata_to_excel[i].garage;
+      delete tempdata_to_excel[i].fullName;
+      delete tempdata_to_excel[i].phoneNumber;
+      delete tempdata_to_excel[i].otherPhoneNumber;
+      delete tempdata_to_excel[i].transferOrderDate;
+      delete tempdata_to_excel[i].transferOrderTime;
+      delete tempdata_to_excel[i].reciveName;
+      delete tempdata_to_excel[i].executiveBody;
+      delete tempdata_to_excel[i].demandDate;
+      delete tempdata_to_excel[i].area;
+      delete tempdata_to_excel[i].status;
+      delete tempdata_to_excel[i].commanderNotes;
+      delete tempdata_to_excel[i].turnNumber;
+      delete tempdata_to_excel[i].errInfoOther;
+
+      // delete tempdata_to_excel[i].otherPhoneNumber;
+      // delete tempdata_to_excel[i].transferOrderDate;
+      // delete tempdata_to_excel[i].transferOrderTime;
+    }
+
+    console.log(tempdata_to_excel);
+
+    const currentDate = new Date();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+    const day = currentDate.getDate().toString().padStart(2, "0");
+
+    let EXCEL_EXTENSION = ".xlsx";
+    let worksheet = XLSX.WorkSheet;
+    let sheetName = `הזמנות שירות ${day}-${month}-${currentDate.getFullYear()}`;
+
+    const headers = {
+      reference_m: "אסמכתא",
+      orderDate_m: "תאריך",
+      orderTime_m: "שעה",
+      serviceName_m: "שם נציג שירות",
+      ahmashNotes_m: "הערות אחמש",
+      carnumber_m: "צ'",
+      location_m: "מיקום",
+      garage_m: "לגרור ל",
+      fullName_m: "שם מלא",
+      phoneNumber_m: "טלפון",
+      otherPhoneNumber_m: "טלפון נוסף",
+      transferOrderDate_m: "תאריך העברת הזמנה",
+      transferOrderTime_m: "שעת העברת הזמנה",
+      reciveName_m: "שם מקבל מחלקה צבאית או שגריר",
+      executiveBody_m: "גוף מבצע",
+      turnNumber_m: "מספר הזמנה",
+      demandDate_m: "תאריך ביצוע מבוקש",
+      area_m: "מרחב",
+      status_m: "סטטוס",
+      commanderNotes_m: "הערות מפקד",
+
+      // transferOrderDate_m: "חטיבה",
+      // transferOrderTime_m: "גדוד",
+    };
+    tempdata_to_excel.unshift(headers); // if custom header, then make sure first row of data is custom header
+
+    worksheet = XLSX.utils.json_to_sheet(tempdata_to_excel, {
+      skipHeader: true,
+    });
+
+    const workbook = XLSX.utils.book_new();
+    const fileName = `הזמנות שירות ${day}-${month}-${currentDate.getFullYear()}${EXCEL_EXTENSION}`;
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+    XLSX.writeFile(workbook, fileName);
+
+    window.location.reload();
+  }
   const showError = () => (
     <Dialog
       open={dbe}
@@ -403,101 +583,7 @@ const towingOrdersTable = (props) => {
       </MDBox>
     </Dialog>
   );
-  // const handlechangeRoleWClose = () => {
-  //   setChangeRoleW(false);
-  // };
-  // const showChangeRoleW = () => (
-  //   <Dialog
-  //     open={changeRoleW}
-  //     onClose={handleErrorClose}
-  //     aria-labelledby="alert-dialog-title"
-  //     aria-describedby="alert-dialog-description"
-  //   >
-  //     <MDBox
-  //       variant="gradient"
-  //       bgColor="mekatnar"
-  //       coloredShadow="mekatnar"
-  //       borderRadius="l"
-  //       // mx={2}
-  //       // mt={2}
-  //       p={3}
-  //       // mb={2}
-  //       textAlign="center"
-  //     >
-  //       <MDTypography variant="h1" fontWeight="medium" color="white" mt={1}>
-  //         בחר את התפקיד החדש
-  //       </MDTypography>
 
-  //       <DialogContent>
-  //         <MDBox mb={2}>
-  //           <FormControl>
-  //             <InputLabel id="demo-simple-select-autowidth-label">בחר סוג משתמש</InputLabel>
-  //             <Select
-  //               labelId="demo-simple-select-autowidth-label"
-  //               name="userType"
-  //               id="demo-simple-select-autowidth"
-  //               value={() => {
-  //                 axios
-  //                   .post(`http://localhost:5000/TowingLogApi/user/getuserbyid`, {
-  //                     userid: pressedID,
-  //                   })
-  //                   .then(
-  //                     (response) =>
-  //                       `${response.datadata.user.admin}${response.datadata.user.adminType}`
-  //                   )
-  //                   .catch((error) => {
-  //                     console.log(error);
-  //                     return "00";
-  //                   });
-  //               }}
-  //               onChange={() => {
-  //                 axios
-  //                   .put(`http://localhost:5000/TowingLogApi/user/update/${pressedID}`, {
-  //                     admin: "00",
-  //                     adminType: "00",
-  //                   })
-  //                   .then((response) => {
-  //                     setChangeRoleW(false);
-  //                     window.location.reload(false);
-  //                   })
-  //                   .catch((error) => {
-  //                     console.log(error);
-  //                   });
-  //               }}
-  //               autoWidth
-  //               label="בחר סוג משתמש"
-  //               sx={{ height: 50, minWidth: 150 }}
-  //             >
-  //               <MenuItem value="0">מפקד מוקד</MenuItem>
-  //               <MenuItem value="1">מוקדנית</MenuItem>
-  //               <MenuItem value="2">אחמש</MenuItem>
-  //             </Select>
-  //           </FormControl>
-  //         </MDBox>
-  //       </DialogContent>
-  //     </MDBox>
-  //   </Dialog>
-  // );
-  // const handleErrorInfoChange = (event) => {
-  //   const {
-  //     target: { value },
-  //   } = event;
-  //   const res =  typeof value === 'string' ? value.split(',') : value;
-  //   setData(
-  //     // On autofill we get a stringified value.
-  //     (prev) => ({...data, erorrInfo : res})
-  //   );
-  // };
-
-  // function getStyles(name, personName, theme) {
-  //   return {
-  //     fontWeight:
-  //       personName.indexOf(name) === -1
-  //         ? theme.typography.fontWeightRegular
-  //         : theme.typography.fontWeightMedium,
-  //   };
-  // }
-  // console.log(data.erorrInfo);
   const table = () => (
     <MDBox pt={6} pb={3}>
       <Grid container spacing={6}>
@@ -518,19 +604,31 @@ const towingOrdersTable = (props) => {
               </MDTypography>
               {urlType === "towingorders" ? (
                 <Grid container justifyContent="flex-end">
-                  <MDButton
-                    variant="gradient"
-                    onClick={() => setToAddFile(true)}
-                    // onClick={() => {
-                    //   // setIsInfoPressed(true);
-                    //   // setpressedID(hozla._id);
-                    // }}
-                    circular="true"
-                    iconOnly="true"
-                    size="medium"
-                  >
-                    <Icon>add</Icon>
-                  </MDButton>
+                  <Grid item xs={2} md={1} xl={0.5}>
+                    <MDButton
+                      circular="true"
+                      iconOnly="true"
+                      size="medium"
+                      onClick={FixDataAndExportToExcel}
+                    >
+                      <Icon>download</Icon>
+                    </MDButton>
+                  </Grid>
+                  <Grid item xs={2} md={1} xl={0.5}>
+                    <MDButton
+                      variant="gradient"
+                      onClick={() => setToAddFile(true)}
+                      // onClick={() => {
+                      //   // setIsInfoPressed(true);
+                      //   // setpressedID(hozla._id);
+                      // }}
+                      circular="true"
+                      iconOnly="true"
+                      size="medium"
+                    >
+                      <Icon>add</Icon>
+                    </MDButton>
+                  </Grid>
                 </Grid>
               ) : null}
               <Grid style={{ position: "static", top: "7px" }}>
@@ -819,7 +917,7 @@ const towingOrdersTable = (props) => {
                 </MDTypography>
               ) : (
                 <MDTypography mx={30} variant="h3" color="mekatnar" textGradient={true}>
-                  לא קיימות הזמנות גרירה
+                  לא קיימות הזמנות שירות
                 </MDTypography>
               )}
             </MDBox>
