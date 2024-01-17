@@ -32,7 +32,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import axios from "axios";
-import React, { useEffect, useState, } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Navigate, Outlet, useParams, useNavigate } from "react-router-dom";
 // import { Upload } from "antd-upload";
 // import { multipleFilesUpload } from "../../data/api";
@@ -128,7 +128,7 @@ const TowingOrderFormDB = () => {
     }
 
     setData({ ...data, [evt.target.name]: value });
-    console.log(value);
+    // console.log(value);
   }
 
   useEffect(() => {
@@ -168,29 +168,26 @@ const TowingOrderFormDB = () => {
     axios
       .get(`http://localhost:5000/TowingLogApi/CarDatas`)
       .then((response) => {
-        if(Object.keys(bankData).length === 0)
-          return;
+        if (Object.keys(bankData).length === 0) return;
         const toSet = response.data.map((carDataInfo) => {
           const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId];
-          if(!gdod)
-            return carDataInfo;
+          if (!gdod) return carDataInfo;
           const hativa = bankData.Unit_bank.hativas[gdod.hativaId];
           const ogda = bankData.Unit_bank.ogdas[hativa.ogdaId];
           const pikod = bankData.Unit_bank.pikods[ogda.pikodId];
           return {
-            ... carDataInfo,
-            gdodName : gdod.name,
-            hativaId : gdod.hativaId,
-            hativaName : hativa.name,
-            ogdaId : hativa.ogdaId,
-            ogdaName : ogda.name,
-            pikodId : ogda.pikodId,
-            pikodName : pikod.name
-          }
+            ...carDataInfo,
+            gdodName: gdod.name,
+            hativaId: gdod.hativaId,
+            hativaName: hativa.name,
+            ogdaId: hativa.ogdaId,
+            ogdaName: ogda.name,
+            pikodId: ogda.pikodId,
+            pikodName: pikod.name,
+          };
           // console.log(carDataInfo);
         });
-        if(toSet && toSet.length > 0)
-          setCarData(toSet);
+        if (toSet && toSet.length > 0) setCarData(toSet);
       })
       .catch((error) => {});
   }, [bankData]);
@@ -198,7 +195,9 @@ const TowingOrderFormDB = () => {
   useEffect(() => {
     function sortArrayByHebrewAlphabet(array) {
       return array.sort((a, b) =>
-        a.garageFullName.trim().localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
+        a.garageFullName
+          .trim()
+          .localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
       );
     }
 
@@ -209,9 +208,10 @@ const TowingOrderFormDB = () => {
         const fixedData = garagesArray.map((garage) => {
           const res = {
             ...garage,
-            garageFullName: (garage.garageArea && garage.garageArea !== "")
-              ? `${garage.garageName.trim()} - ${garage.garageArea.trim()}`
-              : garage.garageName.trim(),
+            garageFullName:
+              garage.garageArea && garage.garageArea !== ""
+                ? `${garage.garageName.trim()} - ${garage.garageArea.trim()}`
+                : garage.garageName.trim(),
           };
           return res;
         });
@@ -219,18 +219,18 @@ const TowingOrderFormDB = () => {
         setGaragesData(sorted);
       })
       .catch((error) => {});
-  // }, []);
+    // }, []);
 
-  // useEffect(() => {
+    // useEffect(() => {
     axios
       .get(`http://localhost:5000/TowingLogApi/CarTypes`)
       .then((response) => {
         setCarTypesData(response.data);
       })
       .catch((error) => {});
-  // }, []);
+    // }, []);
 
-  // useEffect(() => {
+    // useEffect(() => {
     axios
       .get(`http://localhost:5000/TowingLogApi/TowingOrder`)
       .then((response) => {
@@ -255,18 +255,18 @@ const TowingOrderFormDB = () => {
         const fixedTransferOrderDate = response.data.transferOrderDate.split("T")[0];
         response.data.transferOrderDate = fixedTransferOrderDate;
 
-        console.log(response.data);
+        // console.log(response.data);
         setInitialStatus(response.data.status);
         setData(response.data);
       })
       .catch((error) => {});
   }, []);
-  console.log(`Initial status: ${initialStatus}`);
+  // console.log(`Initial status: ${initialStatus}`);
   function setChosenCarNumber(value) {
     const carNumber = value;
-    console.log(carNumber);
+    // console.log(carNumber);
     carDataInfoArray.push(carData.filter((el) => el.carnumber === carNumber));
-    console.log(carData);
+    // console.log(carData);
     if (carDataInfoArray[0][0]) {
       setChosenPikod(carDataInfoArray[0][0].pikodId);
       setChosenOgda(carDataInfoArray[0][0].ogdaId);
@@ -299,7 +299,7 @@ const TowingOrderFormDB = () => {
   const removeClientJourneyPost = (index) => {
     const clientJourney = [...data.clientJourney];
     clientJourney.splice(index, 1);
-    console.log(clientJourney);
+    // console.log(clientJourney);
 
     setData((prev) => ({ ...prev, clientJourney }));
   };
@@ -315,7 +315,7 @@ const TowingOrderFormDB = () => {
     //   SendFormData(event);
     // }
     event.preventDefault();
-    console.log("submit");
+    // console.log("submit");
     const form = event.currentTarget;
     // console.log(form.elements);
     if (form.elements.carnumber === document.activeElement) {
@@ -382,22 +382,19 @@ const TowingOrderFormDB = () => {
     if (data.location.trim() === "") {
       AddError("מיקום ריק");
     }
-    if(data.executiveBody === "בחר" || data.executiveBody === "")
-    {
-      AddError("גוף מבצע ריק")
-    }
-    else
-    {
-      if(data.executiveBody === "חברה אזרחית - גרירה" || data.executiveBody === "חברה אזרחית – ניידת שירות")
-      {
-        if(data.turnNumber.trim() === "")
-        {
-          AddError("מספר הזמנה ריק")
+    if (data.executiveBody === "בחר" || data.executiveBody === "") {
+      AddError("גוף מבצע ריק");
+    } else {
+      if (
+        data.executiveBody === "חברה אזרחית - גרירה" ||
+        data.executiveBody === "חברה אזרחית – ניידת שירות"
+      ) {
+        if (data.turnNumber.trim() === "") {
+          AddError("מספר הזמנה ריק");
         }
       }
     }
-    if(data.fullName.trim() === "")
-    {
+    if (data.fullName.trim() === "") {
       AddError("שם מלא ריק");
     }
     // if (data.garage === "" || data.garage === "בחר") {
@@ -418,7 +415,7 @@ const TowingOrderFormDB = () => {
         return false;
       });
     } else {
-      console.log("Valid");
+      // console.log("Valid");
       return true;
     }
   };
@@ -440,7 +437,7 @@ const TowingOrderFormDB = () => {
   //   // }
   //   // if (data.carnumber === "") {
   //   //   AddError("צ' ריק");
-  //   // } else 
+  //   // } else
   //   if(data.carnumber !== "")
   //   {
   //     if (!(digitsOnly(data.carnumber) && data.carnumber.length <= 9)) {
@@ -468,7 +465,7 @@ const TowingOrderFormDB = () => {
   //     }
   //   }
   //   if(data.otherPhoneNumber !== "")
-  //   {    
+  //   {
   //     if (!isValidIsraeliPhoneNumber(data.otherPhoneNumber)) {
   //       AddError("מספר טלפון נוסף לא תקין");
   //     }
@@ -533,13 +530,13 @@ const TowingOrderFormDB = () => {
       status: data.status,
       commanderNotes: data.commanderNotes,
     };
-    console.log(requestData);
+    // console.log(requestData);
 
     axios
       .post(`http://localhost:5000/TowingLogApi/TowingOrder/update/${params.id}`, requestData)
       .then((response) => {
         // toast.success(`הטופס נשלח בהצלחה`);
-        console.log(response.data);
+        // console.log(response.data);
         setData({
           ...data,
           loading: false,
@@ -705,7 +702,7 @@ const TowingOrderFormDB = () => {
       published: false,
     });
     setData((prev) => ({ ...prev, clientJourney }));
-    console.log("used set data");
+    // console.log("used set data");
   };
   const journey = data.clientJourney;
   // console.log(journey);
@@ -756,7 +753,7 @@ const TowingOrderFormDB = () => {
   // console.log(data.erorrInfo);
 
   const SearchCarNumber = (carNumber) => {
-    console.log(ordersData);
+    // console.log(ordersData);
     const existing = ordersData.filter(
       (orderData) =>
         orderData.carnumber === carNumber &&
@@ -799,7 +796,11 @@ const TowingOrderFormDB = () => {
                   {data.reference}
                 </MDTypography>
               </MDBox>
-              <Form style={{ textAlign: "right", paddingBottom: "5%" }} role="form" onSubmit={onSubmit}>
+              <Form
+                style={{ textAlign: "right", paddingBottom: "5%" }}
+                role="form"
+                onSubmit={onSubmit}
+              >
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%" }}>
                   <Col>
                     <FormGroup>

@@ -141,8 +141,8 @@ const TowingOrderForm = () => {
   const carDataInfoArray = [];
   const setChosenCarNumber = (carNumber) => {
     carDataInfoArray.push(carData.filter((el) => el.carnumber === carNumber));
-    console.log(carDataInfoArray);
-    console.log(`Car number searched:  ${carNumber}`);
+    // console.log(carDataInfoArray);
+    // console.log(`Car number searched:  ${carNumber}`);
     if (carDataInfoArray[0][0]) {
       setChosenPikod(carDataInfoArray[0][0].pikodId);
       setChosenOgda(carDataInfoArray[0][0].ogdaId);
@@ -175,13 +175,13 @@ const TowingOrderForm = () => {
     }
 
     setData({ ...data, [evt.target.name]: value });
-    console.log(value);
+    // console.log(value);
   }
   useEffect(() => {
     axios
       .get(`http://localhost:5000/TowingLogApi/get_banks`)
       .then((response) => {
-        console.log("מדפיס מערך פיקודים");
+        // console.log("מדפיס מערך פיקודים");
         setBankData(response.data.data);
         setPikods(
           Object.entries(response.data.data.Unit_bank.pikods).map(([key, value]) => ({
@@ -296,7 +296,7 @@ const TowingOrderForm = () => {
   const removeClientJourneyPost = (index) => {
     const clientJourney = [...data.clientJourney];
     clientJourney.splice(index, 1);
-    console.log(clientJourney);
+    // console.log(clientJourney);
 
     setData((prev) => ({ ...prev, clientJourney }));
   };
@@ -462,8 +462,7 @@ const TowingOrderForm = () => {
         }
       }
     }
-    if(data.fullName.trim() === "")
-    {
+    if (data.fullName.trim() === "") {
       AddError("שם מלא ריק");
     }
     // if (data.garage === "" || data.garage === "בחר") {
@@ -485,7 +484,7 @@ const TowingOrderForm = () => {
       });
       return false;
     }
-    console.log("Valid");
+    // console.log("Valid");
     return true;
   };
 
@@ -523,13 +522,13 @@ const TowingOrderForm = () => {
       status: data.status,
       commanderNotes: data.commanderNotes,
     };
-    console.log(requestData);
+    // console.log(requestData);
 
     axios
       .post(`http://localhost:5000/TowingLogApi/TowingOrder/add`, requestData)
       .then((response) => {
         // toast.success(`הטופס נשלח בהצלחה`);
-        console.log(response.data);
+        // console.log(response.data);
         setData({
           ...data,
           loading: false,
@@ -696,10 +695,10 @@ const TowingOrderForm = () => {
       published: false,
     });
     setData((prev) => ({ ...prev, clientJourney }));
-    console.log("used set data");
+    // console.log("used set data");
   };
   const journey = data.clientJourney;
-  console.log(journey);
+  // console.log(journey);
 
   const toggleError = (evt) => {
     const errorInfo = [...data.erorrInfo];
@@ -743,11 +742,11 @@ const TowingOrderForm = () => {
     "קודן",
     "אחר",
   ];
-  console.log("מערך סיבות טעות");
-  console.log(data.erorrInfo);
+  // console.log("מערך סיבות טעות");
+  // console.log(data.erorrInfo);
 
   const SearchCarNumber = (carNumber) => {
-    console.log(ordersData);
+    // console.log(ordersData);
     const existing = ordersData.filter(
       (orderData) =>
         orderData.carnumber === carNumber &&

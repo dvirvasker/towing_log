@@ -110,7 +110,7 @@ function Dashboard() {
 
   const handleChange = (evt) => {
     const { value, name } = evt.target;
-    console.log(value);
+    // console.log(value);
     setData((prev) => ({ ...prev, [name]: value }));
     // if (name === "status") {
     //   setStatus(value);
@@ -147,7 +147,7 @@ function Dashboard() {
     axios
       .get(`http://localhost:5000/TowingLogApi/get_banks`)
       .then((response) => {
-        console.log("מדפיס מערך פיקודים");
+        // console.log("מדפיס מערך פיקודים");
         setBankData(response.data.data);
         setPikods(
           Object.entries(response.data.data.Unit_bank.pikods).map(([key, value]) => ({
@@ -206,7 +206,7 @@ function Dashboard() {
       .catch((error) => {});
   }, [bankData]);
 
-  console.log(carData);
+  // console.log(carData);
 
   // // מקבל את כל המוסכים מהמסד נתונים
   // useEffect(() => {
@@ -342,7 +342,7 @@ function Dashboard() {
 
     setFilteredOrders(filter8);
   }, [data, carsList, isCarFiltered]);
-  console.log(filteredOrders);
+  // console.log(filteredOrders);
   //   console.log(garages);
 
   function isInThisWeek(israelDate) {
@@ -375,11 +375,11 @@ function Dashboard() {
   // });
 
   // מערך הזמנות לפי גוף מבצע
-
+  const tzvai = "צבאי";
   const indexObject = {
     "חברה אזרחית - גרירה": 0,
     "חברה אזרחית – ניידת שירות": 1,
-    ["צבאי"]: 2,
+    [tzvai]: 2,
     "מוביל כננת": 3,
   };
 
@@ -390,7 +390,7 @@ function Dashboard() {
   //   const index = indexObject[order.executiveBody];
   //   executiveBodyArr[index] += 1;
   // });
-  console.log(executiveBodyArr);
+  // console.log(executiveBodyArr);
   let today = 0;
   let open = 0;
   // מערך ההזמנות לפי סוג רכב

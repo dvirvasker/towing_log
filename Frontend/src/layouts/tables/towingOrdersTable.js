@@ -235,9 +235,7 @@ const towingOrdersTable = (props) => {
   let tableTittle = "";
   let urlType = "";
   if (typeTable === "landing") {
-    tableTittle = `גרירות מוזמנות להיום - ${
-      currentDate.toLocaleDateString(undefined, options).split(", ")[0]
-    }`;
+    tableTittle = `גרירות מוזמנות להיום - ${currentDate.toLocaleDateString("he-IL")}`;
     urlType = "landing";
   } else if (typeTable === "towingorders") {
     tableTittle = "הזמנות שירות";
@@ -255,7 +253,7 @@ const towingOrdersTable = (props) => {
     axios
       .get(`http://localhost:5000/TowingLogApi/get_banks`)
       .then((response) => {
-        console.log("מדפיס מערך פיקודים");
+        // console.log("מדפיס מערך פיקודים");
         setBankData(response.data.data);
         setPikods(
           Object.entries(response.data.data.Unit_bank.pikods).map(([key, value]) => ({
@@ -505,7 +503,7 @@ const towingOrdersTable = (props) => {
       // delete tempdata_to_excel[i].transferOrderTime;
     }
 
-    console.log(tempdata_to_excel);
+    // console.log(tempdata_to_excel);
 
     const currentDate = new Date();
     const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");

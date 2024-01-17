@@ -231,7 +231,7 @@ export default function data(
     axios
       .get(`http://localhost:5000/TowingLogApi/TowingOrder`)
       .then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
         if (urlType === "landing") {
           setRequestDB(
             response.data.filter(
@@ -250,7 +250,7 @@ export default function data(
         } else if (urlType === "towingorders") {
           setRequestDB(response.data);
           setOriginaldata(response.data);
-          console.log(response.data);
+          // console.log(response.data);
         }
         // if (response.data !== null) {
 
@@ -371,17 +371,19 @@ export default function data(
     return nameOfGarage;
   };
 
-  const openOrderTime = (status, time) => {
+  const openOrderTime = (statusOrder, time) => {
     let nameOfGarage = "יום שונה";
     let color = "mekatnar";
-    if (status === "פתוח") {
-      if (time.split("T")[0] === currentDate.toISOString().split("T")[0]) {
-        // if(time.split("T")[0].split(".")[0] )
-        let milliseconds = new Date(currentDate).getTime() - new Date(time).getTime();
-        if (milliseconds < 1800000) {
+    if (time && statusOrder === "פתוח") {
+      if (
+        new Date(time).toLocaleDateString("he-IL") ===
+        new Date(currentDate).toLocaleDateString("he-IL")
+      ) {
+        const milliseconds = new Date(currentDate).valueOf() - new Date(time).valueOf();
+        if (milliseconds < 10800000) {
           nameOfGarage = "עד 3 שעות";
           color = "success";
-        } else if (milliseconds > 1800000) {
+        } else if (milliseconds > 10800000) {
           nameOfGarage = "מעל 3 שעות";
           color = "error";
         }
@@ -434,9 +436,9 @@ export default function data(
       <MDTypography
         variant="caption"
         fontWeight="bold"
-        color={openOrderTime(towingOrder.status, towingOrder.updatedAt)[1]}
+        color={openOrderTime(towingOrder.status, towingOrder.openOrderTime)[1]}
       >
-        {openOrderTime(towingOrder.status, towingOrder.updatedAt)[0]}
+        {openOrderTime(towingOrder.status, towingOrder.openOrderTime)[0]}
       </MDTypography>
     ),
     status: (
@@ -465,7 +467,7 @@ export default function data(
     ),
   }));
 
-  console.log(`isError ${isError}`);
+  // console.log(`isError ${isError}`);
   return {
     //* the tables headers
     columns: [
