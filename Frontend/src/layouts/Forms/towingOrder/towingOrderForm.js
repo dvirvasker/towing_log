@@ -242,7 +242,9 @@ const TowingOrderForm = () => {
   useEffect(() => {
     function sortArrayByHebrewAlphabet(array) {
       return array.sort((a, b) =>
-        a.garageFullName.trim().localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
+        a.garageFullName
+          .trim()
+          .localeCompare(b.garageFullName.trim(), "he", { sensitivity: "base" })
       );
     }
 
@@ -253,9 +255,10 @@ const TowingOrderForm = () => {
         const fixedData = garagesArray.map((garage) => {
           const res = {
             ...garage,
-            garageFullName: (garage.garageArea && garage.garageArea !== "")
-              ? `${garage.garageName.trim()} - ${garage.garageArea.trim()}`
-              : garage.garageName.trim(),
+            garageFullName:
+              garage.garageArea && garage.garageArea !== ""
+                ? `${garage.garageName.trim()} - ${garage.garageArea.trim()}`
+                : garage.garageName.trim(),
           };
           return res;
         });
@@ -305,8 +308,14 @@ const TowingOrderForm = () => {
 
   const onSubmit = (event) => {
     event.preventDefault();
-    if (CheckFormData(event)) {
-      SendFormData(event);
+    const form = event.currentTarget;
+    // console.log(form.elements);
+    if (form.elements.carnumber === document.activeElement) {
+      console.log("On car number");
+    } else {
+      if (CheckFormData(event)) {
+        SendFormData(event);
+      }
     }
   };
   function isValidIsraeliPhoneNumber(phoneNumber) {
@@ -441,19 +450,21 @@ const TowingOrderForm = () => {
     if (data.location.trim() === "") {
       AddError("מיקום ריק");
     }
-    if(data.executiveBody === "בחר" || data.executiveBody === "")
-    {
-      AddError("גוף מבצע ריק")
-    }
-    else
-    {
-      if(data.executiveBody === "חברה אזרחית - גרירה" || data.executiveBody === "חברה אזרחית – ניידת שירות")
-      {
-        if(data.turnNumber.trim() === "")
-        {
-          AddError("מספר הזמנה ריק")
+    if (data.executiveBody === "בחר" || data.executiveBody === "") {
+      AddError("גוף מבצע ריק");
+    } else {
+      if (
+        data.executiveBody === "חברה אזרחית - גרירה" ||
+        data.executiveBody === "חברה אזרחית – ניידת שירות"
+      ) {
+        if (data.turnNumber.trim() === "") {
+          AddError("מספר הזמנה ריק");
         }
       }
+    }
+    if(data.fullName.trim() === "")
+    {
+      AddError("שם מלא ריק");
     }
     // if (data.garage === "" || data.garage === "בחר") {
     //   AddError("לגרור ל, ריק");
@@ -796,7 +807,11 @@ const TowingOrderForm = () => {
                   טופס הזמנת גרירה
                 </MDTypography>
               </MDBox>
-              <Form style={{ textAlign: "right", paddingBottom: "5%" }} role="form">
+              <Form
+                style={{ textAlign: "right", paddingBottom: "5%" }}
+                role="form"
+                onSubmit={onSubmit}
+              >
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%" }}>
                   <Col>
                     <FormGroup>
@@ -907,6 +922,11 @@ const TowingOrderForm = () => {
                       <h6 style={{}}>צ'</h6>
                       <div style={{ display: "flex" }}>
                         <Input
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              SearchCarNumber(data.carnumber);
+                            }
+                          }}
                           style={{ marginLeft: "5px" }}
                           placeholder="צ'"
                           type="text"
@@ -1334,7 +1354,7 @@ const TowingOrderForm = () => {
                   <MDButton
                     color="mekatnar"
                     size="large"
-                    onClick={onSubmit}
+                    // onClick={onSubmit}
                     className="btn-new-blue"
                     type="submit"
                     startIcon={<Icon fontSize="small">upload</Icon>}

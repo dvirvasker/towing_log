@@ -67,8 +67,22 @@ exports.create = (req, res) => {
   const area = req.body.area;
   const status = req.body.status;
   const commanderNotes = req.body.commanderNotes;
+  let dates = {};
+  if(status === "פתוח")
+  {
+    dates.openOrderTime = new Date();
+  }
+  else if(status === "ממתין לאישור")
+  {
+    dates.waitForApproveTime = new Date();
+  }
+  else if(status === "סגור")
+  {
+    dates.closeOrderTime = new Date();
+  }
 
   const towingorder = new TowingOrder({
+    ...dates,
     reference,
     orderDate,
     orderTime,
@@ -96,7 +110,7 @@ exports.create = (req, res) => {
   towingorder.save((err, data) => {
     if (err) {
       console.log("error is: ")
-      console.log(error);
+      console.log(err);
       return res.status(400).json({
         error: err,
       });
@@ -107,6 +121,8 @@ exports.create = (req, res) => {
 
 exports.update = (req, res) => {
   TowingOrder.findById(req.params.id).then((request) => {
+    const previousStatus = request.status;
+
     request.reference = req.body.reference;
     request.orderDate = req.body.orderDate;
     request.orderTime = req.body.orderTime;
@@ -134,6 +150,7 @@ exports.update = (req, res) => {
         erorrInfoArray.push(element);
       });
     }
+
     request.erorrInfo = erorrInfoArray;
     request.errInfoOther = req.body.errInfoOther;
     request.location = req.body.location;
@@ -150,6 +167,24 @@ exports.update = (req, res) => {
     request.area = req.body.area;
     request.status = req.body.status;
     request.commanderNotes = req.body.commanderNotes;
+
+    /// updating open order time
+    if(req.body.status === "פתוח" && previousStatus !== "פתוח")
+    {
+      request.openOrderTime = new Date();
+    }
+
+    /// updating wait for approve time 
+    if(req.body.status === "ממתין לאישור" && previousStatus !== "ממתין לאישור")
+    {
+      request.waitForApproveTime = new Date();
+    }
+
+    // updating close order time
+    if(req.body.status === "סגור" && previousStatus !== "סגור")
+    {
+      request.closeOrderTime = new Date();
+    }
 
     request.save((err, data) => {
       if (err) {
