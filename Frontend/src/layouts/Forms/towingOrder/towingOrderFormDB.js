@@ -308,9 +308,19 @@ const TowingOrderFormDB = () => {
   }
 
   const onSubmit = (event) => {
+    // event.preventDefault();
+    // if (CheckFormData(event)) {
+    //   SendFormData(event);
+    // }
     event.preventDefault();
-    if (CheckFormData(event)) {
-      SendFormData(event);
+    const form = event.currentTarget;
+    // console.log(form.elements);
+    if (form.elements.carnumber === document.activeElement) {
+      console.log("On car number");
+    } else {
+      if (CheckFormData(event)) {
+        SendFormData(event);
+      }
     }
   };
   function isValidIsraeliPhoneNumber(phoneNumber) {
@@ -382,6 +392,10 @@ const TowingOrderFormDB = () => {
           AddError("מספר הזמנה ריק")
         }
       }
+    }
+    if(data.fullName.trim() === "")
+    {
+      AddError("שם מלא ריק");
     }
     // if (data.garage === "" || data.garage === "בחר") {
     //   AddError("לגרור ל, ריק");
@@ -782,7 +796,7 @@ const TowingOrderFormDB = () => {
                   {data.reference}
                 </MDTypography>
               </MDBox>
-              <Form style={{ textAlign: "right", paddingBottom: "5%" }} role="form">
+              <Form style={{ textAlign: "right", paddingBottom: "5%" }} role="form" onSubmit={onSubmit}>
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%" }}>
                   <Col>
                     <FormGroup>
@@ -894,6 +908,11 @@ const TowingOrderFormDB = () => {
                       <div style={{ display: "flex" }}>
                         <Input
                           style={{ marginLeft: "5px" }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              SearchCarNumber(data.carnumber);
+                            }
+                          }}
                           placeholder="צ'"
                           type="text"
                           name="carnumber"
@@ -1321,7 +1340,7 @@ const TowingOrderFormDB = () => {
                       <MDButton
                         color="mekatnar"
                         size="large"
-                        onClick={onSubmit}
+                        // onClick={onSubmit}
                         className="btn-new-blue"
                         type="submit"
                         style={{ marginLeft: "3%" }}

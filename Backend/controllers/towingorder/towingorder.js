@@ -96,7 +96,7 @@ exports.create = (req, res) => {
   towingorder.save((err, data) => {
     if (err) {
       console.log("error is: ")
-      console.log(error);
+      console.log(err);
       return res.status(400).json({
         error: err,
       });
