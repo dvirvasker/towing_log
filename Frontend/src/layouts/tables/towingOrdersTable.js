@@ -4,8 +4,16 @@
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
+/* eslint-disable camelcase */
 /* eslint-disable no-param-reassign */
 /* eslint no-underscore-dangle: ["error", { "allow": ["foo_", "_id"] }] */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable react/jsx-no-bind */
+
+
+
 
 /**
 =========================================================
@@ -371,20 +379,20 @@ const towingOrdersTable = (props) => {
   function FixDataAndExportToExcel() {
     let tempdata_to_excel = [];
     let tempdata_to_excelrow = [];
-    for (let i = 0; i < requestDB.length; i++) {
+    for (let i = 0; i < requestDB.length; i+= 1) {
       tempdata_to_excel.push({ ...requestDB[i] });
     }
 
-    for (let i = 0; i < pRows.length; i++) {
+    for (let i = 0; i < pRows.length; i+= 1) {
       tempdata_to_excelrow.push({ ...pRows[i] });
     }
-    for (let i = 0; i < tempdata_to_excelrow.length; i++) {
+    for (let i = 0; i < tempdata_to_excelrow.length; i+= 1) {
       tempdata_to_excelrow[i].garage
         ? (tempdata_to_excel[i].garage_m = tempdata_to_excelrow[i].garage)
         : (tempdata_to_excel[i].garage_m = " ");
     }
 
-    for (let i = 0; i < tempdata_to_excel.length; i++) {
+    for (let i = 0; i < tempdata_to_excel.length; i+= 1) {
       tempdata_to_excel[i].reference
         ? (tempdata_to_excel[i].reference_m = tempdata_to_excel[i].reference)
         : (tempdata_to_excel[i].reference_m = " ");
@@ -494,7 +502,7 @@ const towingOrdersTable = (props) => {
     }
 
     // export to excel -fix
-    for (let i = 0; i < tempdata_to_excel.length; i++) {
+    for (let i = 0; i < tempdata_to_excel.length; i+= 1) {
       // delete unwanted fields
       delete tempdata_to_excel[i]._id;
       delete tempdata_to_excel[i].__v;
@@ -534,13 +542,13 @@ const towingOrdersTable = (props) => {
 
     // console.log(tempdata_to_excel);
 
-    const currentDate = new Date();
-    const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
-    const day = currentDate.getDate().toString().padStart(2, "0");
+    const todayDate = new Date();
+    const month = (todayDate.getMonth() + 1).toString().padStart(2, "0");
+    const day = todayDate.getDate().toString().padStart(2, "0");
 
     let EXCEL_EXTENSION = ".xlsx";
     let worksheet = XLSX.WorkSheet;
-    let sheetName = `הזמנות שירות ${day}-${month}-${currentDate.getFullYear()}`;
+    let sheetName = `הזמנות שירות ${day}-${month}-${todayDate.getFullYear()}`;
 
     const headers = {
       reference_m: "אסמכתא",
@@ -579,7 +587,7 @@ const towingOrdersTable = (props) => {
     });
 
     const workbook = XLSX.utils.book_new();
-    const fileName = `הזמנות שירות ${day}-${month}-${currentDate.getFullYear()}${EXCEL_EXTENSION}`;
+    const fileName = `הזמנות שירות ${day}-${month}-${todayDate.getFullYear()}${EXCEL_EXTENSION}`;
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
     XLSX.writeFile(workbook, fileName);
 
