@@ -14,7 +14,7 @@ const towingOrderSchema = new mongoose.Schema(
     erorrInfo: { type: Array, required: true },
     errInfoOther: { type: String },
     location: { type: String, required: true },
-    garage: { type: String, required: true },
+    garage: { type: String },
     fullName: { type: String, required: true },
     phoneNumber: { type: String },
     otherPhoneNumber: { type: String },

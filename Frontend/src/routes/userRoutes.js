@@ -59,19 +59,19 @@ import Pagedamagedtools from "layouts/dashboard/damagedtools";
 const routes = [
   {
     type: "collapse",
+    name: "דף ראשי",
+    key: "dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/dashboard",
+    component: <TowingDashboard />,
+  },
+  {
+    type: "collapse",
     name: `דו"ח יומי`,
     key: "landing",
     icon: <Icon fontSize="small">toys</Icon>,
     route: "/landing",
     component: <TowingOrders typeTable="landing" />,
-  },
-  {
-    type: "collapse",
-    name: "מסך הבית",
-    key: "dashboard",
-    icon: <Icon fontSize="small">dashboard</Icon>,
-    route: "/dashboard",
-    component: <TowingDashboard />,
   },
   {
     type: "collapse",

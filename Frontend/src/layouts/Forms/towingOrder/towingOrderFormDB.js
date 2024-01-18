@@ -255,6 +255,15 @@ const TowingOrderFormDB = () => {
         const fixedTransferOrderDate = response.data.transferOrderDate.split("T")[0];
         response.data.transferOrderDate = fixedTransferOrderDate;
 
+        const fixedClientJourney = response.data.clientJourney.map(post => {
+          const dateEl = new Date(post.date);
+          return {
+            ...post,
+            date : dateEl,
+          }
+        })
+        response.data.clientJourney = fixedClientJourney;
+
         // console.log(response.data);
         setInitialStatus(response.data.status);
         setData(response.data);
@@ -276,7 +285,8 @@ const TowingOrderFormDB = () => {
       const carType = carTypesData.filter(
         (element) => element._id === carDataInfoArray[0][0].carTypeId
       );
-      setData((prev) => ({ ...prev, weight: carType[0].weight }));
+      if(carType[0])
+      {setData((prev) => ({ ...prev, weight: carType[0].weight }));}
     } else {
       toast.error("צ' לא קיים");
       setData((prev) => ({ ...data, carnumber: "" }));
@@ -356,20 +366,19 @@ const TowingOrderFormDB = () => {
     } else if (!(digitsOnly(data.carnumber) && data.carnumber.length <= 9)) {
       AddError("צ' לא תקין");
     }
-    // if (data.erorrInfo.length === 0) {
-    //   AddError("לא רשומה סיבת תקלה");
-    // }
-    if (data.erorrInfo.includes("אחר")) {
-      if (data.errInfoOther.trim() === "") {
-        AddError("הערות ריק");
+
+    if(data.erorrInfo.length === 0)
+    {
+      AddError("חובה להכניס לפחות סיבת תקלה אחת")
+    }
+    if(data.erorrInfo.includes("אחר"))
+    {
+      if(data.errInfoOther.trim() === "")
+      {
+        AddError("הערות ריק")
       }
     }
-    if (data.garage === "" || data.garage === "בחר") {
-      AddError("מוסך ריק");
-    }
-    if (data.garage === "אחר" && data.garageOther.trim() === "") {
-      AddError("מוסך ריק (אחר)");
-    }
+
     if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
       AddError(data.phoneNumber !== "" ? "מספר טלפון לא תקין" : "מספר טלפון ריק");
     }
@@ -397,18 +406,9 @@ const TowingOrderFormDB = () => {
     if (data.fullName.trim() === "") {
       AddError("שם מלא ריק");
     }
-    // if (data.garage === "" || data.garage === "בחר") {
-    //   AddError("לגרור ל, ריק");
-    // }
-    // if (data.fullName.trim() === "") {
-    //   AddError("שם מלא ריק");
-    // }
-    // if (!data.phoneNumber.length)
+
     if (flag !== true) {
-      // if (data.personalnumber === "" || data.personalnumber === undefined) {
-      //   flag = false;
-      //   ErrorReason.push("מספר אישי ריק");
-      // }
+
 
       ErrorReason.forEach((reason) => {
         toast.error(reason);
@@ -698,7 +698,7 @@ const TowingOrderFormDB = () => {
     clientJourney.push({
       text: "",
       publisher: `${user.firstName} ${user.lastName}`,
-      date: new Date().toISOString().split("T")[0],
+      date: new Date(),
       published: false,
     });
     setData((prev) => ({ ...prev, clientJourney }));
@@ -790,7 +790,7 @@ const TowingOrderFormDB = () => {
                 textAlign="center"
               >
                 <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-                  טופס הזמנת גרירה
+                  טופס הזמנת שירות
                 </MDTypography>
                 <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
                   {data.reference}
@@ -863,8 +863,8 @@ const TowingOrderFormDB = () => {
                       {journey.length > 0 &&
                         journey.map((post, index) => (
                           <>
-                            <p style={{ fontSize: "large" }}>
-                              {post.publisher} {post.date}
+                          <p style={{ fontSize: "large" }}>
+                              {post.publisher} {post.date.toLocaleTimeString("he-IL")} {post.date.toLocaleDateString("he-IL")}
                             </p>
                             <Input
                               key={index}
@@ -1314,7 +1314,6 @@ const TowingOrderFormDB = () => {
                         value={data.status}
                         onChange={handleChange}
                       >
-                        <option value="בחר">בחר</option>
                         <option value="פתוח">פתוח</option>
                         <option value="סגור">סגור</option>
                         <option value="מבוטל">מבוטל</option>
@@ -1350,7 +1349,7 @@ const TowingOrderFormDB = () => {
                         style={{ marginLeft: "3%" }}
                         startIcon={<Icon fontSize="small">check</Icon>}
                       >
-                        עדכן טופס גרירה
+                        עדכן טופס שירות
                       </MDButton>
                       <MDButton
                         color="error"
