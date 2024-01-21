@@ -97,6 +97,9 @@ const TowingOrderForm = () => {
   const [chosenHativa, setChosenHativa] = useState("בחר");
   const [chosenGdod, setChosenGdod] = useState("בחר");
   const date = new Date().toISOString().split("T")[0];
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   // const [errorMessage, setErrorMessage] = useState("");
   // const [toastOpen, setToastOpen] = useState(false);
 
@@ -156,7 +159,7 @@ const TowingOrderForm = () => {
         setData((prev) => ({ ...prev, weight: carType[0].weight }));
       }
     } else {
-      toast.error("צ' לא קיים");
+      openError("צ' לא קיים");
       setData((prev) => ({ ...data, carnumber: "" }));
     }
   };
@@ -172,7 +175,7 @@ const TowingOrderForm = () => {
 
     if (evt.target.name === "orderDate" || evt.target.name === "transferOrderDate") {
       if (value < new Date()) {
-        toast.error("אין לבחור תאריך עבר");
+        openError("אין לבחור תאריך עבר");
       }
     }
 
@@ -333,14 +336,16 @@ const TowingOrderForm = () => {
   const CheckFormData = () => {
     let flag = true;
     const ErrorReason = [];
+    let errorReasonText = "";
     const AddError = (error) => {
       flag = false;
       ErrorReason.push(error);
+      errorReasonText += errorReasonText === "" ? `${error}` : `, ${error}`;
     };
     if (!data.orderDate) {
       AddError("תאריך ריק");
     }
-    if (!data.orderTime || data.orderDate === "") {
+    if (!data.orderTime || data.orderTime === "") {
       AddError("שעה ריקה");
     }
     if (data.serviceName === "") {
@@ -388,10 +393,11 @@ const TowingOrderForm = () => {
     }
 
     if (flag !== true) {
-      ErrorReason.forEach((reason) => {
-        toast.error(reason);
-        // showToast(reason, "error");
-      });
+      // ErrorReason.forEach((reason) => {
+      //   toast.error(reason);
+      //   // showToast(reason, "error");
+      // });
+      openError(errorReasonText);
       return false;
     }
     // console.log("Valid");
@@ -459,6 +465,10 @@ const TowingOrderForm = () => {
       });
   };
 
+  const openError = (error) => {
+    setSnackbarOpen(true);
+    setErrorMessage(error);
+  }
   const handleCloseSuccsecModal = () => {
     setData({ ...data, loading: false, error: false, successmsg: false, NavigateToReferrer: true });
   };
@@ -684,11 +694,15 @@ const TowingOrderForm = () => {
         // }
       }
     } else {
-      toast.error(
-        `שים לב ישנה הזמנה ${
-          existing[0].status === "פתוח" ? "פתוחה" : "מוקפאת"
-        } עם הצ' זה - אסמכתא : ${existing[0].reference}`
-      );
+      const message =         `שים לב ישנה הזמנה ${
+        existing[0].status === "פתוח" ? "פתוחה" : "מוקפאת"
+      } עם הצ' זה - אסמכתא : ${existing[0].reference}`;
+      openError(message);
+      // toast.error(
+      //   `שים לב ישנה הזמנה ${
+      //     existing[0].status === "פתוח" ? "פתוחה" : "מוקפאת"
+      //   } עם הצ' זה - אסמכתא : ${existing[0].reference}`
+      // );
     }
   };
   const filteredOgdas = ogdas.filter((ogda) => ogda.pikodId === chosenPikod);
@@ -1278,11 +1292,18 @@ const TowingOrderForm = () => {
       </Row>
     </Container>
   );
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
 
+    setSnackbarOpen(false);
+    setErrorMessage("");
+  };
   return (
     <MDBox>
       {/* //! fot the pop up warning windoes */}
-      <ToastContainer
+      {/* <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
@@ -1293,7 +1314,17 @@ const TowingOrderForm = () => {
         draggable
         pauseOnHover
         theme="colored"
-      />
+      /> */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert onClose={handleClose} severity="error" variant="filled" sx={{ width: "100%" }}>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       {showError()}
       {showSuccess()}
       {showLoading()}

@@ -1,6 +1,8 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-param-reassign */
+/* eslint-disable no-useless-computed-key */
+
 /* eslint no-underscore-dangle: 0 */
 
 /**
@@ -54,6 +56,7 @@ import MDButton from "components/MDButton";
 // Dashboard components
 import VerticalBarChart from "examples/Charts/BarCharts/VerticalBarChart";
 import DefaultDoughnutChart from "examples/Charts/DoughnutCharts/DefaultDoughnutChart";
+
 
 import { CardBody, Col, Container, Form, FormGroup, FormText, Input, Label, Row } from "reactstrap";
 
@@ -384,6 +387,18 @@ function Dashboard() {
   };
 
   const executiveBodyArr = [0, 0, 0, 0];
+  const statusArr = [0,0,0,0,0]; 
+  const statusIndexes = {["פתוח"] : 0, 
+                          ["ממתין לאישור"] : 1,
+                          ["מוקפא"] : 2, 
+                          ["סגור"] : 3, 
+                          ["מבוטל"] : 4, 
+                        }
+  // 0 פתוח
+  // 1 ממתין לאישור
+  // 2 מוקפא
+  // 3 סוגר
+  // 4 מבוטל
 
   // filteredOrders.forEach((order) => {
   //   // console.log(`${order.executiveBody} : ${indexObject[order.executiveBody]}`);
@@ -397,6 +412,7 @@ function Dashboard() {
   const carTypesCount = {};
   filteredOrders.forEach((order) => {
     const date = new Date(order.demandDate);
+    statusArr[statusIndexes[order.status]] += 1;
     if (isInThisWeek(date)) {
       const day = date.getDay();
       daysArray[day] += 1;
@@ -420,7 +436,7 @@ function Dashboard() {
       open += 1;
     }
   });
-
+  console.log(statusArr);
   const byNamesArr = [];
   Object.entries(carTypesCount).forEach(([key, value]) => {
     const type = carTypesData.find((el) => el._id === key);
@@ -617,67 +633,6 @@ function Dashboard() {
             </Col>
           </Row>
 
-          {/* <Row>
-            <Col>
-              <h6>תאריך פתיחת ההזמנה</h6>
-            </Col>
-            <Col>
-              <h6>תאריך מבוקש</h6>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col>
-              <FormGroup>
-                <h6 style={{}}>מתאריך</h6>
-                <Input
-                  placeholder="מתאריך"
-                  type="date"
-                  name="fromDate"
-                  value={data.fromDate}
-                  onChange={handleChange}
-                />
-              </FormGroup>
-            </Col>
-            <Col>
-              <FormGroup>
-                <h6 style={{}}>עד תאריך</h6>
-                <Input
-                  placeholder="עד תאריך"
-                  type="date"
-                  name="toDate"
-                  value={data.toDate}
-                  onChange={handleChange}
-                />
-              </FormGroup>
-            </Col>
-
-            <Col>
-              <FormGroup>
-                <h6 style={{}}>מתאריך</h6>
-                <Input
-                  placeholder="מתאריך"
-                  type="date"
-                  name="fromDamandDate"
-                  value={data.fromDamandDate}
-                  onChange={handleChange}
-                />
-              </FormGroup>
-            </Col>
-            <Col>
-              <FormGroup>
-                <h6 style={{}}>עד תאריך</h6>
-                <Input
-                  placeholder="עד תאריך"
-                  type="date"
-                  name="toDamandDate"
-                  value={data.toDamandDate}
-                  onChange={handleChange}
-                />
-              </FormGroup>
-            </Col>
-          </Row> */}
-
           <Row>
             <Col>
               <FormGroup>
@@ -766,9 +721,9 @@ function Dashboard() {
         </MDBox>
       )}
       <Grid container spacing={3}>
-        <Grid item xs={6}>
-          <Grid container spacing={1}>
-            <Grid item xs={12}>
+        {/* <Grid item xs={6}>
+          <Grid container spacing={1}> */}
+            <Grid item xs={4}>
               <DefaultInfoCard
                 icon="table_view"
                 title="הזמנות שירות"
@@ -776,14 +731,14 @@ function Dashboard() {
                 value={filteredOrders.length}
               />
             </Grid>
-            <Grid item xs={6}>
-              <SimpleInfoCard icon="today" title="הזמנות שנפתחו היום" value={today} />
+            <Grid item xs={4}>
+              <DefaultInfoCard icon="today" title="הזמנות שנפתחו היום" value={today} />
             </Grid>
-            <Grid item xs={6}>
-              <SimpleInfoCard icon="table_view" title="הזמנות עם סטטוס פתוח" value={open} />
+            <Grid item xs={4}>
+              <DefaultInfoCard icon="table_view" title="הזמנות עם סטטוס פתוח" value={open} />
             </Grid>
-          </Grid>
-        </Grid>
+          {/* </Grid>
+        </Grid> */}
 
         <Grid item xs={6}>
           <DefaultDoughnutChart
@@ -800,6 +755,21 @@ function Dashboard() {
             }}
           />
         </Grid>
+        <Grid item xs={6}>
+        <PieChart
+          icon={{ color: "mekatnar", component: "pie_chart" }}
+          title="סטטוס"
+          description="אחוזי הזמנות לפי סטטוס הזמנה"
+          chart={{
+            labels: ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"],
+            datasets: {
+              label: "סטטוס הזמנה",
+              backgroundColors: ["primary", "info", "secondary", "dark", "error"],
+              data: statusArr,
+            },
+          }}
+        />
+      </Grid>
         <Grid item xs={6}>
           <VerticalBarChart
             icon={{ color: "mekatnar", component: "calendar_today" }}
@@ -834,6 +804,7 @@ function Dashboard() {
             }}
           />
         </Grid>
+
       </Grid>
     </>
   );

@@ -68,6 +68,8 @@ import {
   Modal,
   Select,
   TextField,
+  Snackbar,
+  Alert
 } from "@mui/material";
 
 // user and auth import
@@ -97,6 +99,8 @@ const TowingOrderFormDB = () => {
   const [chosenGdod, setChosenGdod] = useState("בחר");
   const date = new Date().toISOString().split("T")[0];
   const [initialStatus, setInitialStatus] = useState();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   // const [htivas, setHtivas]
 
   const [data, setData] = useState({
@@ -123,7 +127,7 @@ const TowingOrderFormDB = () => {
 
     if (evt.target.name === "orderDate" || evt.target.name === "transferOrderDate") {
       if (value < new Date()) {
-        toast.error("אין לבחור תאריך עבר");
+        openError("אין לבחור תאריך עבר");
       }
     }
 
@@ -289,7 +293,7 @@ const TowingOrderFormDB = () => {
         setData((prev) => ({ ...prev, weight: carType[0].weight }));
       }
     } else {
-      toast.error("צ' לא קיים");
+      openError("צ' לא קיים");
       setData((prev) => ({ ...data, carnumber: "" }));
     }
   }
@@ -318,6 +322,11 @@ const TowingOrderFormDB = () => {
   function handleChange1(evt) {
     const value = Math.max(min, Math.min(max, Number(evt.target.value)));
     setData({ ...data, [evt.target.name]: value });
+  }
+
+  const openError = (error) => {
+    setSnackbarOpen(true);
+    setErrorMessage(error);
   }
 
   const onSubmit = (event) => {
@@ -349,9 +358,11 @@ const TowingOrderFormDB = () => {
   const CheckFormData = () => {
     let flag = true;
     const ErrorReason = [];
+    let errorReasonText = "";
     const AddError = (error) => {
       flag = false;
       ErrorReason.push(error);
+      errorReasonText += errorReasonText === "" ? `${error}` : `, ${error}`;
     };
     if (!data.orderDate) {
       AddError("תאריך ריק");
@@ -406,10 +417,11 @@ const TowingOrderFormDB = () => {
     }
 
     if (flag !== true) {
-      ErrorReason.forEach((reason) => {
-        toast.error(reason);
-        return false;
-      });
+      // ErrorReason.forEach((reason) => {
+      //   toast.error(reason);
+      //   return false;
+      // });
+      openError(errorReasonText)
     } else {
       // console.log("Valid");
       return true;
@@ -760,11 +772,15 @@ const TowingOrderFormDB = () => {
         setChosenCarNumber(carNumber);
       }
     } else {
-      toast.error(
-        `שים לב ישנה הזמנה ${
-          existing[0].status === "פתוח" ? "פתוחה" : "מוקפאת"
-        } עם הצ' זה - אסמכתא : ${existing[0].reference}`
-      );
+      const message = `שים לב ישנה הזמנה ${
+        existing[0].status === "פתוח" ? "פתוחה" : "מוקפאת"
+      } עם הצ' זה - אסמכתא : ${existing[0].reference}`;
+      openError(message);
+      // toast.error(
+      //   `שים לב ישנה הזמנה ${
+      //     existing[0].status === "פתוח" ? "פתוחה" : "מוקפאת"
+      //   } עם הצ' זה - אסמכתא : ${existing[0].reference}`
+      // );
     }
   };
 
@@ -1368,12 +1384,19 @@ const TowingOrderFormDB = () => {
       </Row>
     </Container>
   );
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
 
+    setSnackbarOpen(false);
+    setErrorMessage("");
+  };
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
-        <ToastContainer
+        {/* <ToastContainer
           position="top-right"
           autoClose={5000}
           hideProgressBar={false}
@@ -1384,7 +1407,17 @@ const TowingOrderFormDB = () => {
           draggable
           pauseOnHover
           theme="colored"
-        />
+        /> */}
+         <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert onClose={handleClose} severity="error" variant="filled" sx={{ width: "100%" }}>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
         {showError()}
         {showSuccess()}
         {showLoading()}
