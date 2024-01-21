@@ -152,8 +152,9 @@ const TowingOrderForm = () => {
       const carType = carTypesData.filter(
         (element) => element._id === carDataInfoArray[0][0].carTypeId
       );
-      if(carType[0])
-      {setData((prev) => ({ ...prev, weight: carType[0].weight }));}
+      if (carType[0]) {
+        setData((prev) => ({ ...prev, weight: carType[0].weight }));
+      }
     } else {
       toast.error("צ' לא קיים");
       setData((prev) => ({ ...data, carnumber: "" }));
@@ -293,7 +294,6 @@ const TowingOrderForm = () => {
     const clientJourney = [...data.clientJourney];
     clientJourney[index].text = value;
     setData((prev) => ({ ...prev, [evt.target.name]: clientJourney }));
-
   };
   const removeClientJourneyPost = (index) => {
     const clientJourney = [...data.clientJourney];
@@ -352,7 +352,6 @@ const TowingOrderForm = () => {
       AddError("צ' לא תקין");
     }
 
-
     if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
       AddError(data.phoneNumber ? "מספר טלפון לא תקין" : "מספר טלפון ריק");
     }
@@ -361,15 +360,12 @@ const TowingOrderForm = () => {
         AddError("מספר טלפון נוסף לא תקין");
       }
     }
-    if(data.erorrInfo.length === 0)
-    {
-      AddError("חובה להכניס לפחות סיבת תקלה אחת")
+    if (data.erorrInfo.length === 0) {
+      AddError("חובה להכניס לפחות סיבת תקלה אחת");
     }
-    if(data.erorrInfo.includes("אחר"))
-    {
-      if(data.errInfoOther.trim() === "")
-      {
-        AddError("הערות ריק")
+    if (data.erorrInfo.includes("אחר")) {
+      if (data.errInfoOther.trim() === "") {
+        AddError("הערות ריק");
       }
     }
     if (data.location.trim() === "") {
@@ -392,8 +388,6 @@ const TowingOrderForm = () => {
     }
 
     if (flag !== true) {
-
-
       ErrorReason.forEach((reason) => {
         toast.error(reason);
         // showToast(reason, "error");
@@ -768,8 +762,6 @@ const TowingOrderForm = () => {
                       />
                     </FormGroup>
                   </Col>
-                  </Row>
-                  <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>הערות אחמ"ש</h6>
@@ -792,7 +784,8 @@ const TowingOrderForm = () => {
                         journey.map((post, index) => (
                           <>
                             <p style={{ fontSize: "large" }}>
-                              {post.publisher} {post.date.toLocaleTimeString("he-IL")} {post.date.toLocaleDateString("he-IL")}
+                              {post.publisher} {post.date.toLocaleTimeString("he-IL")}{" "}
+                              {post.date.toLocaleDateString("he-IL")}
                             </p>
                             <Input
                               key={index}
@@ -1250,8 +1243,7 @@ const TowingOrderForm = () => {
                       </Input>
                     </FormGroup>
                   </Col>
-                  </Row>
-                  <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
+
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>הערות מפקד</h6>
