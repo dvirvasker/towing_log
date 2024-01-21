@@ -116,21 +116,26 @@ const towingOrdersTable = (props) => {
     axios
       .get(`http://localhost:5000/TowingLogApi/CarDatas`)
       .then((response) => {
-        response.data.forEach((carDataInfo) => {
+        if (Object.keys(bankData).length === 0) return;
+        const toSet = response.data.map((carDataInfo) => {
           const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId];
-          carDataInfo.gdodName = gdod.name;
-          carDataInfo.hativaId = gdod.hativaId;
-          const hativa = bankData.Unit_bank.hativas[carDataInfo.hativaId];
-          carDataInfo.hativaName = hativa.name;
-          carDataInfo.ogdaId = hativa.ogdaId;
-          const ogda = bankData.Unit_bank.ogdas[carDataInfo.ogdaId];
-          carDataInfo.ogdaName = ogda.name;
-          carDataInfo.pikodId = ogda.pikodId;
-          const pikod = bankData.Unit_bank.pikods[carDataInfo.pikodId];
-          carDataInfo.pikodName = pikod.name;
+          if (!gdod) return carDataInfo;
+          const hativa = bankData.Unit_bank.hativas[gdod.hativaId];
+          const ogda = bankData.Unit_bank.ogdas[hativa.ogdaId];
+          const pikod = bankData.Unit_bank.pikods[ogda.pikodId];
+          return {
+            ...carDataInfo,
+            gdodName: gdod.name,
+            hativaId: gdod.hativaId,
+            hativaName: hativa.name,
+            ogdaId: hativa.ogdaId,
+            ogdaName: ogda.name,
+            pikodId: ogda.pikodId,
+            pikodName: pikod.name,
+          };
           // console.log(carDataInfo);
         });
-        setCarData(response.data);
+        if (toSet && toSet.length > 0) setCarData(toSet);
       })
       .catch((error) => {});
   }, [bankData]);
@@ -238,7 +243,7 @@ const towingOrdersTable = (props) => {
   let tableTittle = "";
   let urlType = "";
   if (typeTable === "landing") {
-    tableTittle = `גרירות מוזמנות להיום - ${currentDate.toLocaleDateString("he-IL")}`;
+    tableTittle = `הזמנות שירות להיום - ${currentDate.toLocaleDateString("he-IL")}`;
     urlType = "landing";
   } else if (typeTable === "towingorders") {
     tableTittle = "הזמנות שירות";

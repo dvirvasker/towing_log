@@ -277,10 +277,12 @@ const TowingOrderFormDB = () => {
     carDataInfoArray.push(carData.filter((el) => el.carnumber === carNumber));
     // console.log(carData);
     if (carDataInfoArray[0][0]) {
-      setChosenPikod(carDataInfoArray[0][0].pikodId);
-      setChosenOgda(carDataInfoArray[0][0].ogdaId);
-      setChosenHativa(carDataInfoArray[0][0].hativaId);
-      setChosenGdod(carDataInfoArray[0][0].gdodId);
+      if(gdods.find(gdod => gdod.id === carDataInfoArray[0][0].gdodId)){
+        setChosenPikod(carDataInfoArray[0][0].pikodId);
+        setChosenOgda(carDataInfoArray[0][0].ogdaId);
+        setChosenHativa(carDataInfoArray[0][0].hativaId);
+        setChosenGdod(carDataInfoArray[0][0].gdodId);
+      }
       setData((prev) => ({ ...prev, a: carDataInfoArray[0][0].carTypeId }));
       const carType = carTypesData.filter(
         (element) => element._id === carDataInfoArray[0][0].carTypeId
@@ -756,6 +758,10 @@ const TowingOrderFormDB = () => {
         (orderData.status === "פתוח" || orderData.status === "מוקפא")
     );
     if (existing.length === 0) {
+      setChosenPikod("בחר");
+      setChosenOgda("בחר");
+      setChosenHativa("בחר");
+      setChosenGdod("בחר");
       if (carNumber.trim() !== "") {
         setChosenCarNumber(carNumber);
       }
