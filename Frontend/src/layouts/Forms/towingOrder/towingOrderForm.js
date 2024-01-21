@@ -768,6 +768,8 @@ const TowingOrderForm = () => {
                       />
                     </FormGroup>
                   </Col>
+                  </Row>
+                  <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>הערות אחמ"ש</h6>
@@ -1248,7 +1250,8 @@ const TowingOrderForm = () => {
                       </Input>
                     </FormGroup>
                   </Col>
-
+                  </Row>
+                  <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>הערות מפקד</h6>
