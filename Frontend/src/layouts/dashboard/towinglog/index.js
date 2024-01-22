@@ -29,7 +29,8 @@ import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-import { Dialog, DialogContent } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
+import { Box, Dialog, DialogContent } from "@mui/material";
 import { setMiniSidenav, setOpenConfigurator, useMaterialUIController } from "context";
 
 // Material Dashboard 2 React components
@@ -48,6 +49,7 @@ import MDTypography from "components/MDTypography";
 import MilitaryIndustryForm from "layouts/Forms/kshirotMisgrot/MilitaryIndustryForm";
 import CivilIndustryForm from "layouts/Forms/kshirotMisgrot/CivilIndustryForm";
 import HoliyotForm from "layouts/Forms/kshirotMisgrot/HoliyotForm";
+import TowingOrderForm from "layouts/Forms/towingOrder/towingOrderForm";
 // import MDProgress from "components/MDProgress";
 import MDCircularProgress from "components/MDCircularProgress";
 // import CircularProgress from "@mui/material/CircularProgress";
@@ -56,7 +58,6 @@ import MDButton from "components/MDButton";
 // Dashboard components
 import VerticalBarChart from "examples/Charts/BarCharts/VerticalBarChart";
 import DefaultDoughnutChart from "examples/Charts/DoughnutCharts/DefaultDoughnutChart";
-
 
 import { CardBody, Col, Container, Form, FormGroup, FormText, Input, Label, Row } from "reactstrap";
 
@@ -75,6 +76,7 @@ function Dashboard() {
   const [hativas, setHativas] = useState([]);
   const [gdods, setGdods] = useState([]);
   const [carTypesData, setCarTypesData] = useState([]);
+  const [toAddFile, setToAddFile] = useState(false);
 
   const [garages, setGarages] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
@@ -348,6 +350,23 @@ function Dashboard() {
   // console.log(filteredOrders);
   //   console.log(garages);
 
+  const addFile = () => (
+    <Dialog
+      px={5}
+      open={toAddFile}
+      onClose={() => setToAddFile(false)}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      maxWidth="xl"
+    >
+      <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
+        <DialogContent>
+          <TowingOrderForm />
+        </DialogContent>
+      </MDBox>
+    </Dialog>
+  );
+
   function isInThisWeek(israelDate) {
     // Get the current date in Israel time
     const currentDateInIsrael = new Date().toLocaleString("en-US", { timeZone: "Asia/Jerusalem" });
@@ -387,13 +406,14 @@ function Dashboard() {
   };
 
   const executiveBodyArr = [0, 0, 0, 0];
-  const statusArr = [0,0,0,0,0]; 
-  const statusIndexes = {["פתוח"] : 0, 
-                          ["ממתין לאישור"] : 1,
-                          ["מוקפא"] : 2, 
-                          ["סגור"] : 3, 
-                          ["מבוטל"] : 4, 
-                        }
+  const statusArr = [0, 0, 0, 0, 0];
+  const statusIndexes = {
+    ["פתוח"]: 0,
+    ["ממתין לאישור"]: 1,
+    ["מוקפא"]: 2,
+    ["סגור"]: 3,
+    ["מבוטל"]: 4,
+  };
   // 0 פתוח
   // 1 ממתין לאישור
   // 2 מוקפא
@@ -458,23 +478,48 @@ function Dashboard() {
 
   const dashboard = () => (
     <>
-      <MDButton
-        color="mekatnar"
-        variant="gradient"
-        onClick={() => setFilterOpen((prev) => !prev)}
-        sx={{
-          marginBottom: 2,
-        }}
-        // onClick={() => {
-        //   // setIsInfoPressed(true);
-        //   // setpressedID(hozla._id);
-        // }}
-        // circular="true"
-        size="medium"
-        startIcon={<Icon>filter_alt</Icon>}
-      >
-        סינון
-      </MDButton>
+    <Box sx={{
+      display: 'flex',
+      justifyContent : 'space-between',
+      marginBottom : 1
+    }}>
+          <MDButton
+            color="mekatnar"
+            variant="gradient"
+            onClick={() => setFilterOpen((prev) => !prev)}
+            sx={{
+              marginBottom: 2,
+            }}
+            // onClick={() => {
+            //   // setIsInfoPressed(true);
+            //   // setpressedID(hozla._id);
+            // }}
+            // circular="true"
+            size="medium"
+            startIcon={<Icon>filter_alt</Icon>}
+          >
+            סינון
+          </MDButton>
+      
+          <Tooltip title="הוסף הזמנה חדשה" arrow>
+            <MDButton
+              sx={{}}
+              color="mekatnar"
+              variant="gradient"
+              onClick={() => setToAddFile(true)}
+              // onClick={() => {
+              //   // setIsInfoPressed(true);
+              //   // setpressedID(hozla._id);
+              // }}
+              circular="true"
+              iconOnly="true"
+              size="medium"
+            >
+              <Icon>add</Icon>
+            </MDButton>
+          </Tooltip>
+          </Box>
+
       {filterOpen && (
         <MDBox py={3}>
           <Row>
@@ -723,21 +768,21 @@ function Dashboard() {
       <Grid container spacing={3}>
         {/* <Grid item xs={6}>
           <Grid container spacing={1}> */}
-            <Grid item xs={4}>
-              <DefaultInfoCard
-                icon="table_view"
-                title="הזמנות שירות"
-                description="מספר הזמנות הגרירה שקיימות"
-                value={filteredOrders.length}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <DefaultInfoCard icon="today" title="הזמנות שנפתחו היום" value={today} />
-            </Grid>
-            <Grid item xs={4}>
-              <DefaultInfoCard icon="table_view" title="הזמנות עם סטטוס פתוח" value={open} />
-            </Grid>
-          {/* </Grid>
+        <Grid item xs={4}>
+          <DefaultInfoCard
+            icon="table_view"
+            title="הזמנות שירות"
+            description="מספר הזמנות הגרירה שקיימות"
+            value={filteredOrders.length}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <DefaultInfoCard icon="today" title="הזמנות שנפתחו היום" value={today} />
+        </Grid>
+        <Grid item xs={4}>
+          <DefaultInfoCard icon="table_view" title="הזמנות עם סטטוס פתוח" value={open} />
+        </Grid>
+        {/* </Grid>
         </Grid> */}
 
         <Grid item xs={6}>
@@ -756,20 +801,20 @@ function Dashboard() {
           />
         </Grid>
         <Grid item xs={6}>
-        <PieChart
-          icon={{ color: "mekatnar", component: "pie_chart" }}
-          title="סטטוס"
-          description="אחוזי הזמנות לפי סטטוס הזמנה"
-          chart={{
-            labels: ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"],
-            datasets: {
-              label: "סטטוס הזמנה",
-              backgroundColors: ["primary", "info", "secondary", "dark", "error"],
-              data: statusArr,
-            },
-          }}
-        />
-      </Grid>
+          <PieChart
+            icon={{ color: "mekatnar", component: "pie_chart" }}
+            title="סטטוס"
+            description="אחוזי הזמנות לפי סטטוס הזמנה"
+            chart={{
+              labels: ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"],
+              datasets: {
+                label: "סטטוס הזמנה",
+                backgroundColors: ["primary", "info", "secondary", "dark", "error"],
+                data: statusArr,
+              },
+            }}
+          />
+        </Grid>
         <Grid item xs={6}>
           <VerticalBarChart
             icon={{ color: "mekatnar", component: "calendar_today" }}
@@ -804,7 +849,6 @@ function Dashboard() {
             }}
           />
         </Grid>
-
       </Grid>
     </>
   );
@@ -812,7 +856,7 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-
+      {addFile()}
       {dashboard()}
       <Footer />
     </DashboardLayout>
