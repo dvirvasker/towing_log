@@ -25,6 +25,7 @@ exports.create = (req, res) => {
   const reference = req.body.reference;
   const orderDate = req.body.orderDate;
   const orderTime = req.body.orderTime;
+  const personalnumber = req.body.personalnumber;
   const serviceName = req.body.serviceName;
   const ahmashNotes = req.body.ahmashNotes;
 
@@ -86,6 +87,7 @@ exports.create = (req, res) => {
     reference,
     orderDate,
     orderTime,
+    personalnumber,
     serviceName,
     ahmashNotes,
     clientJourney,
@@ -126,6 +128,7 @@ exports.update = (req, res) => {
     request.reference = req.body.reference;
     request.orderDate = req.body.orderDate;
     request.orderTime = req.body.orderTime;
+    request.personalnumber = req.body.personalnumber;
     request.serviceName = req.body.serviceName;
     request.ahmashNotes = req.body.ahmashNotes;
 

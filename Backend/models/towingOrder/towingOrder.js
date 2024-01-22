@@ -7,6 +7,7 @@ const towingOrderSchema = new mongoose.Schema(
     reference: { type: String, required: true },
     orderDate: { type: Date, default: new Date(), required: true },
     orderTime: { type: String, required: true },
+    personalnumber : {type : String, required : true},
     serviceName: { type: String, required: true },
     ahmashNotes: { type: String, default: "" },
     clientJourney: [Object],

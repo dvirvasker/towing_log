@@ -121,6 +121,7 @@ const TowingOrderForm = () => {
       .split(".")[0],
     orderDate: new Date().toISOString().split("T")[0],
     orderTime: new Date().toLocaleString("en-IL").split(", ")[1].split(".")[0].slice(0, 5),
+    personalnumber : user.personalnumber,
     serviceName: `${user.firstName} ${user.lastName}`,
     ahmashNotes: "",
     clientJourney: [],
@@ -337,7 +338,20 @@ const TowingOrderForm = () => {
 
     return isValidFormat;
   }
-
+  const isPersonalNumberValid = (personalnum) => {
+    if(personalnum.length === 7 && digitsOnly(personalnum))
+    {
+      return true;
+    }
+    if(personalnum.length === 8)
+    {
+      if(personalnum.startsWith('s') && digitsOnly(personalnum.slice(1)))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
   const CheckFormData = () => {
     let flag = true;
     const ErrorReason = [];
@@ -352,6 +366,10 @@ const TowingOrderForm = () => {
     }
     if (!data.orderTime || data.orderTime === "") {
       AddError("שעה ריקה");
+    }
+    if(!isPersonalNumberValid(data.personalnumber))
+    {
+      AddError((!data.personalnumber) || data.personalnumber === "" ? "מספר אישי ריק" : "מספר אישי לא תקין")
     }
     if (data.serviceName === "") {
       AddError("שם נציג שירות ריק");
@@ -422,6 +440,7 @@ const TowingOrderForm = () => {
       reference: data.reference,
       orderDate: data.orderDate,
       orderTime: data.orderTime,
+      personalnumber : data.personalnumber,
       serviceName: data.serviceName,
       ahmashNotes: data.ahmashNotes,
       clientJourney: data.clientJourney.map((post) => ({ ...post, published: true })),
@@ -781,6 +800,21 @@ const TowingOrderForm = () => {
                       />
                     </FormGroup>
                   </Col>
+                  <Col>
+                  <FormGroup>
+                      <h6 style={{}}>מספר אישי</h6>
+                      <Input
+                        placeholder="מספר אישי"
+                        type="text"
+                        name="personalnumber"
+                        value={data.personalnumber}
+                        onChange={handleChange}
+                        maxLength={8}
+                      />
+                    </FormGroup>
+                  </Col>
+                  </Row>
+                  <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>הערות אחמ"ש</h6>
