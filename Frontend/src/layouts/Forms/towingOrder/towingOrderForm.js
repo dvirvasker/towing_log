@@ -67,6 +67,7 @@ import {
   TextField,
   Snackbar,
   Alert,
+  Slide,
 } from "@mui/material";
 
 // user and auth import
@@ -78,6 +79,10 @@ import { authenticate, isAuthenticated, signin } from "auth/index";
 const { user } = isAuthenticated();
 
 const digitsOnly = (str) => /^\d+$/.test(str);
+
+function SlideTransition(props) {
+  return <Slide {...props} direction="left" />;
+}
 
 const TowingOrderForm = () => {
   const [archiveData, setArchiveData] = useState([]);
@@ -1300,6 +1305,7 @@ const TowingOrderForm = () => {
     setSnackbarOpen(false);
     setErrorMessage("");
   };
+  // const slide = <Slide direction="left"/>;
   return (
     <MDBox>
       {/* //! fot the pop up warning windoes */}
@@ -1317,11 +1323,12 @@ const TowingOrderForm = () => {
       /> */}
       <Snackbar
         open={snackbarOpen}
+        TransitionComponent={SlideTransition}
         autoHideDuration={6000}
         onClose={handleClose}
         anchorOrigin={{ vertical: "top", horizontal: "left" }}
       >
-        <Alert onClose={handleClose} severity="error" variant="filled" sx={{ width: "100%" }}>
+        <Alert onClose={handleClose} severity="error" variant="standard" sx={{ width: "100%" }}>
           {errorMessage}
         </Alert>
       </Snackbar>

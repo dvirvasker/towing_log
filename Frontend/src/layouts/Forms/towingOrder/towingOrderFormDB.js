@@ -69,7 +69,8 @@ import {
   Select,
   TextField,
   Snackbar,
-  Alert
+  Alert,
+  Slide
 } from "@mui/material";
 
 // user and auth import
@@ -77,6 +78,10 @@ import { authenticate, isAuthenticated, signin } from "auth/index";
 const { user } = isAuthenticated();
 
 const digitsOnly = (str) => /^\d+$/.test(str);
+
+function SlideTransition(props) {
+  return <Slide {...props} direction="left" />;
+}
 
 const TowingOrderFormDB = () => {
   const params = useParams();
@@ -1410,11 +1415,12 @@ const TowingOrderFormDB = () => {
         /> */}
          <Snackbar
         open={snackbarOpen}
+        TransitionComponent={SlideTransition}
         autoHideDuration={6000}
         onClose={handleClose}
         anchorOrigin={{ vertical: "top", horizontal: "left" }}
       >
-        <Alert onClose={handleClose} severity="error" variant="filled" sx={{ width: "100%" }}>
+        <Alert onClose={handleClose} severity="error" variant="standard" sx={{ width: "100%" }}>
           {errorMessage}
         </Alert>
       </Snackbar>
