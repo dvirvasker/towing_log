@@ -458,12 +458,15 @@ function Dashboard() {
   });
   console.log(statusArr);
   const byNamesArr = [];
+  console.log(carTypesCount);
   Object.entries(carTypesCount).forEach(([key, value]) => {
     const type = carTypesData.find((el) => el._id === key);
-    byNamesArr.push({
-      name: type.carType,
-      value,
-    });
+    if(type){
+      byNamesArr.push({
+        name: type.carType,
+        value,
+      });
+    }
   });
 
   byNamesArr.sort((a, b) => a.value - b.value);
@@ -772,7 +775,7 @@ function Dashboard() {
           <DefaultInfoCard
             icon="table_view"
             title="הזמנות שירות"
-            description="מספר הזמנות הגרירה שקיימות"
+            // description="מספר הזמנות הגרירה שקיימות"
             value={filteredOrders.length}
           />
         </Grid>

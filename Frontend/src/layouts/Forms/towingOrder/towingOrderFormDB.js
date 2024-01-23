@@ -274,7 +274,7 @@ const TowingOrderFormDB = () => {
         response.data.clientJourney = fixedClientJourney;
 
         // console.log(response.data);
-        setInitialStatus(response.data.status);
+        // setInitialStatus(response.data.status);
         setData(response.data);
       })
       .catch((error) => {});

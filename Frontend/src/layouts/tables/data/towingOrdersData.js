@@ -53,7 +53,8 @@ export default function data(
   carsList,
   isCarFiltered,
   garage,
-  executiveBody
+  executiveBody,
+  activateEditFile
 ) {
   // const Project = ({ image, name }) => (
   //   <MDBox display="flex" alignItems="center" lineHeight={1}>
@@ -442,23 +443,23 @@ export default function data(
       />
     ),
     editPower: (
-      <Link to={`/${urlType}/${towingOrder._id}`} key={towingOrder._id}>
-        <Tooltip title="עדכן טופס" arrow>
-          <MDButton
-            variant="gradient"
-            color="mekatnar"
-            circular="true"
-            iconOnly="true"
-            size="medium"
-            onClick={() => {
-              setToEditFile(true);
-            }}
-          >
-            {editFile(towingOrder._id)}
-            <Icon>edit</Icon>
-          </MDButton>
-        </Tooltip>
-      </Link>
+      // <Link to={`/${urlType}/${towingOrder._id}`} key={towingOrder._id}>
+      <Tooltip title="עדכן טופס" arrow>
+        <MDButton
+          variant="gradient"
+          color="mekatnar"
+          circular="true"
+          iconOnly="true"
+          size="medium"
+          onClick={() => {
+            activateEditFile(towingOrder._id);
+          }}
+        >
+          {/* {editFile(towingOrder._id)} */}
+          <Icon>edit</Icon>
+        </MDButton>
+      </Tooltip>
+      // </Link>
     ),
   }));
 

@@ -84,7 +84,7 @@ function SlideTransition(props) {
   return <Slide {...props} direction="left" />;
 }
 
-const TowingOrderForm = () => {
+const TowingOrderForm = (props) => {
   const [archiveData, setArchiveData] = useState([]);
   const [checkData, setCheckData] = useState("update");
   const [carData, setCarData] = useState([]);
@@ -110,6 +110,10 @@ const TowingOrderForm = () => {
 
   // const { isOpen, showToast, text, textType, setIsOpen } = useToast();
   // const [htivas, setHtivas]
+
+  const {edit, orderId} = props;
+  // console.log(props);
+  // console.log(orderId);
 
   const [data, setData] = useState({
     reference: new Date()
@@ -169,7 +173,12 @@ const TowingOrderForm = () => {
       setData((prev) => ({ ...data, carnumber: "" }));
     }
   };
-
+  useEffect(async () => {
+    if(edit){
+    if (carData.length > 0) {
+      setChosenCarNumber(data.carnumber);
+    }}
+  }, [carData, edit]);
   // console.log(data);
 
   const min = 0;
@@ -296,6 +305,40 @@ const TowingOrderForm = () => {
       })
       .catch((error) => {});
   }, []);
+
+  useEffect(async () => {
+    if(edit){
+      await axios
+        .get(`http://localhost:5000/TowingLogApi/TowingOrder/${orderId}`)
+        .then((response) => {
+          delete response.data.updatedAt;
+          delete response.data.__v;
+          delete response.data._id;
+          delete response.data.createdAt;
+
+          const fixedDate = response.data.orderDate.split("T")[0];
+          response.data.orderDate = fixedDate;
+          const fixedDemandDate = response.data.demandDate.split("T")[0];
+          response.data.demandDate = fixedDemandDate;
+          const fixedTransferOrderDate = response.data.transferOrderDate.split("T")[0];
+          response.data.transferOrderDate = fixedTransferOrderDate;
+
+          const fixedClientJourney = response.data.clientJourney.map((post) => {
+            const dateEl = new Date(post.date);
+            return {
+              ...post,
+              date: dateEl,
+            };
+          });
+          response.data.clientJourney = fixedClientJourney;
+
+          // console.log(response.data);
+          // setInitialStatus(response.data.status);
+          setData(response.data);
+        })
+        .catch((error) => {});
+      }
+  }, [orderId, edit]);
 
   const handleClientJourneyChange = (evt, key) => {
     const index = key;
@@ -463,9 +506,9 @@ const TowingOrderForm = () => {
       commanderNotes: data.commanderNotes,
     };
     // console.log(requestData);
-
+    const method = edit ? `update/${orderId}` : "add";
     axios
-      .post(`http://localhost:5000/TowingLogApi/TowingOrder/add`, requestData)
+      .post(`http://localhost:5000/TowingLogApi/TowingOrder/${method}`, requestData)
       .then((response) => {
         // toast.success(`הטופס נשלח בהצלחה`);
         // console.log(response.data);
@@ -486,7 +529,7 @@ const TowingOrderForm = () => {
           error: true,
           NavigateToReferrer: false,
         });
-      });
+      });    
   };
 
   const openError = (error) => {
@@ -546,7 +589,7 @@ const TowingOrderForm = () => {
         textAlign="center"
       >
         <MDTypography variant="h2" fontWeight="medium" color="white" mt={1}>
-          הזמנה {data.reference} נוצרה בהצלחה
+          {edit ? `הזמנה ${data.reference} עודכנה בהצלחה` : `הזמנה ${data.reference} נוצרה בהצלחה`}
         </MDTypography>
 
         <DialogContent>
@@ -732,6 +775,7 @@ const TowingOrderForm = () => {
   const filteredOgdas = ogdas.filter((ogda) => ogda.pikodId === chosenPikod);
   const filteredHativas = hativas.filter((hativa) => hativa.ogdaId === chosenOgda);
   const filteredGdods = gdods.filter((gdod) => gdod.hativaId === chosenHativa);
+  const date2000 = new Date('2000-1-1');
 
   const towingOrderForm = () => (
     <Container className="" dir="rtl">
@@ -753,6 +797,9 @@ const TowingOrderForm = () => {
                 <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
                   טופס הזמנת שירות
                 </MDTypography>
+                {edit && <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
+                  {data.reference}
+                </MDTypography>}
               </MDBox>
               <Form
                 style={{ textAlign: "right", paddingBottom: "5%" }}
@@ -763,14 +810,16 @@ const TowingOrderForm = () => {
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>תאריך</h6>
+                      
                       <Input
                         placeholder="תאריך"
                         type="date"
                         name="orderDate"
                         value={data.orderDate}
                         onChange={handleChange}
-                        min={date}
+                        min={!edit && date}
                       />
+
                     </FormGroup>
                   </Col>
                   <Col>
@@ -1312,7 +1361,9 @@ const TowingOrderForm = () => {
                   </Col>
                 </Row>
 
-                <div className="text-center">
+                <Row>
+                  <Col>
+                  <div className="text-center">
                   <MDButton
                     color="mekatnar"
                     size="large"
@@ -1321,9 +1372,25 @@ const TowingOrderForm = () => {
                     type="submit"
                     startIcon={<Icon fontSize="small">upload</Icon>}
                   >
-                    שלח טופס שירות
+                    {
+                    `${edit ? 'עדכן' : 'שלח'} טופס שירות`
+                    }
                   </MDButton>
+                  {edit && <MDButton
+                        color="error"
+                        size="large"
+                        onClick={handleCloseSuccsecModal}
+                        className="btn-new-blue"
+                        style={{ marginRight: "3%" }}
+                        startIcon={<Icon fontSize="small">clear</Icon>}
+                      >
+                        צא ללא שינויים
+                      </MDButton>}
                 </div>
+                  </Col>
+
+                </Row>
+
               </Form>
             </CardBody>
           </Card>

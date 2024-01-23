@@ -70,6 +70,8 @@ const towingOrdersTable = (props) => {
   const [area, setArea] = useState("בחר");
   const [dbError, setDbError] = useState(false);
   const [toAddFile, setToAddFile] = useState(false);
+  const [toEditFile, setToEditFile] = useState(false);
+  const [editFormId, setEditFormId] = useState("");
   // const usedTheme = useTheme();
 
   const [bankData, setBankData] = useState({});
@@ -279,6 +281,12 @@ const towingOrdersTable = (props) => {
       .catch((error) => {});
   }, []);
 
+  const activateEditFile = (orderId) => {
+    setEditFormId(orderId);
+    setToEditFile(true);
+    console.log(`sent to edit ${orderId}`);
+  }
+  console.log(toEditFile);
   const {
     columns: pColumns,
     rows: pRows,
@@ -299,7 +307,8 @@ const towingOrdersTable = (props) => {
     carsList,
     isCarFiltered,
     garage,
-    executiveBody
+    executiveBody,
+    activateEditFile
   );
 
   const handleErrorClose = () => {
@@ -370,11 +379,29 @@ const towingOrdersTable = (props) => {
     >
       <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
         <DialogContent>
-          <TowingOrderForm />
+          <TowingOrderForm edit={false} orderId=""/>
         </DialogContent>
       </MDBox>
     </Dialog>
   );
+
+  const editFile = () => (
+    <Dialog
+      px={5}
+      open={toEditFile}
+      onClose={() => setToEditFile(false)}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      maxWidth="xl"
+    >
+      <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
+        <DialogContent>
+          <TowingOrderForm edit={true} orderId={editFormId} />
+        </DialogContent>
+      </MDBox>
+    </Dialog>
+  )
+
 
   function FixDataAndExportToExcel() {
     let tempdata_to_excel = [];
@@ -975,6 +1002,7 @@ const towingOrdersTable = (props) => {
       <DashboardNavbar />
       {showError()}
       {addFile()}
+      {editFile()}
       {table()}
       <Outlet />
       <Footer />
