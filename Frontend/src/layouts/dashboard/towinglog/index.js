@@ -30,7 +30,7 @@ import Icon from "@mui/material/Icon";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
-import { Box, Dialog, DialogContent } from "@mui/material";
+import { Box, Button, Dialog, DialogContent } from "@mui/material";
 import { setMiniSidenav, setOpenConfigurator, useMaterialUIController } from "context";
 
 // Material Dashboard 2 React components
@@ -109,6 +109,7 @@ function Dashboard() {
     // demandDate: new Date().toISOString().split("T")[0],
     area: "בחר",
     status: "בחר",
+    statuses: [],
     garage: "בחר",
     // commanderNotes: "",
   });
@@ -315,8 +316,7 @@ function Dashboard() {
     const filter1 =
       data.area === "בחר" ? allOrders : allOrders.filter((order) => order.area === data.area);
     // סינון לפי סטטוס
-    const filter2 =
-      data.status === "בחר" ? filter1 : filter1.filter((order) => order.status === data.status);
+    const filter2 = data.statuses.length === 0 ? filter1 : filter1.filter((order) => data.statuses.includes(order.status));
     // סינון לפי מוסך
     const garagesIDs = garages.map((garage) => garage._id);
 
@@ -367,6 +367,18 @@ function Dashboard() {
     </Dialog>
   );
 
+  const statusesArr = ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"];
+  const statusesColors = ["primary", "info", "secondary", "dark", "error"];
+  const toggleStatus = (status) => {
+    const arr = [...data.statuses];
+    if (data.statuses.includes(status)) {
+      setData((prev) => ({ ...prev, statuses: arr.filter((statusEl) => statusEl !== status) }));
+    } else {
+      arr.push(status);
+      setData((prev) => ({ ...prev, statuses: arr }));
+    }
+  };
+
   function isInThisWeek(israelDate) {
     // Get the current date in Israel time
     const currentDateInIsrael = new Date().toLocaleString("en-US", { timeZone: "Asia/Jerusalem" });
@@ -406,7 +418,7 @@ function Dashboard() {
   };
 
   const executiveBodyArr = [0, 0, 0, 0];
-  const statusArr = [0, 0, 0, 0, 0];
+  const statusCountArr = [0, 0, 0, 0, 0];
   const statusIndexes = {
     ["פתוח"]: 0,
     ["ממתין לאישור"]: 1,
@@ -432,7 +444,7 @@ function Dashboard() {
   const carTypesCount = {};
   filteredOrders.forEach((order) => {
     const date = new Date(order.demandDate);
-    statusArr[statusIndexes[order.status]] += 1;
+    statusCountArr[statusIndexes[order.status]] += 1;
     if (isInThisWeek(date)) {
       const day = date.getDay();
       daysArray[day] += 1;
@@ -456,12 +468,12 @@ function Dashboard() {
       open += 1;
     }
   });
-  console.log(statusArr);
+  console.log(statusCountArr);
   const byNamesArr = [];
   console.log(carTypesCount);
   Object.entries(carTypesCount).forEach(([key, value]) => {
     const type = carTypesData.find((el) => el._id === key);
-    if(type){
+    if (type) {
       byNamesArr.push({
         name: type.carType,
         value,
@@ -478,55 +490,80 @@ function Dashboard() {
     typeNames.push(top.name);
     typesNumbers.push(top.value);
   });
-
+  console.log(data.statuses);
   const dashboard = () => (
     <>
-    <Box sx={{
-      display: 'flex',
-      justifyContent : 'space-between',
-      marginBottom : 1
-    }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 1,
+        }}
+      >
+        <MDButton
+          color="mekatnar"
+          variant="gradient"
+          onClick={() => setFilterOpen((prev) => !prev)}
+          sx={{
+            marginBottom: 2,
+          }}
+          // onClick={() => {
+          //   // setIsInfoPressed(true);
+          //   // setpressedID(hozla._id);
+          // }}
+          // circular="true"
+          size="medium"
+          startIcon={<Icon>filter_alt</Icon>}
+        >
+          סינון
+        </MDButton>
+
+        <Tooltip title="הוסף הזמנה חדשה" arrow>
           <MDButton
+            sx={{}}
             color="mekatnar"
             variant="gradient"
-            onClick={() => setFilterOpen((prev) => !prev)}
-            sx={{
-              marginBottom: 2,
-            }}
+            onClick={() => setToAddFile(true)}
             // onClick={() => {
             //   // setIsInfoPressed(true);
             //   // setpressedID(hozla._id);
             // }}
-            // circular="true"
+            circular="true"
+            iconOnly="true"
             size="medium"
-            startIcon={<Icon>filter_alt</Icon>}
           >
-            סינון
+            <Icon>add</Icon>
           </MDButton>
-      
-          <Tooltip title="הוסף הזמנה חדשה" arrow>
-            <MDButton
-              sx={{}}
-              color="mekatnar"
-              variant="gradient"
-              onClick={() => setToAddFile(true)}
-              // onClick={() => {
-              //   // setIsInfoPressed(true);
-              //   // setpressedID(hozla._id);
-              // }}
-              circular="true"
-              iconOnly="true"
-              size="medium"
-            >
-              <Icon>add</Icon>
-            </MDButton>
-          </Tooltip>
-          </Box>
+        </Tooltip>
+      </Box>
 
       {filterOpen && (
         <MDBox py={3}>
           <Row>
-            <Col
+            <Col>
+            <h6 style={{}}>סטטוסים</h6>
+            </Col>
+          </Row>
+          <Row>
+          <Col>
+            {statusesArr.map((status, index) => (       
+                <MDButton
+                sx={{
+                  marginRight: 2
+                }}
+                  color={statusesColors[index]}
+                  variant={data.statuses.includes(status) ? "contained" : "outlined"}
+                  onClick={() => {
+                    toggleStatus(status);
+                  }}
+                >
+                  {status}
+                </MDButton>
+            ))}
+           </Col>
+          </Row>
+          <Row>
+            {/* <Col
               style={{
                 justifyContent: "right",
                 alignContent: "right",
@@ -548,7 +585,7 @@ function Dashboard() {
                 <option value="מוקפא">מוקפא</option>
                 <option value="ממתין לאישור">ממתין לאישור</option>
               </Input>
-            </Col>
+            </Col> */}
             <Col
               style={{
                 justifyContent: "right",
@@ -812,8 +849,8 @@ function Dashboard() {
               labels: ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"],
               datasets: {
                 label: "סטטוס הזמנה",
-                backgroundColors: ["primary", "info", "secondary", "dark", "error"],
-                data: statusArr,
+                backgroundColors: statusesColors,
+                data: statusCountArr,
               },
             }}
           />
