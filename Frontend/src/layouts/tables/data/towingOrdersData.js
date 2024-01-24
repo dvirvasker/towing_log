@@ -43,7 +43,7 @@ export default function data(
   typeTable,
   urlType,
   currentDate,
-  status,
+  statuses,
   area,
   fromDate,
   toDate,
@@ -104,10 +104,10 @@ export default function data(
     // console.log(beforfilter);
     let filter1 = [];
 
-    if (status === "בחר" || status === undefined) {
+    if (statuses.length === 0) {
       filter1 = beforfilter;
-    } else if (status) {
-      filter1 = beforfilter.filter((el) => el.status === status);
+    } else if (statuses) {
+      filter1 = beforfilter.filter((el) => statuses.includes(el.status));
     }
 
     let filter2 = [];
@@ -209,7 +209,7 @@ export default function data(
   useEffect(async () => {
     filteruse();
   }, [
-    status,
+    statuses,
     area,
     fromDate,
     toDate,

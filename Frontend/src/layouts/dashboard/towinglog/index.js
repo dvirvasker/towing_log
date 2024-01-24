@@ -368,7 +368,7 @@ function Dashboard() {
   );
 
   const statusesArr = ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"];
-  const statusesColors = ["primary", "info", "secondary", "dark", "error"];
+  const statusesColors = ["success", "info", "warning", "secondary", "error"];
   const toggleStatus = (status) => {
     const arr = [...data.statuses];
     if (data.statuses.includes(status)) {
@@ -490,7 +490,7 @@ function Dashboard() {
     typeNames.push(top.name);
     typesNumbers.push(top.value);
   });
-  console.log(data.statuses);
+  // console.log(data.statuses);
   const dashboard = () => (
     <>
       <Box

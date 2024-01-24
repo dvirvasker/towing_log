@@ -12,9 +12,6 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable react/jsx-no-bind */
 
-
-
-
 /**
 =========================================================
 * Material Dashboard 2 React - v2.1.0
@@ -67,6 +64,7 @@ const towingOrdersTable = (props) => {
 
   const [filterOpen, setFilterOpen] = useState(false);
   const [status, setStatus] = useState("בחר");
+  const [statuses, setStatuses] = useState([]);
   const [area, setArea] = useState("בחר");
   const [dbError, setDbError] = useState(false);
   const [toAddFile, setToAddFile] = useState(false);
@@ -107,6 +105,7 @@ const towingOrdersTable = (props) => {
     demandDate: new Date().toISOString().split("T")[0],
     area: "",
     status: "",
+    statuses: [],
     commanderNotes: "",
   });
 
@@ -285,7 +284,7 @@ const towingOrdersTable = (props) => {
     setEditFormId(orderId);
     setToEditFile(true);
     console.log(`sent to edit ${orderId}`);
-  }
+  };
   console.log(toEditFile);
   const {
     columns: pColumns,
@@ -297,7 +296,7 @@ const towingOrdersTable = (props) => {
     typeTable,
     urlType,
     currentDate,
-    status,
+    statuses,
     area,
     data.fromDate,
     data.toDate,
@@ -379,7 +378,7 @@ const towingOrdersTable = (props) => {
     >
       <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
         <DialogContent>
-          <TowingOrderForm edit={false} orderId=""/>
+          <TowingOrderForm edit={false} orderId="" />
         </DialogContent>
       </MDBox>
     </Dialog>
@@ -400,26 +399,25 @@ const towingOrdersTable = (props) => {
         </DialogContent>
       </MDBox>
     </Dialog>
-  )
-
+  );
 
   function FixDataAndExportToExcel() {
     let tempdata_to_excel = [];
     let tempdata_to_excelrow = [];
-    for (let i = 0; i < requestDB.length; i+= 1) {
+    for (let i = 0; i < requestDB.length; i += 1) {
       tempdata_to_excel.push({ ...requestDB[i] });
     }
 
-    for (let i = 0; i < pRows.length; i+= 1) {
+    for (let i = 0; i < pRows.length; i += 1) {
       tempdata_to_excelrow.push({ ...pRows[i] });
     }
-    for (let i = 0; i < tempdata_to_excelrow.length; i+= 1) {
+    for (let i = 0; i < tempdata_to_excelrow.length; i += 1) {
       tempdata_to_excelrow[i].garage
         ? (tempdata_to_excel[i].garage_m = tempdata_to_excelrow[i].garage)
         : (tempdata_to_excel[i].garage_m = " ");
     }
 
-    for (let i = 0; i < tempdata_to_excel.length; i+= 1) {
+    for (let i = 0; i < tempdata_to_excel.length; i += 1) {
       tempdata_to_excel[i].reference
         ? (tempdata_to_excel[i].reference_m = tempdata_to_excel[i].reference)
         : (tempdata_to_excel[i].reference_m = " ");
@@ -529,7 +527,7 @@ const towingOrdersTable = (props) => {
     }
 
     // export to excel -fix
-    for (let i = 0; i < tempdata_to_excel.length; i+= 1) {
+    for (let i = 0; i < tempdata_to_excel.length; i += 1) {
       // delete unwanted fields
       delete tempdata_to_excel[i]._id;
       delete tempdata_to_excel[i].__v;
@@ -651,6 +649,18 @@ const towingOrdersTable = (props) => {
     </Dialog>
   );
 
+  const statusesArr = ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"];
+  const statusesColors = ["success", "info", "warning", "secondary", "error"];
+  const toggleStatus = (toggledStatus) => {
+    const arr = [...statuses];
+    if (statuses.includes(toggledStatus)) {
+      setStatuses(arr.filter((statusEl) => statusEl !== toggledStatus));
+    } else {
+      arr.push(toggledStatus);
+      setStatuses(arr);
+    }
+  };
+
   const table = () => (
     <MDBox pt={6} pb={3}>
       <Grid container spacing={6}>
@@ -730,7 +740,21 @@ const towingOrdersTable = (props) => {
                     }}
                   >
                     <h6 style={{}}>סטטוס</h6>
-                    <Input
+                    {statusesArr.map((statusEl, index) => (
+                      <MDButton
+                        sx={{
+                          marginRight: 2,
+                        }}
+                        color={statusesColors[index]}
+                        variant={statuses.includes(statusEl) ? "contained" : "outlined"}
+                        onClick={() => {
+                          toggleStatus(statusEl);
+                        }}
+                      >
+                        {statusEl}
+                      </MDButton>
+                    ))}
+                    {/* <Input
                       placeholder="סטטוס"
                       type="select"
                       name="status"
@@ -743,8 +767,10 @@ const towingOrdersTable = (props) => {
                       <option value="מבוטל">מבוטל</option>
                       <option value="מוקפא">מוקפא</option>
                       <option value="ממתין לאישור">ממתין לאישור</option>
-                    </Input>
+                    </Input> */}
                   </Col>
+                </Row>
+                <Row>
                   <Col
                     style={{
                       justifyContent: "right",
