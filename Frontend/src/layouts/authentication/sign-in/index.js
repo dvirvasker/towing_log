@@ -44,7 +44,16 @@ import { useState } from "react";
 import { Icons, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 // Dialog
-import { Dialog, DialogContent, DialogContentText, DialogTitle, Modal } from "@mui/material";
+import {
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Modal,
+  Snackbar,
+  Alert,
+  Slide,
+} from "@mui/material";
 
 import { authenticate, isAuthenticated, signin, signout, updateRefreshCount } from "auth/index";
 
@@ -58,6 +67,9 @@ import { Form } from "reactstrap";
 import BasicLayout from "../components/BasicLayout";
 
 // import bgImage from "assets/images/max-burger-DMRQmC8gRBs-unsplash.jpg";
+function SlideTransition(props) {
+  return <Slide {...props} direction="left" />;
+}
 
 function signIn() {
   const navigate = useNavigate();
@@ -75,6 +87,13 @@ function signIn() {
     loading: false,
     NavigateToReferrer: false,
   });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const openError = (error) => {
+    setSnackbarOpen(true);
+    setErrorMessage(error);
+  };
 
   function handleChange(evt) {
     const { value } = evt.target;
@@ -209,27 +228,49 @@ function signIn() {
 
   //* ------------------Send data to server--------------------------
   // eslint-disable-next-line consistent-return
+
+  const digitsOnly = (str) => /^\d+$/.test(str);
+  const isPersonalNumberValid = (personalnum) => {
+    if (personalnum.length === 7 && digitsOnly(personalnum)) {
+      return true;
+    }
+    if (personalnum.length === 8) {
+      if (personalnum.startsWith("s") && digitsOnly(personalnum.slice(1))) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const CheckSignUpForm = (event) => {
     event.preventDefault();
     let flag = true;
     const ErrorReason = [];
+    let errorReasonText = "";
 
-    if (signInData.personalnumber === "" && signInData.personalnumber.length >= 8) {
+    const AddError = (error) => {
       flag = false;
-      ErrorReason.push("אנא הכנס מספר אישי תקין");
+      ErrorReason.push(error);
+      errorReasonText += errorReasonText === "" ? `${error}` : `, ${error}`;
+    };
+
+    if (!isPersonalNumberValid(signInData.personalnumber)) {
+      flag = false;
+      AddError("אנא הכנס מספר אישי תקין");
       // toast.error(ErrorReason);
     }
     if (signInData.password === "") {
       flag = false;
-      ErrorReason.push("אנא הכנס סיסמא");
+      AddError("אנא הכנס סיסמא");
       // toast.error(ErrorReason);
     }
 
     if (flag !== true) {
-      ErrorReason.forEach((reason) => {
-        toast.error(reason);
-        // setData({ ...data, loading: false, successmsg: false, error: true });
-      });
+      // ErrorReason.forEach((reason) => {
+      //   toast.error(reason);
+      //   // setData({ ...data, loading: false, successmsg: false, error: true });
+      // });
+      openError(errorReasonText);
 
       return false;
     } else {
@@ -299,6 +340,15 @@ function signIn() {
     if (CheckSignUpForm(event)) {
       SendFormData(event);
     }
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setSnackbarOpen(false);
+    setErrorMessage("");
   };
 
   //* ------------------Send data to server - end--------------------------
@@ -388,6 +438,17 @@ function signIn() {
       {/* <DashboardNavbar /> */}
       {/* <MDBox pt={6} pb={3}> */}
       {/* //! fot the pop up warning windoes */}
+      <Snackbar
+        open={snackbarOpen}
+        TransitionComponent={SlideTransition}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert onClose={handleClose} severity="error" variant="standard" sx={{ width: "100%" }}>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       {showError()}
       {showSuccess()}
       {showLoading()}

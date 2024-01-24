@@ -746,7 +746,7 @@ const towingOrdersTable = (props) => {
                           marginRight: 2,
                         }}
                         color={statusesColors[index]}
-                        variant={statuses.includes(statusEl) ? "contained" : "outlined"}
+                        variant={statuses.includes(statusEl) ? 'gradient' : "outlined"}
                         onClick={() => {
                           toggleStatus(statusEl);
                         }}

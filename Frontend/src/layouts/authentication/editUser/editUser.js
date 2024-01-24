@@ -39,7 +39,7 @@ import MDTypography from "components/MDTypography";
 // Authentication layout components
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 
-import { FormControl, Icon } from "@mui/material";
+import { FormControl, Icon, Snackbar, Alert, Slide } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
@@ -65,6 +65,11 @@ let { user } = isAuthenticated();
 
 // ? Hozla user ==> 0
 // ? ToraHailit user ==> 3
+
+function SlideTransition(props) {
+  return <Slide {...props} direction="left" />;
+}
+
 function EditUser() {
   const params = useParams();
 
@@ -86,6 +91,14 @@ function EditUser() {
     loading: false,
     NavigateToReferrer: false,
   });
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const openError = (error) => {
+    setSnackbarOpen(true);
+    setErrorMessage(error);
+  };
 
   const [pikods, setPikods] = useState([]);
   useEffect(() => {
@@ -243,28 +256,49 @@ function EditUser() {
 
   //* ------------------Send data to server--------------------------
   // eslint-disable-next-line consistent-return
+  const digitsOnly = (str) => /^\d+$/.test(str);
+  const isPersonalNumberValid = (personalnum) => {
+    if (personalnum.length === 7 && digitsOnly(personalnum)) {
+      return true;
+    }
+    if (personalnum.length === 8) {
+      if (personalnum.startsWith("s") && digitsOnly(personalnum.slice(1))) {
+        return true;
+      }
+    }
+    return false;
+  };
   const CheckSignUpForm = (event) => {
     event.preventDefault();
     let flag = true;
     const ErrorReason = [];
+    let errorReasonText = "";
 
+    const AddError = (error) => {
+      flag = false;
+      ErrorReason.push(error);
+      errorReasonText += errorReasonText === "" ? `${error}` : `, ${error}`;
+    };
     if (editUserData.password === "") {
       flag = false;
-      ErrorReason.push("אנא מלא סיסמא");
+      AddError("אנא מלא סיסמא");
       // toast.error(ErrorReason);
     }
 
     if (editUserData.personalnumber === "") {
       flag = false;
-      ErrorReason.push("אנא מלא מספר אישי");
+      AddError("אנא מלא מספר אישי");
       // toast.error(ErrorReason);
+    } else if (!isPersonalNumberValid(editUserData.personalnumber)) {
+      AddError("אנא וודא כי המספר האישי תקין");
     }
 
     if (flag !== true) {
-      ErrorReason.forEach((reason) => {
-        toast.error(reason);
-        // setData({ ...data, loading: false, successmsg: false, error: true });
-      });
+      // ErrorReason.forEach((reason) => {
+      //   toast.error(reason);
+      //   // setData({ ...data, loading: false, successmsg: false, error: true });
+      // });
+      openError(errorReasonText);
       return false;
     } else {
       return true;
@@ -465,7 +499,14 @@ function EditUser() {
       </MDBox>
     </Card>
   );
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
 
+    setSnackbarOpen(false);
+    setErrorMessage("");
+  };
   return (
     <DashboardLayout>
       <DashboardNavbar /> {/* //! fot the pop up warning windoes */}
@@ -480,7 +521,7 @@ function EditUser() {
         pb={3}
       >
         <MDBox>
-          <ToastContainer
+          {/* <ToastContainer
             position="top-right"
             autoClose={5000}
             hideProgressBar={false}
@@ -491,7 +532,18 @@ function EditUser() {
             draggable
             pauseOnHover
             theme="colored"
-          />
+          /> */}
+          <Snackbar
+            open={snackbarOpen}
+            TransitionComponent={SlideTransition}
+            autoHideDuration={6000}
+            onClose={handleClose}
+            anchorOrigin={{ vertical: "top", horizontal: "left" }}
+          >
+            <Alert onClose={handleClose} severity="error" variant="standard" sx={{ width: "100%" }}>
+              {errorMessage}
+            </Alert>
+          </Snackbar>
           {showError()}
           {showSuccess()}
           {showLoading()}
