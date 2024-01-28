@@ -390,6 +390,26 @@ export default function data(
     return [nameOfGarage, color];
   };
 
+  const waitOrderTime = (statusOrder, time) => {
+    let nameOfGarage = "";
+    let color = "mekatnar";
+    if (time && statusOrder === "ממתין לאישור") {
+      const milliseconds = new Date(currentDate).valueOf() - new Date(time).valueOf();
+      if (milliseconds < 10800000) {
+        nameOfGarage = "עד 3 שעות";
+        color = "success";
+      } else if (milliseconds > 10800000) {
+        nameOfGarage = "מעל 3 שעות";
+        color = "error";
+      }
+    } else {
+      nameOfGarage = "";
+      color = "dark";
+    }
+
+    return [nameOfGarage, color];
+  };
+
   const editFile = (towingOrder) => (
     <Dialog
       px={5}
@@ -435,6 +455,15 @@ export default function data(
         {openOrderTime(towingOrder.status, towingOrder.openOrderTime)[0]}
       </MDTypography>
     ),
+    waitOrder: (
+      <MDTypography
+        variant="caption"
+        fontWeight="bold"
+        color={waitOrderTime(towingOrder.status, towingOrder.waitForApproveTime)[1]}
+      >
+        {waitOrderTime(towingOrder.status, towingOrder.waitForApproveTime)[0]}
+      </MDTypography>
+    ),
     status: (
       <MDBadge
         badgeContent={towingOrder.status}
@@ -477,6 +506,7 @@ export default function data(
       { Header: "תאריך ביצוע מבוקש", accessor: "demandDate", align: "center" },
       { Header: "מרחב", accessor: "area", align: "center" },
       { Header: "זמן מפתיחת הזמנה", accessor: "openOrder", align: "center" },
+      { Header: "זמן המתנה לאישור", accessor: "waitOrder", align: "center" },
       { Header: "סטטוס", accessor: "status", align: "center" },
       { Header: "עדכון", accessor: "editPower", align: "center" },
     ],
