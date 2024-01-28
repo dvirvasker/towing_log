@@ -68,6 +68,7 @@ exports.create = (req, res) => {
   const area = req.body.area;
   const status = req.body.status;
   const commanderNotes = req.body.commanderNotes;
+  const isYaram = req.body.isYaram;
   let dates = {};
   if(status === "פתוח")
   {
@@ -108,6 +109,7 @@ exports.create = (req, res) => {
     area,
     status,
     commanderNotes,
+    isYaram,
   });
   towingorder.save((err, data) => {
     if (err) {
@@ -170,6 +172,7 @@ exports.update = (req, res) => {
     request.area = req.body.area;
     request.status = req.body.status;
     request.commanderNotes = req.body.commanderNotes;
+    request.isYaram = req.body.isYaram;
 
     /// updating open order time
     if(req.body.status === "פתוח" && previousStatus !== "פתוח")

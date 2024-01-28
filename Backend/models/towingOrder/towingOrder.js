@@ -31,7 +31,8 @@ const towingOrderSchema = new mongoose.Schema(
     ///
     openOrderTime : {type: Date},
     waitForApproveTime : {type: Date},
-    closeOrderTime : {type: Date}
+    closeOrderTime : {type: Date},
+    isYaram : {type: Boolean}
     
   },
   { timestamps: true }

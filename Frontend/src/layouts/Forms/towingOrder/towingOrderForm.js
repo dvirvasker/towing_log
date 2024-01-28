@@ -68,6 +68,9 @@ import {
   Snackbar,
   Alert,
   Slide,
+  Switch,
+  FormControl,
+  FormControlLabel,
 } from "@mui/material";
 
 // user and auth import
@@ -104,6 +107,7 @@ const TowingOrderForm = (props) => {
   const date = new Date().toISOString().split("T")[0];
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  // const [isYaram, setIsYaram] = useState(false);
 
   // const [errorMessage, setErrorMessage] = useState("");
   // const [toastOpen, setToastOpen] = useState(false);
@@ -111,7 +115,7 @@ const TowingOrderForm = (props) => {
   // const { isOpen, showToast, text, textType, setIsOpen } = useToast();
   // const [htivas, setHtivas]
 
-  const {edit, orderId} = props;
+  const { edit, orderId } = props;
   // console.log(props);
   // console.log(orderId);
 
@@ -125,7 +129,7 @@ const TowingOrderForm = (props) => {
       .split(".")[0],
     orderDate: new Date().toISOString().split("T")[0],
     orderTime: new Date().toLocaleString("en-IL").split(", ")[1].split(".")[0].slice(0, 5),
-    personalnumber : user.personalnumber,
+    personalnumber: user.personalnumber,
     serviceName: `${user.firstName} ${user.lastName}`,
     ahmashNotes: "",
     clientJourney: [],
@@ -150,34 +154,65 @@ const TowingOrderForm = (props) => {
     area: "",
     status: "ממתין לאישור",
     commanderNotes: "",
+    isYaram: false,
   });
   const carDataInfoArray = [];
   const setChosenCarNumber = (carNumber) => {
     carDataInfoArray.push(carData.filter((el) => el.carnumber === carNumber));
     // console.log(carDataInfoArray);
     // console.log(`Car number searched:  ${carNumber}`);
-    if (carDataInfoArray[0][0]) {
-      setChosenPikod(carDataInfoArray[0][0].pikodId);
-      setChosenOgda(carDataInfoArray[0][0].ogdaId);
-      setChosenHativa(carDataInfoArray[0][0].hativaId);
-      setChosenGdod(carDataInfoArray[0][0].gdodId);
-      setData((prev) => ({ ...prev, a: carDataInfoArray[0][0].carTypeId }));
-      const carType = carTypesData.filter(
-        (element) => element._id === carDataInfoArray[0][0].carTypeId
-      );
-      if (carType[0]) {
-        setData((prev) => ({ ...prev, weight: carType[0].weight }));
+    if (!data.isYaram) {
+      if (carDataInfoArray[0][0]) {
+        if (typeof carDataInfoArray[0][0].status === "undefined") {
+          setChosenPikod(carDataInfoArray[0][0].pikodId);
+          setChosenOgda(carDataInfoArray[0][0].ogdaId);
+          setChosenHativa(carDataInfoArray[0][0].hativaId);
+          setChosenGdod(carDataInfoArray[0][0].gdodId);
+          setData((prev) => ({ ...prev, a: carDataInfoArray[0][0].carTypeId }));
+          const carType = carTypesData.filter(
+            (element) => element._id === carDataInfoArray[0][0].carTypeId
+          );
+          if (carType[0]) {
+            setData((prev) => ({ ...prev, weight: carType[0].weight }));
+          }
+        }
+        else {
+          openError('הרכב הזה הוא רכב אזרחי')
+        }
+      } else {
+        openError("צ' לא קיים");
+        setData((prev) => ({ ...data, carnumber: "" }));
       }
     } else {
-      openError("צ' לא קיים");
-      setData((prev) => ({ ...data, carnumber: "" }));
+      if (carDataInfoArray[0][0]) {
+        const carInfo = carDataInfoArray[0][0];
+        if (typeof carInfo.status !== "undefined") {
+          // check if status is defined
+          if (carInfo.status === true) {
+            setData((prev) => ({ ...prev, a: carDataInfoArray[0][0].carTypeId }));
+            const carType = carTypesData.filter(
+              (element) => element._id === carDataInfoArray[0][0].carTypeId
+            );
+            if (carType[0]) {
+              setData((prev) => ({ ...prev, weight: carType[0].weight }));
+            }
+          } else {
+            openError("רכב זה אינו מגויס ולכן לא ניתן לתת לא שירות");
+          }
+        } else {
+          openError(`מספר רישוי לא קיים`);
+        }
+      } else {
+        openError(`מספר רישוי לא קיים`);
+      }
     }
   };
   useEffect(async () => {
-    if(edit){
-    if (carData.length > 0) {
-      setChosenCarNumber(data.carnumber);
-    }}
+    if (edit) {
+      if (carData.length > 0) {
+        setChosenCarNumber(data.carnumber);
+      }
+    }
   }, [carData, edit]);
   // console.log(data);
 
@@ -202,6 +237,7 @@ const TowingOrderForm = (props) => {
       .get(`http://localhost:5000/TowingLogApi/get_banks`)
       .then((response) => {
         // console.log("מדפיס מערך פיקודים");
+        console.log(response);
         setBankData(response.data.data);
         setPikods(
           Object.entries(response.data.data.Unit_bank.pikods).map(([key, value]) => ({
@@ -307,7 +343,7 @@ const TowingOrderForm = (props) => {
   }, []);
 
   useEffect(async () => {
-    if(edit){
+    if (edit) {
       await axios
         .get(`http://localhost:5000/TowingLogApi/TowingOrder/${orderId}`)
         .then((response) => {
@@ -337,7 +373,7 @@ const TowingOrderForm = (props) => {
           setData(response.data);
         })
         .catch((error) => {});
-      }
+    }
   }, [orderId, edit]);
 
   const handleClientJourneyChange = (evt, key) => {
@@ -382,19 +418,16 @@ const TowingOrderForm = (props) => {
     return isValidFormat;
   }
   const isPersonalNumberValid = (personalnum) => {
-    if(personalnum.length === 7 && digitsOnly(personalnum))
-    {
+    if (personalnum.length === 7 && digitsOnly(personalnum)) {
       return true;
     }
-    if(personalnum.length === 8)
-    {
-      if(personalnum.startsWith('s') && digitsOnly(personalnum.slice(1)))
-      {
+    if (personalnum.length === 8) {
+      if (personalnum.startsWith("s") && digitsOnly(personalnum.slice(1))) {
         return true;
       }
     }
     return false;
-  }
+  };
   const CheckFormData = () => {
     let flag = true;
     const ErrorReason = [];
@@ -410,17 +443,18 @@ const TowingOrderForm = (props) => {
     if (!data.orderTime || data.orderTime === "") {
       AddError("שעה ריקה");
     }
-    if(!isPersonalNumberValid(data.personalnumber))
-    {
-      AddError((!data.personalnumber) || data.personalnumber === "" ? "מספר אישי ריק" : "מספר אישי לא תקין")
+    if (!isPersonalNumberValid(data.personalnumber)) {
+      AddError(
+        !data.personalnumber || data.personalnumber === "" ? "מספר אישי ריק" : "מספר אישי לא תקין"
+      );
     }
     if (data.serviceName === "") {
       AddError("שם נציג שירות ריק");
     }
     if (data.carnumber === "") {
-      AddError("צ' ריק");
+      AddError(`${data.isYaram ? 'מספר רישוי' : 'צ'} ריק`);
     } else if (!(digitsOnly(data.carnumber) && data.carnumber.length <= 9)) {
-      AddError("צ' לא תקין");
+      AddError(`${data.isYaram ? 'מספר רישוי' : 'צ'} לא תקין`);
     }
 
     if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
@@ -483,7 +517,7 @@ const TowingOrderForm = (props) => {
       reference: data.reference,
       orderDate: data.orderDate,
       orderTime: data.orderTime,
-      personalnumber : data.personalnumber,
+      personalnumber: data.personalnumber,
       serviceName: data.serviceName,
       ahmashNotes: data.ahmashNotes,
       clientJourney: data.clientJourney.map((post) => ({ ...post, published: true })),
@@ -504,6 +538,7 @@ const TowingOrderForm = (props) => {
       area: data.area,
       status: data.status,
       commanderNotes: data.commanderNotes,
+      isYaram: data.isYaram,
     };
     // console.log(requestData);
     const method = edit ? `update/${orderId}` : "add";
@@ -529,13 +564,13 @@ const TowingOrderForm = (props) => {
           error: true,
           NavigateToReferrer: false,
         });
-      });    
+      });
   };
 
   const openError = (error) => {
     setSnackbarOpen(true);
     setErrorMessage(error);
-  }
+  };
   const handleCloseSuccsecModal = () => {
     setData({ ...data, loading: false, error: false, successmsg: false, NavigateToReferrer: true });
   };
@@ -742,40 +777,18 @@ const TowingOrderForm = (props) => {
     if (existing.length === 0) {
       if (carNumber.trim() !== "") {
         setChosenCarNumber(carNumber);
-        // carDataInfoArray.push(carData.filter((el) => el.carnumber === carNumber));
-        // console.log(carDataInfoArray);
-        // console.log(`Car number searched:  ${carNumber}`);
-        // if (carDataInfoArray[0][0]) {
-        //   setChosenPikod(carDataInfoArray[0][0].pikodId);
-        //   setChosenOgda(carDataInfoArray[0][0].ogdaId);
-        //   setChosenHativa(carDataInfoArray[0][0].hativaId);
-        //   setChosenGdod(carDataInfoArray[0][0].gdodId);
-        //   setData((prev) => ({ ...prev, a: carDataInfoArray[0][0].carTypeId }));
-        //   const carType = carTypesData.filter(
-        //     (element) => element._id === carDataInfoArray[0][0].carTypeId
-        //   );
-        //   setData((prev) => ({ ...prev, weight: carType[0].weight }));
-        // } else {
-        //   toast.error("צ' לא קיים");
-        //   setData((prev) => ({ ...data, carnumber: "" }));
-        // }
       }
     } else {
-      const message =         `שים לב ישנה הזמנה ${
+      const message = `שים לב ישנה הזמנה ${
         existing[0].status === "פתוח" ? "פתוחה" : "מוקפאת"
       } עם הצ' זה - אסמכתא : ${existing[0].reference}`;
       openError(message);
-      // toast.error(
-      //   `שים לב ישנה הזמנה ${
-      //     existing[0].status === "פתוח" ? "פתוחה" : "מוקפאת"
-      //   } עם הצ' זה - אסמכתא : ${existing[0].reference}`
-      // );
     }
   };
   const filteredOgdas = ogdas.filter((ogda) => ogda.pikodId === chosenPikod);
   const filteredHativas = hativas.filter((hativa) => hativa.ogdaId === chosenOgda);
   const filteredGdods = gdods.filter((gdod) => gdod.hativaId === chosenHativa);
-  const date2000 = new Date('2000-1-1');
+  const date2000 = new Date("2000-1-1");
 
   const towingOrderForm = () => (
     <Container className="" dir="rtl">
@@ -797,9 +810,11 @@ const TowingOrderForm = (props) => {
                 <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
                   טופס הזמנת שירות
                 </MDTypography>
-                {edit && <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-                  {data.reference}
-                </MDTypography>}
+                {edit && (
+                  <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
+                    {data.reference}
+                  </MDTypography>
+                )}
               </MDBox>
               <Form
                 style={{ textAlign: "right", paddingBottom: "5%" }}
@@ -810,7 +825,7 @@ const TowingOrderForm = (props) => {
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>תאריך</h6>
-                      
+
                       <Input
                         placeholder="תאריך"
                         type="date"
@@ -819,7 +834,6 @@ const TowingOrderForm = (props) => {
                         onChange={handleChange}
                         min={!edit && date}
                       />
-
                     </FormGroup>
                   </Col>
                   <Col>
@@ -850,7 +864,7 @@ const TowingOrderForm = (props) => {
                     </FormGroup>
                   </Col>
                   <Col>
-                  <FormGroup>
+                    <FormGroup>
                       <h6 style={{}}>מספר אישי</h6>
                       <Input
                         placeholder="מספר אישי"
@@ -862,8 +876,8 @@ const TowingOrderForm = (props) => {
                       />
                     </FormGroup>
                   </Col>
-                  </Row>
-                  <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
+                </Row>
+                <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>הערות אחמ"ש</h6>
@@ -928,10 +942,30 @@ const TowingOrderForm = (props) => {
                     </FormGroup>
                   </Col>
                 </Row>
+                <Row>
+                  <Col>
+                    <h6 style={{}}>סוג רכב</h6>
+                    <div style={{ display: "flex" }}>
+                      <FormControl>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={data.isYaram}
+                              onChange={() => {
+                                setData((prev) => ({ ...prev, isYaram: !prev.isYaram }));
+                              }}
+                            />
+                          }
+                          label={data.isYaram ? `יר"מ` : `צ'`}
+                        />
+                      </FormControl>
+                    </div>
+                  </Col>
+                </Row>
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
-                      <h6 style={{}}>צ'</h6>
+                      <h6 style={{}}>{data.isYaram ? `לוחית רישוי` : `צ'`}</h6>
                       <div style={{ display: "flex" }}>
                         <Input
                           onKeyDown={(event) => {
@@ -940,7 +974,7 @@ const TowingOrderForm = (props) => {
                             }
                           }}
                           style={{ marginLeft: "5px" }}
-                          placeholder="צ'"
+                          placeholder={data.isYaram ? `לוחית רישוי` : `צ'`}
                           type="text"
                           name="carnumber"
                           value={data.carnumber}
@@ -1363,34 +1397,32 @@ const TowingOrderForm = (props) => {
 
                 <Row>
                   <Col>
-                  <div className="text-center">
-                  <MDButton
-                    color="mekatnar"
-                    size="large"
-                    // onClick={onSubmit}
-                    className="btn-new-blue"
-                    type="submit"
-                    startIcon={<Icon fontSize="small">upload</Icon>}
-                  >
-                    {
-                    `${edit ? 'עדכן' : 'שלח'} טופס שירות`
-                    }
-                  </MDButton>
-                  {edit && <MDButton
-                        color="error"
+                    <div className="text-center">
+                      <MDButton
+                        color="mekatnar"
                         size="large"
-                        onClick={handleCloseSuccsecModal}
+                        // onClick={onSubmit}
                         className="btn-new-blue"
-                        style={{ marginRight: "3%" }}
-                        startIcon={<Icon fontSize="small">clear</Icon>}
+                        type="submit"
+                        startIcon={<Icon fontSize="small">upload</Icon>}
                       >
-                        צא ללא שינויים
-                      </MDButton>}
-                </div>
+                        {`${edit ? "עדכן" : "שלח"} טופס שירות`}
+                      </MDButton>
+                      {edit && (
+                        <MDButton
+                          color="error"
+                          size="large"
+                          onClick={handleCloseSuccsecModal}
+                          className="btn-new-blue"
+                          style={{ marginRight: "3%" }}
+                          startIcon={<Icon fontSize="small">clear</Icon>}
+                        >
+                          צא ללא שינויים
+                        </MDButton>
+                      )}
+                    </div>
                   </Col>
-
                 </Row>
-
               </Form>
             </CardBody>
           </Card>
