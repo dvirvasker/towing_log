@@ -173,11 +173,10 @@ const TowingOrderForm = (props) => {
             (element) => element._id === carDataInfoArray[0][0].carTypeId
           );
           // if (carType[0]) {
-            setData((prev) => ({ ...prev, weight: carDataInfoArray[0][0].weight }));
+          setData((prev) => ({ ...prev, weight: carDataInfoArray[0][0].weight }));
           // }
-        }
-        else {
-          openError('הרכב הזה הוא רכב אזרחי')
+        } else {
+          openError("הרכב הזה הוא רכב אזרחי");
         }
       } else {
         openError("צ' לא קיים");
@@ -452,9 +451,9 @@ const TowingOrderForm = (props) => {
       AddError("שם נציג שירות ריק");
     }
     if (data.carnumber === "") {
-      AddError(`${data.isYaram ? 'מספר רישוי' : 'צ'} ריק`);
+      AddError(`${data.isYaram ? "מספר רישוי" : "צ"} ריק`);
     } else if (!(digitsOnly(data.carnumber) && data.carnumber.length <= 9)) {
-      AddError(`${data.isYaram ? 'מספר רישוי' : 'צ'} לא תקין`);
+      AddError(`${data.isYaram ? "מספר רישוי" : "צ"} לא תקין`);
     }
 
     if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
@@ -1379,7 +1378,8 @@ const TowingOrderForm = (props) => {
                       </Input>
                     </FormGroup>
                   </Col>
-
+                </Row>
+                <Row>
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>הערות מפקד</h6>
