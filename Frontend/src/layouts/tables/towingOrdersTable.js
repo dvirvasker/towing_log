@@ -80,9 +80,9 @@ const towingOrdersTable = (props) => {
   const [hativas, setHativas] = useState([]);
   const [gdods, setGdods] = useState([]);
 
-  const [popUpMessage, setPopUpMessage] = useState('');
-  const [popUpTitle, setPopUpTitle] = useState('');
-  const [popUpColor, setPopUpColor] = useState('');
+  const [popUpMessage, setPopUpMessage] = useState("");
+  const [popUpTitle, setPopUpTitle] = useState("");
+  const [popUpColor, setPopUpColor] = useState("");
   const [isPopUp, setIsPopUp] = useState(false);
 
   const [chosenPikod, setChosenPikod] = useState("בחר");
@@ -443,17 +443,65 @@ const towingOrdersTable = (props) => {
     </Dialog>
   );
 
-  // const textClientJourney = (clientJourney) => {
-  //   let text = "";
-  //   clientJourney.forEach(post => {
-  //     post.data = new Date(post.date);
-  //     console.log(clientJourney);
-  //     text += `${post.publisher} ${post.date.toLocaleTimeString("he-IL")} ${post.date.toLocaleDateString("he-IL")}: \n`;
-  //     text += post.text;
-  //     text += '\n';
-  //   });
-  //   return text;
-  // }
+  const textClientJourney = (clientJourney) => {
+    let text = "";
+    clientJourney.forEach((post) => {
+      post.date = new Date(post.date);
+      console.log(post);
+      text += `${post.publisher} ${post.date.toLocaleTimeString(
+        "he-IL"
+      )} ${post.date.toLocaleDateString("he-IL")}: \n`;
+      text += post.text;
+      text += "\n";
+    });
+    return text;
+  };
+
+  const textErrorArray = (errorInfo, errorInfoOther) => {
+    let text = "";
+    let isOther = false;
+    errorInfo.forEach((errorElement) => {
+      if (errorElement === "אחר") {
+        isOther = true;
+      } else {
+        text += `${errorElement}, `;
+      }
+    });
+    if (isOther) {
+      text += `אחר: ${errorInfoOther}`;
+    }
+    return text;
+  };
+
+  const getTimeDiffrencese = (time1, time2) => {
+    const timeObject1 = new Date(time1);
+    const timeObject2 = new Date(time2);
+    const milliseconds = timeObject2.valueOf() - timeObject1.valueOf();
+    let seconds = Math.floor(milliseconds / 1000);
+    let minutes = Math.floor(milliseconds / (60 * 1000));
+    let hours = Math.floor(milliseconds / (60 * 60 * 1000));
+    let days = Math.floor(milliseconds / (24 * 60 * 60 * 1000));
+    seconds %= 60;
+    minutes %= 60;
+    hours %= 24;
+    seconds = seconds.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false
+    })
+    minutes = minutes.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false
+    })
+    hours = hours.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false
+    })
+    days = days.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false
+    })
+    return `${days}:${hours}:${minutes}:${seconds}`;
+  };
 
   function FixDataAndExportToExcel() {
     let tempdata_to_excel = [];
@@ -492,12 +540,18 @@ const towingOrdersTable = (props) => {
         ? (tempdata_to_excel[i].ahmashNotes_m = tempdata_to_excel[i].ahmashNotes)
         : (tempdata_to_excel[i].ahmashNotes_m = " ");
 
-      tempdata_to_excel[i].clientJourney
-        ? (tempdata_to_excel[i].clientJourney_m = tempdata_to_excel[i].clientJourney)
+      // console.log(textClientJourney(tempdata_to_excel[i].clientJourney));
+      tempdata_to_excel[i].clientJourney && tempdata_to_excel[i].clientJourney.length > 0
+        ? (tempdata_to_excel[i].clientJourney_m = textClientJourney(
+            tempdata_to_excel[i].clientJourney
+          ))
         : (tempdata_to_excel[i].clientJourney_m = " ");
 
       tempdata_to_excel[i].erorrInfo
-        ? (tempdata_to_excel[i].erorrInfo_m = tempdata_to_excel[i].erorrInfo)
+        ? (tempdata_to_excel[i].erorrInfo_m = textErrorArray(
+            tempdata_to_excel[i].erorrInfo,
+            tempdata_to_excel[i].errInfoOther
+          ))
         : (tempdata_to_excel[i].erorrInfo_m = " ");
 
       tempdata_to_excel[i].carnumber
@@ -578,6 +632,20 @@ const towingOrdersTable = (props) => {
             tempdata_to_excel[i].waitForApproveTime
           ).toLocaleString("en-IL"))
         : (tempdata_to_excel[i].waitForApproveTime_m = " ");
+
+      tempdata_to_excel[i].orderWaitTime_m = tempdata_to_excel[i].waitForApproveTime
+        ? tempdata_to_excel[i].status === "ממתין לאישור" || !tempdata_to_excel[i].openOrderTime
+          ? getTimeDiffrencese(tempdata_to_excel[i].waitForApproveTime, new Date())
+          : getTimeDiffrencese(
+              tempdata_to_excel[i].waitForApproveTime,
+              tempdata_to_excel[i].openOrderTime
+            )
+        : "";
+
+      tempdata_to_excel[i].isYaram_m = tempdata_to_excel[i].isYaram ? "אזרחי" : "צבאי";
+      tempdata_to_excel[i].personalnumber
+        ? (tempdata_to_excel[i].personalnumber_m = tempdata_to_excel[i].personalnumber)
+        : (tempdata_to_excel[i].personalnumber_m = " ");
     }
 
     // export to excel -fix
@@ -613,6 +681,8 @@ const towingOrdersTable = (props) => {
       delete tempdata_to_excel[i].openOrderTime;
       delete tempdata_to_excel[i].closeOrderTime;
       delete tempdata_to_excel[i].waitForApproveTime;
+      delete tempdata_to_excel[i].isYaram;
+      delete tempdata_to_excel[i].personalnumber;
 
       // delete tempdata_to_excel[i].otherPhoneNumber;
       // delete tempdata_to_excel[i].transferOrderDate;
@@ -655,6 +725,9 @@ const towingOrdersTable = (props) => {
       openOrderTime_m: "זמן פתיחת הזמנה",
       closeOrderTime_m: "זמן סגירת הזמנה",
       waitForApproveTime_m: "זמן המתנת הזמנה",
+      orderWaitTime_m : 'זמן המתנה לאישור',
+      isYaram_m: "סוג רכב",
+      personalnumber_m: "מספר אישי",
 
       // transferOrderDate_m: "חטיבה",
       // transferOrderTime_m: "גדוד",
@@ -708,45 +781,43 @@ const towingOrdersTable = (props) => {
     setPopUpMessage(message);
     setPopUpTitle(title);
     setIsPopUp(true);
-  }
+  };
 
-  const showPopUpMessage = () => 
+  const showPopUpMessage = () => (
     <Dialog
-    open={isPopUp}
-    onClose={() => {
-      setIsPopUp(false);
-      setPopUpMessage('');
-      setPopUpTitle('');
-      setPopUpColor('');
-    }}
-    aria-labelledby="alert-dialog-title"
-    aria-describedby="alert-dialog-description"
-  >
-    <MDBox
-      variant="gradient"
-      bgColor={popUpColor}
-      coloredShadow={popUpColor}
-      borderRadius="l"
-      // mx={2}
-      // mt={2}
-      p={3}
-      // mb={2}
-      textAlign="center"
+      open={isPopUp}
+      onClose={() => {
+        setIsPopUp(false);
+        setPopUpMessage("");
+        setPopUpTitle("");
+        setPopUpColor("");
+      }}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
     >
-      <MDTypography variant="h1" fontWeight="medium" color="white" mt={1}>
-        {popUpTitle}
-      </MDTypography>
-
-      <DialogContent>
-        <MDTypography variant="h6" fontWeight="medium" color="white" mt={1}>
-          {popUpMessage}
+      <MDBox
+        variant="gradient"
+        bgColor={popUpColor}
+        coloredShadow={popUpColor}
+        borderRadius="l"
+        // mx={2}
+        // mt={2}
+        p={3}
+        // mb={2}
+        textAlign="center"
+      >
+        <MDTypography variant="h1" fontWeight="medium" color="white" mt={1}>
+          {popUpTitle}
         </MDTypography>
-      </DialogContent>
-    </MDBox>
-  </Dialog>
-  
 
-
+        <DialogContent>
+          <MDTypography variant="h6" fontWeight="medium" color="white" mt={1}>
+            {popUpMessage}
+          </MDTypography>
+        </DialogContent>
+      </MDBox>
+    </Dialog>
+  );
 
   const statusesArr = ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"];
   const statusesColors = ["success", "info", "warning", "secondary", "error"];
@@ -761,7 +832,6 @@ const towingOrdersTable = (props) => {
   };
 
   const updateCivilCars = (carsData) => {
-
     // תכתוב פעולה שתעשה את העברה של כל הרשומת בשרת, ככה תוכל לשלוח הודעה עם סטטום אם הפעולה הצליחה
     // carsData.forEach(carInfo => {
     //   const carNumber = carInfo['מספר רישוי'];
@@ -771,41 +841,40 @@ const towingOrdersTable = (props) => {
     //   const existingCar = carData.find(car => car.carnumber === carNumber);
 
     // })
-    const civilCars = carsData.map(carInfo => {
-      const carTypeName = carInfo['דגם'];
-      const carTypeObject = carTypesData.find(carType => carType.carType === carTypeName);
-      const carTypeId = carTypeObject ? carTypeObject._id : '';
+    const civilCars = carsData.map((carInfo) => {
+      const carTypeName = carInfo["דגם"];
+      const carTypeObject = carTypesData.find((carType) => carType.carType === carTypeName);
+      const carTypeId = carTypeObject ? carTypeObject._id : "";
       return {
-        carnumber : carInfo['מספר רישוי'],
-        weight : carInfo['משקל כולל'],
+        carnumber: carInfo["מספר רישוי"],
+        weight: carInfo["משקל כולל"],
         carTypeId,
-        status : !(carInfo['תאריך שחרור'] && carInfo['תאריך שחרור'].trim() !== '')
-      }
-    })
+        status: !(carInfo["תאריך שחרור"] && carInfo["תאריך שחרור"].trim() !== ""),
+      };
+    });
     // console.log(civilCars);
-    axios.post('http://localhost:5000/TowingLogApi/CarDatas/updateCivilCars', {cars : civilCars})
-    .then((response) => {
-      if(response.status === 200)
-      {
-        console.log('updated')
-        activatePopUp("העדכון בוצע בהצלחה", `רכבי היר"מ עודכנו במערכת`, 'mekatnar');
-      }
-      else{
-        console.log('failed')
-        activatePopUp('תקלת שרת', 'עדכון הרכבים נכשל', 'error');
-      }
-    })
-  }
+    axios
+      .post("http://localhost:5000/TowingLogApi/CarDatas/updateCivilCars", { cars: civilCars })
+      .then((response) => {
+        if (response.status === 200) {
+          console.log("updated");
+          activatePopUp("העדכון בוצע בהצלחה", `רכבי היר"מ עודכנו במערכת`, "mekatnar");
+        } else {
+          console.log("failed");
+          activatePopUp("תקלת שרת", "עדכון הרכבים נכשל", "error");
+        }
+      });
+  };
   const uploadCivilCarsXlsx = (event) => {
-    console.log('reading...');
+    console.log("reading...");
     const reader = new FileReader();
     reader.readAsBinaryString(event.target.files[0]);
     reader.onload = (e) => {
       const dataXl = e.target.result;
-      const workbook = XLSX.read(dataXl, {type : 'binary'});
+      const workbook = XLSX.read(dataXl, { type: "binary" });
       const sheetname = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetname];
-      const parsedData = XLSX.utils.sheet_to_json(sheet, {raw : false});
+      const parsedData = XLSX.utils.sheet_to_json(sheet, { raw: false });
       // const newParsed = parsedData.map(car => {
       //   const date = new Date(car['תאריך שחרור']);
       //   return {
@@ -814,9 +883,9 @@ const towingOrdersTable = (props) => {
       // }})
       // console.log(newParsed);
       updateCivilCars(parsedData);
-    }
-    event.target.value = '';// in order to allow the file reader to read the same file the second time in a row
-  }
+    };
+    event.target.value = ""; // in order to allow the file reader to read the same file the second time in a row
+  };
 
   const table = () => (
     <MDBox pt={6} pb={3}>
@@ -837,7 +906,7 @@ const towingOrdersTable = (props) => {
                 {tableTittle}
               </MDTypography>{" "}
               <Grid container justifyContent="flex-end">
-              {urlType === "towingorders" ? (
+                {urlType === "towingorders" ? (
                   <Grid item xs={2} md={1} xl={0.4}>
                     <Tooltip title="העלת רכבים אזרחיים" arrow>
                       <MDButton
@@ -853,11 +922,11 @@ const towingOrdersTable = (props) => {
                       </MDButton>
                     </Tooltip>
                     <input
-                    ref={uploadCarXlsxRef}
-                    style={{display : 'none'}}
-                    type='file'
-                    accept='.xlsx, .xls'
-                    onChange={uploadCivilCarsXlsx}
+                      ref={uploadCarXlsxRef}
+                      style={{ display: "none" }}
+                      type="file"
+                      accept=".xlsx, .xls"
+                      onChange={uploadCivilCarsXlsx}
                     />
                   </Grid>
                 ) : null}
@@ -927,7 +996,7 @@ const towingOrdersTable = (props) => {
                           marginRight: 2,
                         }}
                         color={statusesColors[index]}
-                        variant={statuses.includes(statusEl) ? 'gradient' : "outlined"}
+                        variant={statuses.includes(statusEl) ? "gradient" : "outlined"}
                         onClick={() => {
                           toggleStatus(statusEl);
                         }}
