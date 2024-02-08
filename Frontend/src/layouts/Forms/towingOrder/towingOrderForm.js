@@ -172,9 +172,9 @@ const TowingOrderForm = (props) => {
           const carType = carTypesData.filter(
             (element) => element._id === carDataInfoArray[0][0].carTypeId
           );
-          if (carType[0]) {
-            setData((prev) => ({ ...prev, weight: carType[0].weight }));
-          }
+          // if (carType[0]) {
+            setData((prev) => ({ ...prev, weight: carDataInfoArray[0][0].weight }));
+          // }
         }
         else {
           openError('הרכב הזה הוא רכב אזרחי')
@@ -193,9 +193,9 @@ const TowingOrderForm = (props) => {
             const carType = carTypesData.filter(
               (element) => element._id === carDataInfoArray[0][0].carTypeId
             );
-            if (carType[0]) {
-              setData((prev) => ({ ...prev, weight: carType[0].weight }));
-            }
+            // if (carType[0]) {
+            setData((prev) => ({ ...prev, weight: carDataInfoArray[0][0].weight }));
+            // }
           } else {
             openError("רכב זה אינו מגויס ולכן לא ניתן לתת לא שירות");
           }

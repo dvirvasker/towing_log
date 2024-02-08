@@ -49,7 +49,7 @@ import TowingOrderForm from "layouts/Forms/towingOrder/towingOrderForm";
 import { Dialog, DialogContent, Box, TextField } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import towingOrdersData from "layouts/tables/data/towingOrdersData";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import axios from "axios";
 import { Navigate, Outlet } from "react-router-dom";
@@ -80,6 +80,11 @@ const towingOrdersTable = (props) => {
   const [hativas, setHativas] = useState([]);
   const [gdods, setGdods] = useState([]);
 
+  const [popUpMessage, setPopUpMessage] = useState('');
+  const [popUpTitle, setPopUpTitle] = useState('');
+  const [popUpColor, setPopUpColor] = useState('');
+  const [isPopUp, setIsPopUp] = useState(false);
+
   const [chosenPikod, setChosenPikod] = useState("בחר");
   const [chosenOgda, setChosenOgda] = useState("בחר");
   const [chosenHativa, setChosenHativa] = useState("בחר");
@@ -89,8 +94,11 @@ const towingOrdersTable = (props) => {
   const [isCarFiltered, setIsCarFiltered] = useState(false);
 
   const [carData, setCarData] = useState([]);
+  const [carTypesData, setCarTypesData] = useState([]);
 
   const [carsList, setCarsList] = useState([]);
+
+  const uploadCarXlsxRef = useRef(null);
 
   const [data, setData] = useState({
     fromDate: "",
@@ -113,25 +121,52 @@ const towingOrdersTable = (props) => {
   const filteredHativas = hativas.filter((hativa) => hativa.ogdaId === chosenOgda);
   const filteredGdods = gdods.filter((gdod) => gdod.hativaId === chosenHativa);
 
+  // useEffect(() => {
+  //   axios
+  //     .get(`http://localhost:5000/TowingLogApi/CarDatas`)
+  //     .then((response) => {
+  //       response.data.forEach((carDataInfo) => {
+  //         const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId];
+  //         carDataInfo.gdodName = gdod.name;
+  //         carDataInfo.hativaId = gdod.hativaId;
+  //         const hativa = bankData.Unit_bank.hativas[carDataInfo.hativaId];
+  //         carDataInfo.hativaName = hativa.name;
+  //         carDataInfo.ogdaId = hativa.ogdaId;
+  //         const ogda = bankData.Unit_bank.ogdas[carDataInfo.ogdaId];
+  //         carDataInfo.ogdaName = ogda.name;
+  //         carDataInfo.pikodId = ogda.pikodId;
+  //         const pikod = bankData.Unit_bank.pikods[carDataInfo.pikodId];
+  //         carDataInfo.pikodName = pikod.name;
+  //         // console.log(carDataInfo);
+  //       });
+  //       setCarData(response.data);
+  //     })
+  //     .catch((error) => {});
+  // }, [bankData]);
   useEffect(() => {
     axios
       .get(`http://localhost:5000/TowingLogApi/CarDatas`)
       .then((response) => {
-        response.data.forEach((carDataInfo) => {
+        if (Object.keys(bankData).length === 0) return;
+        const toSet = response.data.map((carDataInfo) => {
           const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId];
-          carDataInfo.gdodName = gdod.name;
-          carDataInfo.hativaId = gdod.hativaId;
-          const hativa = bankData.Unit_bank.hativas[carDataInfo.hativaId];
-          carDataInfo.hativaName = hativa.name;
-          carDataInfo.ogdaId = hativa.ogdaId;
-          const ogda = bankData.Unit_bank.ogdas[carDataInfo.ogdaId];
-          carDataInfo.ogdaName = ogda.name;
-          carDataInfo.pikodId = ogda.pikodId;
-          const pikod = bankData.Unit_bank.pikods[carDataInfo.pikodId];
-          carDataInfo.pikodName = pikod.name;
+          if (!gdod) return carDataInfo;
+          const hativa = bankData.Unit_bank.hativas[gdod.hativaId];
+          const ogda = bankData.Unit_bank.ogdas[hativa.ogdaId];
+          const pikod = bankData.Unit_bank.pikods[ogda.pikodId];
+          return {
+            ...carDataInfo,
+            gdodName: gdod.name,
+            hativaId: gdod.hativaId,
+            hativaName: hativa.name,
+            ogdaId: hativa.ogdaId,
+            ogdaName: ogda.name,
+            pikodId: ogda.pikodId,
+            pikodName: pikod.name,
+          };
           // console.log(carDataInfo);
         });
-        setCarData(response.data);
+        if (toSet && toSet.length > 0) setCarData(toSet);
       })
       .catch((error) => {});
   }, [bankData]);
@@ -161,6 +196,13 @@ const towingOrdersTable = (props) => {
         });
         const sorted = sortArrayByHebrewAlphabet(fixedData);
         setGaragesData(sorted);
+      })
+      .catch((error) => {});
+
+    axios
+      .get(`http://localhost:5000/TowingLogApi/CarTypes`)
+      .then((response) => {
+        setCarTypesData(response.data);
       })
       .catch((error) => {});
   }, []);
@@ -285,7 +327,7 @@ const towingOrdersTable = (props) => {
     setToEditFile(true);
     console.log(`sent to edit ${orderId}`);
   };
-  console.log(toEditFile);
+  // console.log(toEditFile);
   const {
     columns: pColumns,
     rows: pRows,
@@ -400,6 +442,18 @@ const towingOrdersTable = (props) => {
       </MDBox>
     </Dialog>
   );
+
+  // const textClientJourney = (clientJourney) => {
+  //   let text = "";
+  //   clientJourney.forEach(post => {
+  //     post.data = new Date(post.date);
+  //     console.log(clientJourney);
+  //     text += `${post.publisher} ${post.date.toLocaleTimeString("he-IL")} ${post.date.toLocaleDateString("he-IL")}: \n`;
+  //     text += post.text;
+  //     text += '\n';
+  //   });
+  //   return text;
+  // }
 
   function FixDataAndExportToExcel() {
     let tempdata_to_excel = [];
@@ -649,6 +703,51 @@ const towingOrdersTable = (props) => {
     </Dialog>
   );
 
+  const activatePopUp = (title, message, color) => {
+    setPopUpColor(color);
+    setPopUpMessage(message);
+    setPopUpTitle(title);
+    setIsPopUp(true);
+  }
+
+  const showPopUpMessage = () => 
+    <Dialog
+    open={isPopUp}
+    onClose={() => {
+      setIsPopUp(false);
+      setPopUpMessage('');
+      setPopUpTitle('');
+      setPopUpColor('');
+    }}
+    aria-labelledby="alert-dialog-title"
+    aria-describedby="alert-dialog-description"
+  >
+    <MDBox
+      variant="gradient"
+      bgColor={popUpColor}
+      coloredShadow={popUpColor}
+      borderRadius="l"
+      // mx={2}
+      // mt={2}
+      p={3}
+      // mb={2}
+      textAlign="center"
+    >
+      <MDTypography variant="h1" fontWeight="medium" color="white" mt={1}>
+        {popUpTitle}
+      </MDTypography>
+
+      <DialogContent>
+        <MDTypography variant="h6" fontWeight="medium" color="white" mt={1}>
+          {popUpMessage}
+        </MDTypography>
+      </DialogContent>
+    </MDBox>
+  </Dialog>
+  
+
+
+
   const statusesArr = ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"];
   const statusesColors = ["success", "info", "warning", "secondary", "error"];
   const toggleStatus = (toggledStatus) => {
@@ -660,6 +759,64 @@ const towingOrdersTable = (props) => {
       setStatuses(arr);
     }
   };
+
+  const updateCivilCars = (carsData) => {
+
+    // תכתוב פעולה שתעשה את העברה של כל הרשומת בשרת, ככה תוכל לשלוח הודעה עם סטטום אם הפעולה הצליחה
+    // carsData.forEach(carInfo => {
+    //   const carNumber = carInfo['מספר רישוי'];
+    //   const carTypeName = carInfo['דגם'];
+    //   const releaseDate = carInfo['תאריך שחרור'];
+    //   const weight = carInfo['משקל כולל'];
+    //   const existingCar = carData.find(car => car.carnumber === carNumber);
+
+    // })
+    const civilCars = carsData.map(carInfo => {
+      const carTypeName = carInfo['דגם'];
+      const carTypeObject = carTypesData.find(carType => carType.carType === carTypeName);
+      const carTypeId = carTypeObject ? carTypeObject._id : '';
+      return {
+        carnumber : carInfo['מספר רישוי'],
+        weight : carInfo['משקל כולל'],
+        carTypeId,
+        status : !(carInfo['תאריך שחרור'] && carInfo['תאריך שחרור'].trim() !== '')
+      }
+    })
+    // console.log(civilCars);
+    axios.post('http://localhost:5000/TowingLogApi/CarDatas/updateCivilCars', {cars : civilCars})
+    .then((response) => {
+      if(response.status === 200)
+      {
+        console.log('updated')
+        activatePopUp("העדכון בוצע בהצלחה", `רכבי היר"מ עודכנו במערכת`, 'mekatnar');
+      }
+      else{
+        console.log('failed')
+        activatePopUp('תקלת שרת', 'עדכון הרכבים נכשל', 'error');
+      }
+    })
+  }
+  const uploadCivilCarsXlsx = (event) => {
+    console.log('reading...');
+    const reader = new FileReader();
+    reader.readAsBinaryString(event.target.files[0]);
+    reader.onload = (e) => {
+      const dataXl = e.target.result;
+      const workbook = XLSX.read(dataXl, {type : 'binary'});
+      const sheetname = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetname];
+      const parsedData = XLSX.utils.sheet_to_json(sheet, {raw : false});
+      // const newParsed = parsedData.map(car => {
+      //   const date = new Date(car['תאריך שחרור']);
+      //   return {
+      //   ...car,
+      //   'תאריך שחרור' : date
+      // }})
+      // console.log(newParsed);
+      updateCivilCars(parsedData);
+    }
+    event.target.value = '';// in order to allow the file reader to read the same file the second time in a row
+  }
 
   const table = () => (
     <MDBox pt={6} pb={3}>
@@ -680,6 +837,30 @@ const towingOrdersTable = (props) => {
                 {tableTittle}
               </MDTypography>{" "}
               <Grid container justifyContent="flex-end">
+              {urlType === "towingorders" ? (
+                  <Grid item xs={2} md={1} xl={0.4}>
+                    <Tooltip title="העלת רכבים אזרחיים" arrow>
+                      <MDButton
+                        variant="gradient"
+                        onClick={() => {
+                          uploadCarXlsxRef.current.click();
+                        }}
+                        circular="true"
+                        iconOnly="true"
+                        size="medium"
+                      >
+                        <Icon>file_upload</Icon>
+                      </MDButton>
+                    </Tooltip>
+                    <input
+                    ref={uploadCarXlsxRef}
+                    style={{display : 'none'}}
+                    type='file'
+                    accept='.xlsx, .xls'
+                    onChange={uploadCivilCarsXlsx}
+                    />
+                  </Grid>
+                ) : null}
                 <Grid item xs={2} md={1} xl={0.5}>
                   <Tooltip title="הורדת קובץ אקסל" arrow>
                     <MDButton
@@ -1027,6 +1208,7 @@ const towingOrdersTable = (props) => {
     <DashboardLayout>
       <DashboardNavbar />
       {showError()}
+      {showPopUpMessage()}
       {addFile()}
       {editFile()}
       {table()}

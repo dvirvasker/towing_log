@@ -8,6 +8,8 @@ const cardatasSchema = new mongoose.Schema(
     gdodId: { type: String },
     makatId: { type: String },
     carTypeId: { type: ObjectId },
+    weight: {type: String},
+    status: {type: Boolean}
   },
   { timestamps: true }
 );

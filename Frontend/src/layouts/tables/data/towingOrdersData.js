@@ -36,7 +36,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Dialog, DialogContent } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
-import TowingOrderFormDB from "layouts/Forms/towingOrder/towingOrderFormDB";
+// import TowingOrderFormDB from "layouts/Forms/towingOrder/towingOrderFormDB";
 // import { element } from "prop-types";
 
 export default function data(
@@ -410,22 +410,22 @@ export default function data(
     return [nameOfGarage, color];
   };
 
-  const editFile = (towingOrder) => (
-    <Dialog
-      px={5}
-      open={toEditFile}
-      onClose={() => setToEditFile(false)}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-      maxWidth="xl"
-    >
-      <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
-        <DialogContent>
-          <TowingOrderFormDB />
-        </DialogContent>
-      </MDBox>
-    </Dialog>
-  );
+  // const editFile = (towingOrder) => (
+  //   <Dialog
+  //     px={5}
+  //     open={toEditFile}
+  //     onClose={() => setToEditFile(false)}
+  //     aria-labelledby="alert-dialog-title"
+  //     aria-describedby="alert-dialog-description"
+  //     maxWidth="xl"
+  //   >
+  //     <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
+  //       <DialogContent>
+  //         <TowingOrderFormDB />
+  //       </DialogContent>
+  //     </MDBox>
+  //   </Dialog>
+  // );
   const dbRows = requestDB.map((towingOrder, index) => ({
     // fileID: towingOrder._id,
     reference: towingOrder.reference,
