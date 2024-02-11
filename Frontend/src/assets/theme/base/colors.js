@@ -102,6 +102,26 @@ const colors = {
     main: "#6DB9EF",
     focus: "#5FBDFF",
   },
+  blue_grey_1: {
+    main: "#164863",
+    focus: "#164863",
+  },
+  blue_grey_2: {
+    main: "#192655",
+    focus: "#192655",
+  },
+  blue_grey_3: {
+    main: "#427D9D",
+    focus: "#427D9D",
+  },
+  blue_grey_4: {
+    main: "#9BBEC8",
+    focus: "#9BBEC8",
+  },
+  blue_grey_5: {
+    main: "#DDF2FD",
+    focus: "#DDF2FD",
+  },
 
   blue_sky: {
     main: "#CDF5FD",
@@ -116,6 +136,7 @@ const colors = {
     main: "#7FDBDA",
     focus: "#5FBDFF",
   },
+
   grey: {
     100: "#f8f9fa",
     200: "#f0f2f5",
@@ -284,7 +305,27 @@ const colors = {
     },
     blue_light: {
       main: "#6DB9EF",
-      focus: "#5FBDFF",
+      text: "#5FBDFF",
+    },
+    blue_grey_1: {
+      background: "#164863",
+      text: "#ffffff",
+    },
+    blue_grey_2: {
+      background: "#192655",
+      text: "#ffffff",
+    },
+    blue_grey_3: {
+      background: "#427D9D",
+      text: "#000000",
+    },
+    blue_grey_4: {
+      background: "#9BBEC8",
+      text: "#000000",
+    },
+    blue_grey_5: {
+      background: "#DDF2FD",
+      text: "#000000",
     },
   },
 

@@ -849,7 +849,7 @@ function Dashboard() {
               labels: ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"],
               datasets: {
                 label: "סטטוס הזמנה",
-                backgroundColors: statusesColors,
+                backgroundColors:  ["primary", "dark", "info", "mekatnar", "secondary"],
                 data: statusCountArr,
               },
             }}

@@ -19,6 +19,8 @@
 /* eslint-disable import/newline-after-import */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
+/* eslint-disable no-unneeded-ternary */
+
 /* eslint-disable react/prop-types */ // TODO: upgrade to latest eslint tooling
 
 // TODO check mult-files
@@ -71,6 +73,8 @@ import {
   Switch,
   FormControl,
   FormControlLabel,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material";
 
 // user and auth import
@@ -196,7 +200,7 @@ const TowingOrderForm = (props) => {
             setData((prev) => ({ ...prev, weight: carDataInfoArray[0][0].weight }));
             // }
           } else {
-            openError("רכב זה אינו מגויס ולכן לא ניתן לתת לא שירות");
+            openError("רכב זה אינו מגויס ולכן לא ניתן לתת לו שירות");
           }
         } else {
           openError(`מספר רישוי לא קיים`);
@@ -357,6 +361,8 @@ const TowingOrderForm = (props) => {
           response.data.demandDate = fixedDemandDate;
           const fixedTransferOrderDate = response.data.transferOrderDate.split("T")[0];
           response.data.transferOrderDate = fixedTransferOrderDate;
+          const fixedIsYaram = response.data.isYaram === true ? true : false;
+          response.data.isYaram = fixedIsYaram;
 
           const fixedClientJourney = response.data.clientJourney.map((post) => {
             const dateEl = new Date(post.date);
@@ -946,17 +952,25 @@ const TowingOrderForm = (props) => {
                     <h6 style={{}}>סוג רכב</h6>
                     <div style={{ display: "flex" }}>
                       <FormControl>
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={data.isYaram}
-                              onChange={() => {
-                                setData((prev) => ({ ...prev, isYaram: !prev.isYaram }));
+                        {/* <FormControlLabel
+                          control={ */}
+                            <ToggleButtonGroup
+                            sx={{marginBottom: 1}}
+                              exclusive
+                              value={data.isYaram}
+                              onChange={(event) => {
+                                if (event.target.value === "false")
+                                  setData((prev) => ({ ...prev, isYaram: false }));
+                                if (event.target.value === "true")
+                                  setData((prev) => ({ ...prev, isYaram: true }));
                               }}
-                            />
-                          }
+                            >
+                              <ToggleButton value={false}>צ'</ToggleButton>
+                              <ToggleButton value={true}>יר"מ</ToggleButton>
+                            </ToggleButtonGroup>
+                          {/* }
                           label={data.isYaram ? `יר"מ` : `צ'`}
-                        />
+                        /> */}
                       </FormControl>
                     </div>
                   </Col>

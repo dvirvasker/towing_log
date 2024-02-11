@@ -369,18 +369,13 @@ export default function data(
     let nameOfGarage = "";
     let color = "mekatnar";
     if (time && statusOrder === "פתוח") {
-      if (
-        new Date(time).toLocaleDateString("he-IL") ===
-        new Date(currentDate).toLocaleDateString("he-IL")
-      ) {
-        const milliseconds = new Date(currentDate).valueOf() - new Date(time).valueOf();
-        if (milliseconds < 10800000) {
-          nameOfGarage = "עד 3 שעות";
-          color = "success";
-        } else if (milliseconds > 10800000) {
-          nameOfGarage = "מעל 3 שעות";
-          color = "error";
-        }
+      const milliseconds = new Date(currentDate).valueOf() - new Date(time).valueOf();
+      if (milliseconds < 10800000) {
+        nameOfGarage = "עד 3 שעות";
+        color = "success";
+      } else if (milliseconds > 10800000) {
+        nameOfGarage = "מעל 3 שעות";
+        color = "error";
       }
     } else {
       nameOfGarage = "";

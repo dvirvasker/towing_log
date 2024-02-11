@@ -10,6 +10,9 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-template */
+/* eslint-disable react/jsx-curly-brace-presence */
+
 /* eslint-disable react/jsx-no-bind */
 
 /**
@@ -54,6 +57,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Navigate, Outlet } from "react-router-dom";
 import { Col, FormGroup, FormText, Input, Label, Row } from "reactstrap";
+import { authenticate, isAuthenticated, signin } from "auth/index";
 
 const towingOrdersTable = (props) => {
   // const { pathname } = useLocation();
@@ -97,6 +101,8 @@ const towingOrdersTable = (props) => {
   const [carTypesData, setCarTypesData] = useState([]);
 
   const [carsList, setCarsList] = useState([]);
+
+  const { user } = isAuthenticated();
 
   const uploadCarXlsxRef = useRef(null);
 
@@ -484,23 +490,29 @@ const towingOrdersTable = (props) => {
     seconds %= 60;
     minutes %= 60;
     hours %= 24;
-    seconds = seconds.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false
-    })
-    minutes = minutes.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false
-    })
-    hours = hours.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false
-    })
-    days = days.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false
-    })
-    return `${days}:${hours}:${minutes}:${seconds}`;
+    // seconds = seconds.toLocaleString('en-US', {
+    //   minimumIntegerDigits: 2,
+    //   useGrouping: false
+    // })
+    // minutes = minutes.toLocaleString('en-US', {
+    //   minimumIntegerDigits: 2,
+    //   useGrouping: false
+    // })
+    // hours = hours.toLocaleString('en-US', {
+    //   minimumIntegerDigits: 2,
+    //   useGrouping: false
+    // })
+    // days = days.toLocaleString('en-US', {
+    //   minimumIntegerDigits: 2,
+    //   useGrouping: false
+    // })
+    let text = "";
+    if (days !== 0) {
+      text += `${days} days `;
+    }
+    text += `${hours}:${minutes} hours`;
+
+    return text;
   };
 
   function FixDataAndExportToExcel() {
@@ -627,11 +639,20 @@ const towingOrdersTable = (props) => {
           ).toLocaleString("en-IL"))
         : (tempdata_to_excel[i].closeOrderTime_m = " ");
 
-      tempdata_to_excel[i].waitForApproveTime
-        ? (tempdata_to_excel[i].waitForApproveTime_m = new Date(
-            tempdata_to_excel[i].waitForApproveTime
-          ).toLocaleString("en-IL"))
-        : (tempdata_to_excel[i].waitForApproveTime_m = " ");
+      // tempdata_to_excel[i].waitForApproveTime
+      //   ? (tempdata_to_excel[i].waitForApproveTime_m = new Date(
+      //       tempdata_to_excel[i].waitForApproveTime
+      //     ).toLocaleString("en-IL"))
+      //   : (tempdata_to_excel[i].waitForApproveTime_m = " ");
+
+      tempdata_to_excel[i].openToCloseTime_m = tempdata_to_excel[i].openOrderTime
+        ? tempdata_to_excel[i].status === "פתוח" || !tempdata_to_excel[i].closeOrderTime
+          ? getTimeDiffrencese(tempdata_to_excel[i].openOrderTime, new Date())
+          : getTimeDiffrencese(
+              tempdata_to_excel[i].openOrderTime,
+              tempdata_to_excel[i].closeOrderTime
+            )
+        : "";
 
       tempdata_to_excel[i].orderWaitTime_m = tempdata_to_excel[i].waitForApproveTime
         ? tempdata_to_excel[i].status === "ממתין לאישור" || !tempdata_to_excel[i].openOrderTime
@@ -683,6 +704,7 @@ const towingOrdersTable = (props) => {
       delete tempdata_to_excel[i].waitForApproveTime;
       delete tempdata_to_excel[i].isYaram;
       delete tempdata_to_excel[i].personalnumber;
+      delete tempdata_to_excel[i].waitForApproveTime;
 
       // delete tempdata_to_excel[i].otherPhoneNumber;
       // delete tempdata_to_excel[i].transferOrderDate;
@@ -724,8 +746,8 @@ const towingOrdersTable = (props) => {
       commanderNotes_m: "הערות מפקד",
       openOrderTime_m: "זמן פתיחת הזמנה",
       closeOrderTime_m: "זמן סגירת הזמנה",
-      waitForApproveTime_m: "זמן המתנת הזמנה",
-      orderWaitTime_m : 'זמן המתנה לאישור',
+      openToCloseTime_m: "זמן מפתיחת עד סגירת הזמנה",
+      orderWaitTime_m: "זמן המתנה לאישור",
       isYaram_m: "סוג רכב",
       personalnumber_m: "מספר אישי",
 
@@ -842,12 +864,14 @@ const towingOrdersTable = (props) => {
 
     // })
     const civilCars = carsData.map((carInfo) => {
+      // console.log(carInfo);
+      console.log(carInfo["משקל כולל (קג)"]);
       const carTypeName = carInfo["דגם"];
       const carTypeObject = carTypesData.find((carType) => carType.carType === carTypeName);
       const carTypeId = carTypeObject ? carTypeObject._id : "";
       return {
         carnumber: carInfo["מספר רישוי"],
-        weight: carInfo["משקל כולל"],
+        weight: carInfo["משקל כולל (קג)"],
         carTypeId,
         status: !(carInfo["תאריך שחרור"] && carInfo["תאריך שחרור"].trim() !== ""),
       };
@@ -906,30 +930,30 @@ const towingOrdersTable = (props) => {
                 {tableTittle}
               </MDTypography>{" "}
               <Grid container justifyContent="flex-end">
-                {urlType === "towingorders" ? (
-                  <Grid item xs={2} md={1} xl={0.4}>
-                    <Tooltip title="העלת רכבים אזרחיים" arrow>
+              {urlType === "towingorders" && user.admin === "0" ? (
+                <Grid item xs={2} md={2} xl={1.4}>
+                {/* <Tooltip title="העלאת רכבים אזרחיים" arrow> */}
                       <MDButton
                         variant="gradient"
                         onClick={() => {
                           uploadCarXlsxRef.current.click();
                         }}
                         circular="true"
-                        iconOnly="true"
-                        size="medium"
-                      >
-                        <Icon>file_upload</Icon>
+                        // iconOnly="true"
+                        size="small"
+                        startIcon={<Icon>file_upload</Icon>}
+                      >{'טעינת רכבי יר"מ'}
                       </MDButton>
-                    </Tooltip>
-                    <input
-                      ref={uploadCarXlsxRef}
-                      style={{ display: "none" }}
-                      type="file"
-                      accept=".xlsx, .xls"
-                      onChange={uploadCivilCarsXlsx}
-                    />
-                  </Grid>
-                ) : null}
+                      {/* </Tooltip> */}
+                      <input
+                        ref={uploadCarXlsxRef}
+                        style={{ display: "none" }}
+                        type="file"
+                        accept=".xlsx, .xls"
+                        onChange={uploadCivilCarsXlsx}
+                      />
+                    </Grid>
+                  ) : null}
                 <Grid item xs={2} md={1} xl={0.5}>
                   <Tooltip title="הורדת קובץ אקסל" arrow>
                     <MDButton
@@ -963,19 +987,22 @@ const towingOrdersTable = (props) => {
                 ) : null}
               </Grid>
               <Grid style={{ position: "static", top: "7px" }}>
-                <MDButton
-                  variant="gradient"
-                  onClick={() => setFilterOpen(!filterOpen)}
-                  // onClick={() => {
-                  //   // setIsInfoPressed(true);
-                  //   // setpressedID(hozla._id);
-                  // }}
-                  // circular="true"
-                  size="small"
-                  startIcon={<Icon>filter_alt</Icon>}
-                >
-                  סינון
-                </MDButton>
+                <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
+                  <MDButton
+                    variant="gradient"
+                    onClick={() => setFilterOpen(!filterOpen)}
+                    // onClick={() => {
+                    //   // setIsInfoPressed(true);
+                    //   // setpressedID(hozla._id);
+                    // }}
+                    // circular="true"
+                    size="small"
+                    startIcon={<Icon>filter_alt</Icon>}
+                  >
+                    סינון
+                  </MDButton>
+                  
+                </Box>
               </Grid>
             </MDBox>
 
