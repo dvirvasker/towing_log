@@ -43,10 +43,11 @@ Coded by www.creative-tim.com
 
 // import SystemAlerts from "layouts/SystemAlerts";
 import Dashboard from "layouts/dashboard/Tene/dashMain";
-import GenralInfo from "layouts/dashboard/genralInfo";
-import KshirotMisgrot from "layouts/dashboard/kshirotMisgrot";
+import TowingOrders from "layouts/tables/towingOrdersTable";
+import KshirotMisgrot from "layouts/dashboard/halfim";
+import TowingDashboard from "layouts/dashboard/towinglog";
 import Pagedamagedtools from "layouts/dashboard/damagedtools";
-import Halfim from "layouts/dashboard/halfim";
+// import Halfim from "layouts/dashboard/halfim";
 import HomePage from "layouts/home";
 // import RequiredProjects from "layouts/requiedProjects";
 import AdminManagementTable from "layouts/tables/userManagementTable";
@@ -63,27 +64,28 @@ import AboutPage from "views/aboutpage/AboutPage";
 const AdminRoutes = [
   {
     type: "collapse",
-    name: "הזמנות גרירה",
-    key: "towingorders",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/towingorders",
-    component: <GenralInfo />,
-  },
-  {
-    type: "collapse",
-    name: "דשבורד",
+    name: "דף ראשי",
     key: "dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
-    component: <KshirotMisgrot />,
+    component: <TowingDashboard />,
   },
   {
     type: "collapse",
-    name: "מסך נחיתה",
+    name: `דו"ח יומי`,
     key: "landing",
     icon: <Icon fontSize="small">toys</Icon>,
     route: "/landing",
-    component: <Halfim />,
+    component: <TowingOrders typeTable="landing" />,
+  },
+
+  {
+    type: "collapse",
+    name: "הזמנות שירות",
+    key: "towingorders",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/towingorders",
+    component: <TowingOrders typeTable="towingorders" />,
   },
   {
     type: "divider",

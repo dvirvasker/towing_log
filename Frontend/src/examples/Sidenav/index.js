@@ -3,6 +3,7 @@
 /* eslint-disable import/newline-after-import */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
+/* eslint no-return-assign: "error" */
 /**
 =========================================================
 * Material Dashboard 2 React - v2.1.0
@@ -21,7 +22,7 @@ Coded by www.creative-tim.com
 import { useEffect, useState } from "react";
 
 // react-router-dom components
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, Navigate, useNavigate } from "react-router-dom";
 
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
@@ -56,12 +57,15 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { Collapse } from "@mui/material";
 import NGTeamLogo from "assets/images/NewNGlogoWhite.svg";
 import hozlaLogo from "assets/images/hozlaLogo.png";
-import mekatnarLogo from "assets/images/unitsimg/mekatnar58.png";
+import egedLogo from "assets/images/unitsimg/egedTag.png";
+import team100white from "assets/images/team100_white.png";
+import { Col } from "reactstrap";
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
   const location = useLocation();
   const collapseName = location.pathname.replace("/", "");
+  const navigate = useNavigate();
 
   let textColor = "white";
 
@@ -361,28 +365,28 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
         }
       />
       <List>{renderRoutes}</List>
-      <MDBox
-        component="img"
-        src={mekatnarLogo}
-        alt="mekatnarLogo"
-        width="70px"
-        alignSelf="center"
-        sx={{
-          marginTop: "auto",
-          marginBottom: "2rem",
-        }}
-      />
-      {/* <MDBox
-        component="img"
-        src={NGTeamLogo}
-        alt="NGTeamLogo"
-        width="50px"
-        alignSelf="center"
-        sx={{
+      <Col
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          position: "absolute",
+          bottom: 0,
+          paddingRight: "18%",
+          paddingLeft: "1%",
           marginTop: "2rem",
           marginBottom: "2rem",
         }}
-      /> */}
+      >
+        <MDBox component="img" src={egedLogo} alt="egedLogo" width="70px" alignSelf="center" />
+        <MDBox
+          component="img"
+          src={team100white}
+          onClick={() => navigate("/AboutPage")}
+          alt="team100white"
+          width="90px"
+          alignSelf="center"
+        />
+      </Col>
     </SidenavRoot>
   );
 }

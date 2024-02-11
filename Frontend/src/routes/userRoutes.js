@@ -41,12 +41,14 @@ Coded by www.creative-tim.com
 // Material Dashboard 2 React layouts
 import KshirotMisgrot from "layouts/dashboard/kshirotMisgrot";
 import GenralInfo from "layouts/dashboard/genralInfo";
+import TowingOrders from "layouts/tables/towingOrdersTable";
 import MashkTech from "layouts/dashboard/mashkTeh";
 import NesoaShchikaDashbord from "layouts/dashboard/nesoaShchika";
 import Dashboard from "layouts/dashboard/Tene/dashMain";
 import Halfim from "layouts/dashboard/halfim";
 import HomePage from "layouts/home";
 import AdminManagementTable from "layouts/tables/userManagementTable";
+import TowingDashboard from "layouts/dashboard/towinglog";
 // @mui icons
 import Icon from "@mui/material/Icon";
 //my components
@@ -57,27 +59,27 @@ import Pagedamagedtools from "layouts/dashboard/damagedtools";
 const routes = [
   {
     type: "collapse",
-    name: "הזמנות גרירה",
-    key: "towingorders",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/towingorders",
-    component: <GenralInfo />,
-  },
-  {
-    type: "collapse",
-    name: "דשבורד",
+    name: "דף ראשי",
     key: "dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
-    component: <KshirotMisgrot />,
+    component: <TowingDashboard />,
   },
   {
     type: "collapse",
-    name: "מסך נחיתה",
+    name: `דו"ח יומי`,
     key: "landing",
     icon: <Icon fontSize="small">toys</Icon>,
     route: "/landing",
-    component: <Halfim />,
+    component: <TowingOrders typeTable="landing" />,
+  },
+  {
+    type: "collapse",
+    name: "הזמנות שירות",
+    key: "towingorders",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/towingorders",
+    component: <TowingOrders typeTable="towingorders" />,
   },
 ];
 

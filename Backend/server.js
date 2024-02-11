@@ -59,70 +59,65 @@ app.use("/TowingLogApi", userRoutes);
 // const HolyaReports = require("./routes/reports/report");
 // app.use("/TowingLogApi/HolyaReports", HolyaReports);
 
-const MashkTeh = require("./routes/mashkTeh/mashkTeh");
-app.use("/TowingLogApi/mashkTeh", MashkTeh);
+const Gdod = require("./models/units/gdod");
+const Hativa = require("./models/units/hativa");
+const Ogda = require("./models/units/ogda");
+const Pikod = require("./models/units/pikod");
 
-const MashkTehArchive = require("./routes/mashkTeh/mashkTehArchive");
-app.use("/TowingLogApi/mashkTehArchive", MashkTehArchive);
+const Magad = require("./models/magads/magad");
+const Magadal = require("./models/magads/magadal");
+const Makat = require("./models/magads/makat");
+const Mkabaz = require("./models/magads/mkabaz");
 
-const Holiyot = require("./routes/holiyot/holiyot");
-app.use("/TowingLogApi/Holiyot", Holiyot);
+const { getMagadTree } = require("./on_run_req/getMagadal");
+const { getUnitTree } = require("./on_run_req/getUnitTree");
 
-const HoliyotArchive = require("./routes/holiyot/holiyotArchive");
-app.use("/TowingLogApi/HoliyotArchive", HoliyotArchive);
+let Magadal_bank = {};
+let Unit_bank = {};
+const getMagadal_bank = async () => {
+  // const res = await getMagadTree();
+  // // console.log(res);
+  // return res;
+};
 
-const Militaryindustry = require("./routes/militaryindustry/militaryindustry");
-app.use("/TowingLogApi/Militaryindustry", Militaryindustry);
+const getUnit_bank = async () => {
+  const res = await getUnitTree();
+  // console.log(res);
+  return res;
+};
 
-const MilitaryindustryArchive = require("./routes/militaryindustry/militaryindustryArchive");
-app.use("/TowingLogApi/MilitaryindustryArchive", MilitaryindustryArchive);
+async function getBanks() {
+  [Magadal_bank, Unit_bank] = await Promise.all([
+    getMagadal_bank(),
+    getUnit_bank(),
+  ]);
+}
+getBanks().then(() => {
+  // console.log(Magadal_bank);
+  // console.log(Unit_bank);
+});
 
-const Civilindustry = require("./routes/civilindustry/civilindustry");
-app.use("/TowingLogApi/Civilindustry", Civilindustry);
 
-const CivilindustryArchive = require("./routes/civilindustry/civilindustryArchive");
-app.use("/TowingLogApi/CivilindustryArchive", CivilindustryArchive);
+app.get("/TowingLogApi/get_banks", async (req, res) => {
+  res.json({data: {Unit_bank, Magadal_bank} });
+});
 
-const Halfim = require("./routes/halfim/halfim");
-app.use("/TowingLogApi/Halfim", Halfim);
+const TowingOrder = require("./routes/towingorder/towingorder");
+app.use("/TowingLogApi/TowingOrder", TowingOrder);
 
-const HalfimArchive = require("./routes/halfim/halfimArchive");
-app.use("/TowingLogApi/HalfimArchive", HalfimArchive);
+const CarTypes = require("./routes/cartypes/cartypes");
+app.use("/TowingLogApi/CarTypes", CarTypes);
+
+const Garages = require("./routes/garages/garages");
+app.use("/TowingLogApi/Garages", Garages);
+
+const CarDatas = require("./routes/cardatas/cardatas");
+app.use("/TowingLogApi/CarDatas", CarDatas);
 
 //* file uploader Routes
 // upload files
 const fileuploaderRoutes = require("./routes/fileuploader/fileuploader");
 app.use("/TowingLogApi", fileuploaderRoutes);
-
-const damagedtools = require("./routes/damagedtools/damagedtools");
-app.use("/TowingLogApi/damagedtools", damagedtools);
-
-const archiveddamagedtools = require("./routes/damagedtools/archiveddamagedtools");
-app.use("/TowingLogApi/archiveddamagedtools", archiveddamagedtools);
-
-const nesoashchika = require("./routes/nesoashchika/nesoashchika");
-app.use("/TowingLogApi/nesoashchika", nesoashchika);
-
-const archivenesoashchika = require("./routes/nesoashchika/archivenesoashchika");
-app.use("/TowingLogApi/archivenesoashchika", archivenesoashchika);
-
-const Personnel = require("./routes/personnel/personnel");
-app.use("/TowingLogApi/personnel", Personnel);
-
-const PersonnelArchive = require("./routes/personnel/personnelArchive");
-app.use("/TowingLogApi/personnelArchive", PersonnelArchive);
-
-const SdacPower = require("./routes/sdacPower/sdacPower");
-app.use("/TowingLogApi/sdacPower", SdacPower);
-
-const SdacPowerArchive = require("./routes/sdacPower/sdacPowerArchive");
-app.use("/TowingLogApi/sdacPowerArchive", SdacPowerArchive);
-
-const Kshirot = require("./routes/kshirot/Kshirot");
-app.use("/TowingLogApi/kshirot", Kshirot);
-
-const KshirotrArchive = require("./routes/kshirot/kshirotArchive");
-app.use("/TowingLogApi/kshirotArchive", KshirotrArchive);
 
 //! ----------------- nodemailer --------------------
 // app.use(express.static(path.join(__dirname, "./public")));

@@ -31,9 +31,15 @@ import MDTypography from "components/MDTypography";
 
 // DefaultDoughnutChart configurations
 import configs from "examples/Charts/DoughnutCharts/DefaultDoughnutChart/configs";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 function DefaultDoughnutChart({ icon, title, description, height, chart }) {
-  const { data, options } = configs(chart.labels || [], chart.datasets || {}, chart.cutout);
+  const { data, options, plugins } = configs(
+    chart.labels || [],
+    chart.datasets || {},
+    chart.cutout,
+    ChartDataLabels
+  );
 
   const renderChart = (
     <MDBox py={2} pr={2} pl={icon.component ? 1 : 2}>
@@ -70,7 +76,7 @@ function DefaultDoughnutChart({ icon, title, description, height, chart }) {
       {useMemo(
         () => (
           <MDBox height={height}>
-            <Doughnut data={data} options={options} />
+            <Doughnut data={data} options={options} plugins={plugins} />
           </MDBox>
         ),
         [chart, height]

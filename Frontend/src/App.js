@@ -60,7 +60,10 @@ import { default as UserRoutes, default as routes } from "routes/userRoutes";
 import { setMiniSidenav, setOpenConfigurator, useMaterialUIController } from "context";
 
 // ! ---------------Project Brand Images and info---------------------------
-import { default as brandDark, default as brandWhite } from "assets/images/unitsimg/tne.png";
+import {
+  default as brandDark,
+  default as brandWhite,
+} from "assets/images/projectLogoImages/towinglog.odd";
 // ! ------------------------------------------
 
 import WebsiteLoader from "components/WebsiteLoader/WebsiteLoader";
@@ -77,6 +80,7 @@ import { authenticate, isAuthenticated, signin, updateRefreshCount } from "auth/
 
 import sidenav from "assets/theme/components/sidenav";
 import EditUser from "layouts/authentication/editUser/editUser";
+import TowingOrderFormDB from "layouts/Forms/towingOrder/towingOrderFormDB";
 import AboutPage from "views/aboutpage/AboutPage";
 import "./font.css";
 
@@ -268,6 +272,14 @@ export default function App() {
                     <Route path=":id" element={<EditUser />} />
                   </Route>
 
+                  <Route path="/towingorders">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
+                  </Route>
+
+                  <Route path="/landing">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
+                  </Route>
+
                   {/* <Route path="/casualtiesFamily/profile/">
                     <Route path=":id" element={<CasualtiesFamilyFormDB />} />
                   </Route>
@@ -281,6 +293,7 @@ export default function App() {
                   </Route> */}
 
                   <Route path="/Error404" element={<Error404 />} />
+                  <Route path="/AboutPage" element={<AboutPage />} />
                   <Route path="/" element={<Navigate to="/dashboard" />} />
                   <Route path="*" element={<Error404 />} />
                 </Routes>
@@ -300,8 +313,16 @@ export default function App() {
                     <Route path=":id" element={<SoldierHalalFormDB />} />
                   </Route> */}
 
-                  <Route path="/authentication/admin/edituser">
+                  {/* <Route path="/authentication/admin/edituser">
                     <Route path=":id" element={<EditUser />} />
+                  </Route> */}
+
+                  <Route path="/towingorders">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
+                  </Route>
+
+                  <Route path="/landing">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
                   </Route>
 
                   <Route path="/Error404" element={<Error404 />} />
@@ -315,6 +336,13 @@ export default function App() {
                   <Route path="/authentication/admin/edituser">
                     <Route path=":id" element={<EditUser />} />
                   </Route> */}
+                  <Route path="/towingorders">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
+                  </Route>
+
+                  <Route path="/landing">
+                    <Route path=":id" element={<TowingOrderFormDB />} />
+                  </Route>
 
                   {/* <Route path="/soldiersKeva/profile/">
                     <Route path=":id" element={<SoldierKevaFormDB />} />

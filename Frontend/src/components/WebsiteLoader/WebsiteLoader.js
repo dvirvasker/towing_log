@@ -6,7 +6,7 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/function-component-definition */
 /* eslint-disable arrow-body-style */
-import TneLogo from "assets/images/unitsimg/tne.png";
+import ProjectLogo from "assets/images/projectLogoImages/towinglog.odd";
 // import CasualtiesLogo from "assets/images/projectLogoImages/CasualtiesLogo.png";
 import { motion } from "framer-motion";
 import React from "react";
@@ -38,14 +38,14 @@ const WebsiteLoader = () => {
           borderRadius: ["0%", "0%", "50%", "50%", "0%"],
         }}
         transition={{
-          duration: 2,
+          duration: 1.5,
           ease: "easeInOut",
           times: [0, 0.2, 0.5, 0.8, 1],
           repeat: Infinity,
           repeatDelay: 1,
         }}
       />
-      <img className="ProjectLogoSVGimage" src={TneLogo} alt="ProjectLogoSVGimage" />
+      <img className="ProjectLogoSVGimage" src={ProjectLogo} alt="ProjectLogoSVGimage" />
     </div>
   );
 };

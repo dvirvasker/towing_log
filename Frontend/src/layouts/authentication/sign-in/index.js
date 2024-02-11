@@ -49,7 +49,7 @@ import { Dialog, DialogContent, DialogContentText, DialogTitle, Modal } from "@m
 import { authenticate, isAuthenticated, signin, signout, updateRefreshCount } from "auth/index";
 
 // Images
-import bgImage from "assets/images/greenBG.jpg";
+import bgImage from "assets/images/towinglogbg2.png";
 // import bgImage from "assets/images/skydesertBackgroundImage.jpg";
 // import bgImage from "assets/images/desertBackgroundImage.jpg";
 import manualHoliyotPDF from "assets/docs/manualHoliyot.pdf";
@@ -109,7 +109,7 @@ function signIn() {
   // eslint-disable-next-line react/no-unstable-nested-components
   function NavigateUser() {
     if (signInData.NavigateToReferrer) {
-      navigate("/dashboard");
+      navigate("/landing");
     }
   }
 
@@ -318,7 +318,7 @@ function signIn() {
           textAlign="center"
         >
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-            {`התחברות למערכת יומן גרירות`}
+            {`התחברות למערכת  יומן גרירות`}
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
