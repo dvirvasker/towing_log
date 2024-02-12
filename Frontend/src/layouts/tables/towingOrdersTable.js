@@ -868,7 +868,7 @@ const towingOrdersTable = (props) => {
       console.log(carInfo["משקל כולל (קג)"]);
       const carTypeName = carInfo["דגם"];
       const carTypeObject = carTypesData.find((carType) => carType.carType === carTypeName);
-      const carTypeId = carTypeObject ? carTypeObject._id : "";
+      const carTypeId = carTypeObject ? carTypeObject._id : null;
       return {
         carnumber: carInfo["מספר רישוי"],
         weight: carInfo["משקל כולל (קג)"],
