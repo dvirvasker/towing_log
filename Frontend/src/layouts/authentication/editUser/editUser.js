@@ -424,7 +424,7 @@ function EditUser() {
               sx={{ height: 50, minWidth: 150 }}
             >
               <MenuItem value="0">מפקד מוקד</MenuItem>
-              <MenuItem value="1">מוקדנית</MenuItem>
+              <MenuItem value="1">נציג/ת שירות</MenuItem>
               <MenuItem value="2">אחמ"ש</MenuItem>
             </Select>
           </FormControl>

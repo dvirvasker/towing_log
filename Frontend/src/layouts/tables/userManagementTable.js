@@ -165,7 +165,7 @@ const userManagementTable = () => {
               >
                 <MenuItem value="">בחר</MenuItem>
                 <MenuItem value="0">מפקד מוקד</MenuItem>
-                <MenuItem value="1">מוקדנית</MenuItem>
+                <MenuItem value="1">נציג/ת שירות</MenuItem>
                 <MenuItem value="2">אחמש</MenuItem>
               </Select>
             </FormControl>

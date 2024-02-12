@@ -131,7 +131,7 @@ export default function data() {
       typeName = "מפקד מוקד";
       color = "mekatnar";
     } else if (admin === "1") {
-      typeName = "מוקדנית";
+      typeName = "נציג/ת שירות";
       color = "info";
     } else if (admin === "2") {
       typeName = "אחמ''ש";
