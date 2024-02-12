@@ -287,7 +287,7 @@ const towingOrdersTable = (props) => {
   let tableTittle = "";
   let urlType = "";
   if (typeTable === "landing") {
-    tableTittle = `גרירות מוזמנות להיום - ${currentDate.toLocaleDateString("he-IL")}`;
+    tableTittle = `הזמנות שירות להיום - ${currentDate.toLocaleDateString("he-IL")}`;
     urlType = "landing";
   } else if (typeTable === "towingorders") {
     tableTittle = "הזמנות שירות";

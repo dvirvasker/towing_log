@@ -217,6 +217,7 @@ const TowingOrderForm = (props) => {
       }
     }
   }, [carData, edit]);
+
   // console.log(data);
 
   const min = 0;
@@ -780,6 +781,10 @@ const TowingOrderForm = (props) => {
         (orderData.status === "פתוח" || orderData.status === "מוקפא")
     );
     if (existing.length === 0) {
+      setChosenPikod("בחר");
+      setChosenOgda("בחר");
+      setChosenHativa("בחר");
+      setChosenGdod("בחר");
       if (carNumber.trim() !== "") {
         setChosenCarNumber(carNumber);
       }

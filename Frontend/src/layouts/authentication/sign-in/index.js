@@ -58,7 +58,7 @@ import {
 import { authenticate, isAuthenticated, signin, signout, updateRefreshCount } from "auth/index";
 
 // Images
-import bgImage from "assets/images/hummer.jpg";
+import bgImage from "assets/images/towinglogbg2.png";
 // import bgImage from "assets/images/skydesertBackgroundImage.jpg";
 // import bgImage from "assets/images/desertBackgroundImage.jpg";
 import manualHoliyotPDF from "assets/docs/manualHoliyot.pdf";
