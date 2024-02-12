@@ -42,23 +42,23 @@ Coded by www.creative-tim.com
 // Material Dashboard 2 React layouts
 
 // import SystemAlerts from "layouts/SystemAlerts";
-import Dashboard from "layouts/dashboard/Tene/dashMain";
+// import Dashboard from "layouts/dashboard/Tene/dashMain";
 import TowingOrders from "layouts/tables/towingOrdersTable";
-import KshirotMisgrot from "layouts/dashboard/halfim";
+// import KshirotMisgrot from "layouts/dashboard/halfim";
 import TowingDashboard from "layouts/dashboard/towinglog";
-import Pagedamagedtools from "layouts/dashboard/damagedtools";
+// import Pagedamagedtools from "layouts/dashboard/damagedtools";
 // import Halfim from "layouts/dashboard/halfim";
-import HomePage from "layouts/home";
+// import HomePage from "layouts/home";
 // import RequiredProjects from "layouts/requiedProjects";
 import AdminManagementTable from "layouts/tables/userManagementTable";
 // @mui icons
 import Icon from "@mui/material/Icon";
 //my components
 // import AdminHome from "layouts/Forms/AdminHome";
-import MashkTech from "layouts/dashboard/mashkTeh";
-import NesoaShchikaDashbord from "layouts/dashboard/nesoaShchika";
-import Overview from "layouts/profile";
-import AboutPage from "views/aboutpage/AboutPage";
+// import MashkTech from "layouts/dashboard/mashkTeh";
+// import NesoaShchikaDashbord from "layouts/dashboard/nesoaShchika";
+// import Overview from "layouts/profile";
+// import AboutPage from "views/aboutpage/AboutPage";
 // import Error404 from "views/Error404";
 
 const AdminRoutes = [

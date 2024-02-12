@@ -39,21 +39,21 @@ Coded by www.creative-tim.com
 */
 
 // Material Dashboard 2 React layouts
-import KshirotMisgrot from "layouts/dashboard/kshirotMisgrot";
-import GenralInfo from "layouts/dashboard/genralInfo";
+// import KshirotMisgrot from "layouts/dashboard/kshirotMisgrot";
+// import GenralInfo from "layouts/dashboard/genralInfo";
 import TowingOrders from "layouts/tables/towingOrdersTable";
-import MashkTech from "layouts/dashboard/mashkTeh";
-import NesoaShchikaDashbord from "layouts/dashboard/nesoaShchika";
-import Dashboard from "layouts/dashboard/Tene/dashMain";
-import Halfim from "layouts/dashboard/halfim";
-import HomePage from "layouts/home";
-import AdminManagementTable from "layouts/tables/userManagementTable";
+// import MashkTech from "layouts/dashboard/mashkTeh";
+// import NesoaShchikaDashbord from "layouts/dashboard/nesoaShchika";
+// import Dashboard from "layouts/dashboard/Tene/dashMain";
+// import Halfim from "layouts/dashboard/halfim";
+// import HomePage from "layouts/home";
+// import AdminManagementTable from "layouts/tables/userManagementTable";
 import TowingDashboard from "layouts/dashboard/towinglog";
 // @mui icons
 import Icon from "@mui/material/Icon";
 //my components
 import AboutPage from "views/aboutpage/AboutPage";
-import Pagedamagedtools from "layouts/dashboard/damagedtools";
+// import Pagedamagedtools from "layouts/dashboard/damagedtools";
 // import Error404 from "views/Error404";
 
 const routes = [
