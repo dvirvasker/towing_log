@@ -36,14 +36,14 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Dialog, DialogContent } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
-import TowingOrderFormDB from "layouts/Forms/towingOrder/towingOrderFormDB";
+// import TowingOrderFormDB from "layouts/Forms/towingOrder/towingOrderFormDB";
 // import { element } from "prop-types";
 
 export default function data(
   typeTable,
   urlType,
   currentDate,
-  status,
+  statuses,
   area,
   fromDate,
   toDate,
@@ -53,7 +53,8 @@ export default function data(
   carsList,
   isCarFiltered,
   garage,
-  executiveBody
+  executiveBody,
+  activateEditFile
 ) {
   // const Project = ({ image, name }) => (
   //   <MDBox display="flex" alignItems="center" lineHeight={1}>
@@ -103,10 +104,10 @@ export default function data(
     // console.log(beforfilter);
     let filter1 = [];
 
-    if (status === "בחר" || status === undefined) {
+    if (statuses.length === 0) {
       filter1 = beforfilter;
-    } else if (status) {
-      filter1 = beforfilter.filter((el) => el.status === status);
+    } else if (statuses) {
+      filter1 = beforfilter.filter((el) => statuses.includes(el.status));
     }
 
     let filter2 = [];
@@ -208,7 +209,7 @@ export default function data(
   useEffect(async () => {
     filteruse();
   }, [
-    status,
+    statuses,
     area,
     fromDate,
     toDate,
@@ -368,18 +369,13 @@ export default function data(
     let nameOfGarage = "";
     let color = "mekatnar";
     if (time && statusOrder === "פתוח") {
-      if (
-        new Date(time).toLocaleDateString("he-IL") ===
-        new Date(currentDate).toLocaleDateString("he-IL")
-      ) {
-        const milliseconds = new Date(currentDate).valueOf() - new Date(time).valueOf();
-        if (milliseconds < 10800000) {
-          nameOfGarage = "עד 3 שעות";
-          color = "success";
-        } else if (milliseconds > 10800000) {
-          nameOfGarage = "מעל 3 שעות";
-          color = "error";
-        }
+      const milliseconds = new Date(currentDate).valueOf() - new Date(time).valueOf();
+      if (milliseconds < 10800000) {
+        nameOfGarage = "עד 3 שעות";
+        color = "success";
+      } else if (milliseconds > 10800000) {
+        nameOfGarage = "מעל 3 שעות";
+        color = "error";
       }
     } else {
       nameOfGarage = "";
@@ -389,22 +385,42 @@ export default function data(
     return [nameOfGarage, color];
   };
 
-  const editFile = (towingOrder) => (
-    <Dialog
-      px={5}
-      open={toEditFile}
-      onClose={() => setToEditFile(false)}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-      maxWidth="xl"
-    >
-      <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
-        <DialogContent>
-          <TowingOrderFormDB />
-        </DialogContent>
-      </MDBox>
-    </Dialog>
-  );
+  const waitOrderTime = (statusOrder, time) => {
+    let nameOfGarage = "";
+    let color = "mekatnar";
+    if (time && statusOrder === "ממתין לאישור") {
+      const milliseconds = new Date(currentDate).valueOf() - new Date(time).valueOf();
+      if (milliseconds < 10800000) {
+        nameOfGarage = "עד 3 שעות";
+        color = "success";
+      } else if (milliseconds > 10800000) {
+        nameOfGarage = "מעל 3 שעות";
+        color = "error";
+      }
+    } else {
+      nameOfGarage = "";
+      color = "dark";
+    }
+
+    return [nameOfGarage, color];
+  };
+
+  // const editFile = (towingOrder) => (
+  //   <Dialog
+  //     px={5}
+  //     open={toEditFile}
+  //     onClose={() => setToEditFile(false)}
+  //     aria-labelledby="alert-dialog-title"
+  //     aria-describedby="alert-dialog-description"
+  //     maxWidth="xl"
+  //   >
+  //     <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
+  //       <DialogContent>
+  //         <TowingOrderFormDB />
+  //       </DialogContent>
+  //     </MDBox>
+  //   </Dialog>
+  // );
   const dbRows = requestDB.map((towingOrder, index) => ({
     // fileID: towingOrder._id,
     reference: towingOrder.reference,
@@ -434,6 +450,15 @@ export default function data(
         {openOrderTime(towingOrder.status, towingOrder.openOrderTime)[0]}
       </MDTypography>
     ),
+    waitOrder: (
+      <MDTypography
+        variant="caption"
+        fontWeight="bold"
+        color={waitOrderTime(towingOrder.status, towingOrder.waitForApproveTime)[1]}
+      >
+        {waitOrderTime(towingOrder.status, towingOrder.waitForApproveTime)[0]}
+      </MDTypography>
+    ),
     status: (
       <MDBadge
         badgeContent={towingOrder.status}
@@ -442,23 +467,23 @@ export default function data(
       />
     ),
     editPower: (
-      <Link to={`/${urlType}/${towingOrder._id}`} key={towingOrder._id}>
-        <Tooltip title="עדכן טופס" arrow>
-          <MDButton
-            variant="gradient"
-            color="mekatnar"
-            circular="true"
-            iconOnly="true"
-            size="medium"
-            onClick={() => {
-              setToEditFile(true);
-            }}
-          >
-            {editFile(towingOrder._id)}
-            <Icon>edit</Icon>
-          </MDButton>
-        </Tooltip>
-      </Link>
+      // <Link to={`/${urlType}/${towingOrder._id}`} key={towingOrder._id}>
+      <Tooltip title="עדכן טופס" arrow>
+        <MDButton
+          variant="gradient"
+          color="mekatnar"
+          circular="true"
+          iconOnly="true"
+          size="medium"
+          onClick={() => {
+            activateEditFile(towingOrder._id);
+          }}
+        >
+          {/* {editFile(towingOrder._id)} */}
+          <Icon>edit</Icon>
+        </MDButton>
+      </Tooltip>
+      // </Link>
     ),
   }));
 
@@ -476,6 +501,7 @@ export default function data(
       { Header: "תאריך ביצוע מבוקש", accessor: "demandDate", align: "center" },
       { Header: "מרחב", accessor: "area", align: "center" },
       { Header: "זמן מפתיחת הזמנה", accessor: "openOrder", align: "center" },
+      { Header: "זמן המתנה לאישור", accessor: "waitOrder", align: "center" },
       { Header: "סטטוס", accessor: "status", align: "center" },
       { Header: "עדכון", accessor: "editPower", align: "center" },
     ],

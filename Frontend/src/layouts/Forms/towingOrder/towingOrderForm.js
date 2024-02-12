@@ -19,6 +19,8 @@
 /* eslint-disable import/newline-after-import */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
+/* eslint-disable no-unneeded-ternary */
+
 /* eslint-disable react/prop-types */ // TODO: upgrade to latest eslint tooling
 
 // TODO check mult-files
@@ -67,6 +69,12 @@ import {
   TextField,
   Snackbar,
   Alert,
+  Slide,
+  Switch,
+  FormControl,
+  FormControlLabel,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material";
 
 // user and auth import
@@ -79,7 +87,11 @@ const { user } = isAuthenticated();
 
 const digitsOnly = (str) => /^\d+$/.test(str);
 
-const TowingOrderForm = () => {
+function SlideTransition(props) {
+  return <Slide {...props} direction="left" />;
+}
+
+const TowingOrderForm = (props) => {
   const [archiveData, setArchiveData] = useState([]);
   const [checkData, setCheckData] = useState("update");
   const [carData, setCarData] = useState([]);
@@ -97,11 +109,19 @@ const TowingOrderForm = () => {
   const [chosenHativa, setChosenHativa] = useState("בחר");
   const [chosenGdod, setChosenGdod] = useState("בחר");
   const date = new Date().toISOString().split("T")[0];
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  // const [isYaram, setIsYaram] = useState(false);
+
   // const [errorMessage, setErrorMessage] = useState("");
   // const [toastOpen, setToastOpen] = useState(false);
 
   // const { isOpen, showToast, text, textType, setIsOpen } = useToast();
   // const [htivas, setHtivas]
+
+  const { edit, orderId } = props;
+  // console.log(props);
+  // console.log(orderId);
 
   const [data, setData] = useState({
     reference: new Date()
@@ -113,6 +133,7 @@ const TowingOrderForm = () => {
       .split(".")[0],
     orderDate: new Date().toISOString().split("T")[0],
     orderTime: new Date().toLocaleString("en-IL").split(", ")[1].split(".")[0].slice(0, 5),
+    personalnumber: user.personalnumber,
     serviceName: `${user.firstName} ${user.lastName}`,
     ahmashNotes: "",
     clientJourney: [],
@@ -137,31 +158,65 @@ const TowingOrderForm = () => {
     area: "",
     status: "ממתין לאישור",
     commanderNotes: "",
+    isYaram: false,
   });
   const carDataInfoArray = [];
   const setChosenCarNumber = (carNumber) => {
     carDataInfoArray.push(carData.filter((el) => el.carnumber === carNumber));
     // console.log(carDataInfoArray);
     // console.log(`Car number searched:  ${carNumber}`);
-    if (carDataInfoArray[0][0]) {
-      if(gdods.find(gdod => gdod.id === carDataInfoArray[0][0].gdodId)){
-        setChosenPikod(carDataInfoArray[0][0].pikodId);
-        setChosenOgda(carDataInfoArray[0][0].ogdaId);
-        setChosenHativa(carDataInfoArray[0][0].hativaId);
-        setChosenGdod(carDataInfoArray[0][0].gdodId);
-      }
-      setData((prev) => ({ ...prev, a: carDataInfoArray[0][0].carTypeId }));
-      const carType = carTypesData.filter(
-        (element) => element._id === carDataInfoArray[0][0].carTypeId
-      );
-      if (carType[0]) {
-        setData((prev) => ({ ...prev, weight: carType[0].weight }));
+    if (!data.isYaram) {
+      if (carDataInfoArray[0][0]) {
+        if (typeof carDataInfoArray[0][0].status === "undefined") {
+          setChosenPikod(carDataInfoArray[0][0].pikodId);
+          setChosenOgda(carDataInfoArray[0][0].ogdaId);
+          setChosenHativa(carDataInfoArray[0][0].hativaId);
+          setChosenGdod(carDataInfoArray[0][0].gdodId);
+          setData((prev) => ({ ...prev, a: carDataInfoArray[0][0].carTypeId }));
+          const carType = carTypesData.filter(
+            (element) => element._id === carDataInfoArray[0][0].carTypeId
+          );
+          // if (carType[0]) {
+          setData((prev) => ({ ...prev, weight: carDataInfoArray[0][0].weight }));
+          // }
+        } else {
+          openError("הרכב הזה הוא רכב אזרחי");
+        }
+      } else {
+        openError("צ' לא קיים");
+        setData((prev) => ({ ...data, carnumber: "" }));
       }
     } else {
-      toast.error("צ' לא קיים");
-      setData((prev) => ({ ...data, carnumber: "" }));
+      if (carDataInfoArray[0][0]) {
+        const carInfo = carDataInfoArray[0][0];
+        if (typeof carInfo.status !== "undefined") {
+          // check if status is defined
+          if (carInfo.status === true) {
+            setData((prev) => ({ ...prev, a: carDataInfoArray[0][0].carTypeId }));
+            const carType = carTypesData.filter(
+              (element) => element._id === carDataInfoArray[0][0].carTypeId
+            );
+            // if (carType[0]) {
+            setData((prev) => ({ ...prev, weight: carDataInfoArray[0][0].weight }));
+            // }
+          } else {
+            openError("רכב זה אינו מגויס ולכן לא ניתן לתת לו שירות");
+          }
+        } else {
+          openError(`מספר רישוי לא קיים`);
+        }
+      } else {
+        openError(`מספר רישוי לא קיים`);
+      }
     }
   };
+  useEffect(async () => {
+    if (edit) {
+      if (carData.length > 0) {
+        setChosenCarNumber(data.carnumber);
+      }
+    }
+  }, [carData, edit]);
 
   // console.log(data);
 
@@ -174,7 +229,7 @@ const TowingOrderForm = () => {
 
     if (evt.target.name === "orderDate" || evt.target.name === "transferOrderDate") {
       if (value < new Date()) {
-        toast.error("אין לבחור תאריך עבר");
+        openError("אין לבחור תאריך עבר");
       }
     }
 
@@ -186,6 +241,7 @@ const TowingOrderForm = () => {
       .get(`http://localhost:5000/TowingLogApi/get_banks`)
       .then((response) => {
         // console.log("מדפיס מערך פיקודים");
+        console.log(response);
         setBankData(response.data.data);
         setPikods(
           Object.entries(response.data.data.Unit_bank.pikods).map(([key, value]) => ({
@@ -290,6 +346,42 @@ const TowingOrderForm = () => {
       .catch((error) => {});
   }, []);
 
+  useEffect(async () => {
+    if (edit) {
+      await axios
+        .get(`http://localhost:5000/TowingLogApi/TowingOrder/${orderId}`)
+        .then((response) => {
+          delete response.data.updatedAt;
+          delete response.data.__v;
+          delete response.data._id;
+          delete response.data.createdAt;
+
+          const fixedDate = response.data.orderDate.split("T")[0];
+          response.data.orderDate = fixedDate;
+          const fixedDemandDate = response.data.demandDate.split("T")[0];
+          response.data.demandDate = fixedDemandDate;
+          const fixedTransferOrderDate = response.data.transferOrderDate.split("T")[0];
+          response.data.transferOrderDate = fixedTransferOrderDate;
+          const fixedIsYaram = response.data.isYaram === true ? true : false;
+          response.data.isYaram = fixedIsYaram;
+
+          const fixedClientJourney = response.data.clientJourney.map((post) => {
+            const dateEl = new Date(post.date);
+            return {
+              ...post,
+              date: dateEl,
+            };
+          });
+          response.data.clientJourney = fixedClientJourney;
+
+          // console.log(response.data);
+          // setInitialStatus(response.data.status);
+          setData(response.data);
+        })
+        .catch((error) => {});
+    }
+  }, [orderId, edit]);
+
   const handleClientJourneyChange = (evt, key) => {
     const index = key;
     const { value } = evt.target;
@@ -331,27 +423,44 @@ const TowingOrderForm = () => {
 
     return isValidFormat;
   }
-
+  const isPersonalNumberValid = (personalnum) => {
+    if (personalnum.length === 7 && digitsOnly(personalnum)) {
+      return true;
+    }
+    if (personalnum.length === 8) {
+      if (personalnum.startsWith("s") && digitsOnly(personalnum.slice(1))) {
+        return true;
+      }
+    }
+    return false;
+  };
   const CheckFormData = () => {
     let flag = true;
     const ErrorReason = [];
+    let errorReasonText = "";
     const AddError = (error) => {
       flag = false;
       ErrorReason.push(error);
+      errorReasonText += errorReasonText === "" ? `${error}` : `, ${error}`;
     };
     if (!data.orderDate) {
       AddError("תאריך ריק");
     }
-    if (!data.orderTime || data.orderDate === "") {
+    if (!data.orderTime || data.orderTime === "") {
       AddError("שעה ריקה");
+    }
+    if (!isPersonalNumberValid(data.personalnumber)) {
+      AddError(
+        !data.personalnumber || data.personalnumber === "" ? "מספר אישי ריק" : "מספר אישי לא תקין"
+      );
     }
     if (data.serviceName === "") {
       AddError("שם נציג שירות ריק");
     }
     if (data.carnumber === "") {
-      AddError("צ' ריק");
+      AddError(`${data.isYaram ? "מספר רישוי" : "צ"} ריק`);
     } else if (!(digitsOnly(data.carnumber) && data.carnumber.length <= 9)) {
-      AddError("צ' לא תקין");
+      AddError(`${data.isYaram ? "מספר רישוי" : "צ"} לא תקין`);
     }
 
     if (!isValidIsraeliPhoneNumber(data.phoneNumber)) {
@@ -390,10 +499,11 @@ const TowingOrderForm = () => {
     }
 
     if (flag !== true) {
-      ErrorReason.forEach((reason) => {
-        toast.error(reason);
-        // showToast(reason, "error");
-      });
+      // ErrorReason.forEach((reason) => {
+      //   toast.error(reason);
+      //   // showToast(reason, "error");
+      // });
+      openError(errorReasonText);
       return false;
     }
     // console.log("Valid");
@@ -413,6 +523,7 @@ const TowingOrderForm = () => {
       reference: data.reference,
       orderDate: data.orderDate,
       orderTime: data.orderTime,
+      personalnumber: data.personalnumber,
       serviceName: data.serviceName,
       ahmashNotes: data.ahmashNotes,
       clientJourney: data.clientJourney.map((post) => ({ ...post, published: true })),
@@ -433,11 +544,12 @@ const TowingOrderForm = () => {
       area: data.area,
       status: data.status,
       commanderNotes: data.commanderNotes,
+      isYaram: data.isYaram,
     };
     // console.log(requestData);
-
+    const method = edit ? `update/${orderId}` : "add";
     axios
-      .post(`http://localhost:5000/TowingLogApi/TowingOrder/add`, requestData)
+      .post(`http://localhost:5000/TowingLogApi/TowingOrder/${method}`, requestData)
       .then((response) => {
         // toast.success(`הטופס נשלח בהצלחה`);
         // console.log(response.data);
@@ -461,6 +573,10 @@ const TowingOrderForm = () => {
       });
   };
 
+  const openError = (error) => {
+    setSnackbarOpen(true);
+    setErrorMessage(error);
+  };
   const handleCloseSuccsecModal = () => {
     setData({ ...data, loading: false, error: false, successmsg: false, NavigateToReferrer: true });
   };
@@ -514,7 +630,7 @@ const TowingOrderForm = () => {
         textAlign="center"
       >
         <MDTypography variant="h2" fontWeight="medium" color="white" mt={1}>
-          הזמנה {data.reference} נוצרה בהצלחה
+          {edit ? `הזמנה ${data.reference} עודכנה בהצלחה` : `הזמנה ${data.reference} נוצרה בהצלחה`}
         </MDTypography>
 
         <DialogContent>
@@ -673,16 +789,16 @@ const TowingOrderForm = () => {
         setChosenCarNumber(carNumber);
       }
     } else {
-      toast.error(
-        `שים לב ישנה הזמנה ${
-          existing[0].status === "פתוח" ? "פתוחה" : "מוקפאת"
-        } עם הצ' זה - אסמכתא : ${existing[0].reference}`
-      );
+      const message = `שים לב ישנה הזמנה ${
+        existing[0].status === "פתוח" ? "פתוחה" : "מוקפאת"
+      } עם הצ' זה - אסמכתא : ${existing[0].reference}`;
+      openError(message);
     }
   };
   const filteredOgdas = ogdas.filter((ogda) => ogda.pikodId === chosenPikod);
   const filteredHativas = hativas.filter((hativa) => hativa.ogdaId === chosenOgda);
   const filteredGdods = gdods.filter((gdod) => gdod.hativaId === chosenHativa);
+  const date2000 = new Date("2000-1-1");
 
   const towingOrderForm = () => (
     <Container className="" dir="rtl">
@@ -704,6 +820,11 @@ const TowingOrderForm = () => {
                 <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
                   טופס הזמנת שירות
                 </MDTypography>
+                {edit && (
+                  <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
+                    {data.reference}
+                  </MDTypography>
+                )}
               </MDBox>
               <Form
                 style={{ textAlign: "right", paddingBottom: "5%" }}
@@ -714,13 +835,14 @@ const TowingOrderForm = () => {
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>תאריך</h6>
+
                       <Input
                         placeholder="תאריך"
                         type="date"
                         name="orderDate"
                         value={data.orderDate}
                         onChange={handleChange}
-                        min={date}
+                        min={!edit && date}
                       />
                     </FormGroup>
                   </Col>
@@ -751,6 +873,21 @@ const TowingOrderForm = () => {
                       />
                     </FormGroup>
                   </Col>
+                  <Col>
+                    <FormGroup>
+                      <h6 style={{}}>מספר אישי</h6>
+                      <Input
+                        placeholder="מספר אישי"
+                        type="text"
+                        name="personalnumber"
+                        value={data.personalnumber}
+                        onChange={handleChange}
+                        maxLength={8}
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
+                <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>הערות אחמ"ש</h6>
@@ -815,10 +952,38 @@ const TowingOrderForm = () => {
                     </FormGroup>
                   </Col>
                 </Row>
+                <Row>
+                  <Col>
+                    <h6 style={{}}>סוג רכב</h6>
+                    <div style={{ display: "flex" }}>
+                      <FormControl>
+                        {/* <FormControlLabel
+                          control={ */}
+                            <ToggleButtonGroup
+                            sx={{marginBottom: 1}}
+                              exclusive
+                              value={data.isYaram}
+                              onChange={(event) => {
+                                if (event.target.value === "false")
+                                  setData((prev) => ({ ...prev, isYaram: false }));
+                                if (event.target.value === "true")
+                                  setData((prev) => ({ ...prev, isYaram: true }));
+                              }}
+                            >
+                              <ToggleButton value={false}>צ'</ToggleButton>
+                              <ToggleButton value={true}>יר"מ</ToggleButton>
+                            </ToggleButtonGroup>
+                          {/* }
+                          label={data.isYaram ? `יר"מ` : `צ'`}
+                        /> */}
+                      </FormControl>
+                    </div>
+                  </Col>
+                </Row>
                 <Row style={{ paddingLeft: "1%", paddingRight: "1%", paddingBottom: "0%" }}>
                   <Col>
                     <FormGroup>
-                      <h6 style={{}}>צ'</h6>
+                      <h6 style={{}}>{data.isYaram ? `לוחית רישוי` : `צ'`}</h6>
                       <div style={{ display: "flex" }}>
                         <Input
                           onKeyDown={(event) => {
@@ -827,7 +992,7 @@ const TowingOrderForm = () => {
                             }
                           }}
                           style={{ marginLeft: "5px" }}
-                          placeholder="צ'"
+                          placeholder={data.isYaram ? `לוחית רישוי` : `צ'`}
                           type="text"
                           name="carnumber"
                           value={data.carnumber}
@@ -1232,7 +1397,8 @@ const TowingOrderForm = () => {
                       </Input>
                     </FormGroup>
                   </Col>
-
+                </Row>
+                <Row>
                   <Col>
                     <FormGroup>
                       <h6 style={{}}>הערות מפקד</h6>
@@ -1248,18 +1414,34 @@ const TowingOrderForm = () => {
                   </Col>
                 </Row>
 
-                <div className="text-center">
-                  <MDButton
-                    color="mekatnar"
-                    size="large"
-                    // onClick={onSubmit}
-                    className="btn-new-blue"
-                    type="submit"
-                    startIcon={<Icon fontSize="small">upload</Icon>}
-                  >
-                    שלח טופס שירות
-                  </MDButton>
-                </div>
+                <Row>
+                  <Col>
+                    <div className="text-center">
+                      <MDButton
+                        color="mekatnar"
+                        size="large"
+                        // onClick={onSubmit}
+                        className="btn-new-blue"
+                        type="submit"
+                        startIcon={<Icon fontSize="small">upload</Icon>}
+                      >
+                        {`${edit ? "עדכן" : "שלח"} טופס שירות`}
+                      </MDButton>
+                      {edit && (
+                        <MDButton
+                          color="error"
+                          size="large"
+                          onClick={handleCloseSuccsecModal}
+                          className="btn-new-blue"
+                          style={{ marginRight: "3%" }}
+                          startIcon={<Icon fontSize="small">clear</Icon>}
+                        >
+                          צא ללא שינויים
+                        </MDButton>
+                      )}
+                    </div>
+                  </Col>
+                </Row>
               </Form>
             </CardBody>
           </Card>
@@ -1267,11 +1449,19 @@ const TowingOrderForm = () => {
       </Row>
     </Container>
   );
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
 
+    setSnackbarOpen(false);
+    setErrorMessage("");
+  };
+  // const slide = <Slide direction="left"/>;
   return (
     <MDBox>
       {/* //! fot the pop up warning windoes */}
-      <ToastContainer
+      {/* <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
@@ -1282,7 +1472,18 @@ const TowingOrderForm = () => {
         draggable
         pauseOnHover
         theme="colored"
-      />
+      /> */}
+      <Snackbar
+        open={snackbarOpen}
+        TransitionComponent={SlideTransition}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert onClose={handleClose} severity="error" variant="standard" sx={{ width: "100%" }}>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       {showError()}
       {showSuccess()}
       {showLoading()}

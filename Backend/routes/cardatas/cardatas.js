@@ -6,9 +6,11 @@ const {
   read,
   update,
   remove,
+  updateCivilCars
 } = require("../../controllers/cardatas/cardatas.js");
 
 // find spec
+router.post('/updateCivilCars', updateCivilCars);
 router.put("/remove/:id", remove);
 router.get("/:id", read);
 router.post("/add", create);

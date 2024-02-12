@@ -10,10 +10,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-template */
+/* eslint-disable react/jsx-curly-brace-presence */
+
 /* eslint-disable react/jsx-no-bind */
-
-
-
 
 /**
 =========================================================
@@ -52,11 +52,12 @@ import TowingOrderForm from "layouts/Forms/towingOrder/towingOrderForm";
 import { Dialog, DialogContent, Box, TextField } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import towingOrdersData from "layouts/tables/data/towingOrdersData";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import axios from "axios";
 import { Navigate, Outlet } from "react-router-dom";
 import { Col, FormGroup, FormText, Input, Label, Row } from "reactstrap";
+import { authenticate, isAuthenticated, signin } from "auth/index";
 
 const towingOrdersTable = (props) => {
   // const { pathname } = useLocation();
@@ -67,9 +68,12 @@ const towingOrdersTable = (props) => {
 
   const [filterOpen, setFilterOpen] = useState(false);
   const [status, setStatus] = useState("בחר");
+  const [statuses, setStatuses] = useState([]);
   const [area, setArea] = useState("בחר");
   const [dbError, setDbError] = useState(false);
   const [toAddFile, setToAddFile] = useState(false);
+  const [toEditFile, setToEditFile] = useState(false);
+  const [editFormId, setEditFormId] = useState("");
   // const usedTheme = useTheme();
 
   const [bankData, setBankData] = useState({});
@@ -80,6 +84,11 @@ const towingOrdersTable = (props) => {
   const [hativas, setHativas] = useState([]);
   const [gdods, setGdods] = useState([]);
 
+  const [popUpMessage, setPopUpMessage] = useState("");
+  const [popUpTitle, setPopUpTitle] = useState("");
+  const [popUpColor, setPopUpColor] = useState("");
+  const [isPopUp, setIsPopUp] = useState(false);
+
   const [chosenPikod, setChosenPikod] = useState("בחר");
   const [chosenOgda, setChosenOgda] = useState("בחר");
   const [chosenHativa, setChosenHativa] = useState("בחר");
@@ -89,8 +98,13 @@ const towingOrdersTable = (props) => {
   const [isCarFiltered, setIsCarFiltered] = useState(false);
 
   const [carData, setCarData] = useState([]);
+  const [carTypesData, setCarTypesData] = useState([]);
 
   const [carsList, setCarsList] = useState([]);
+
+  const { user } = isAuthenticated();
+
+  const uploadCarXlsxRef = useRef(null);
 
   const [data, setData] = useState({
     fromDate: "",
@@ -105,6 +119,7 @@ const towingOrdersTable = (props) => {
     demandDate: new Date().toISOString().split("T")[0],
     area: "",
     status: "",
+    statuses: [],
     commanderNotes: "",
   });
 
@@ -112,6 +127,28 @@ const towingOrdersTable = (props) => {
   const filteredHativas = hativas.filter((hativa) => hativa.ogdaId === chosenOgda);
   const filteredGdods = gdods.filter((gdod) => gdod.hativaId === chosenHativa);
 
+  // useEffect(() => {
+  //   axios
+  //     .get(`http://localhost:5000/TowingLogApi/CarDatas`)
+  //     .then((response) => {
+  //       response.data.forEach((carDataInfo) => {
+  //         const gdod = bankData.Unit_bank.gdods[carDataInfo.gdodId];
+  //         carDataInfo.gdodName = gdod.name;
+  //         carDataInfo.hativaId = gdod.hativaId;
+  //         const hativa = bankData.Unit_bank.hativas[carDataInfo.hativaId];
+  //         carDataInfo.hativaName = hativa.name;
+  //         carDataInfo.ogdaId = hativa.ogdaId;
+  //         const ogda = bankData.Unit_bank.ogdas[carDataInfo.ogdaId];
+  //         carDataInfo.ogdaName = ogda.name;
+  //         carDataInfo.pikodId = ogda.pikodId;
+  //         const pikod = bankData.Unit_bank.pikods[carDataInfo.pikodId];
+  //         carDataInfo.pikodName = pikod.name;
+  //         // console.log(carDataInfo);
+  //       });
+  //       setCarData(response.data);
+  //     })
+  //     .catch((error) => {});
+  // }, [bankData]);
   useEffect(() => {
     axios
       .get(`http://localhost:5000/TowingLogApi/CarDatas`)
@@ -165,6 +202,13 @@ const towingOrdersTable = (props) => {
         });
         const sorted = sortArrayByHebrewAlphabet(fixedData);
         setGaragesData(sorted);
+      })
+      .catch((error) => {});
+
+    axios
+      .get(`http://localhost:5000/TowingLogApi/CarTypes`)
+      .then((response) => {
+        setCarTypesData(response.data);
       })
       .catch((error) => {});
   }, []);
@@ -284,6 +328,12 @@ const towingOrdersTable = (props) => {
       .catch((error) => {});
   }, []);
 
+  const activateEditFile = (orderId) => {
+    setEditFormId(orderId);
+    setToEditFile(true);
+    console.log(`sent to edit ${orderId}`);
+  };
+  // console.log(toEditFile);
   const {
     columns: pColumns,
     rows: pRows,
@@ -294,7 +344,7 @@ const towingOrdersTable = (props) => {
     typeTable,
     urlType,
     currentDate,
-    status,
+    statuses,
     area,
     data.fromDate,
     data.toDate,
@@ -304,7 +354,8 @@ const towingOrdersTable = (props) => {
     carsList,
     isCarFiltered,
     garage,
-    executiveBody
+    executiveBody,
+    activateEditFile
   );
 
   const handleErrorClose = () => {
@@ -375,29 +426,112 @@ const towingOrdersTable = (props) => {
     >
       <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
         <DialogContent>
-          <TowingOrderForm />
+          <TowingOrderForm edit={false} orderId="" />
         </DialogContent>
       </MDBox>
     </Dialog>
   );
 
+  const editFile = () => (
+    <Dialog
+      px={5}
+      open={toEditFile}
+      onClose={() => setToEditFile(false)}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      maxWidth="xl"
+    >
+      <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
+        <DialogContent>
+          <TowingOrderForm edit={true} orderId={editFormId} />
+        </DialogContent>
+      </MDBox>
+    </Dialog>
+  );
+
+  const textClientJourney = (clientJourney) => {
+    let text = "";
+    clientJourney.forEach((post) => {
+      post.date = new Date(post.date);
+      console.log(post);
+      text += `${post.publisher} ${post.date.toLocaleTimeString(
+        "he-IL"
+      )} ${post.date.toLocaleDateString("he-IL")}: \n`;
+      text += post.text;
+      text += "\n";
+    });
+    return text;
+  };
+
+  const textErrorArray = (errorInfo, errorInfoOther) => {
+    let text = "";
+    let isOther = false;
+    errorInfo.forEach((errorElement) => {
+      if (errorElement === "אחר") {
+        isOther = true;
+      } else {
+        text += `${errorElement}, `;
+      }
+    });
+    if (isOther) {
+      text += `אחר: ${errorInfoOther}`;
+    }
+    return text;
+  };
+
+  const getTimeDiffrencese = (time1, time2) => {
+    const timeObject1 = new Date(time1);
+    const timeObject2 = new Date(time2);
+    const milliseconds = timeObject2.valueOf() - timeObject1.valueOf();
+    let seconds = Math.floor(milliseconds / 1000);
+    let minutes = Math.floor(milliseconds / (60 * 1000));
+    let hours = Math.floor(milliseconds / (60 * 60 * 1000));
+    let days = Math.floor(milliseconds / (24 * 60 * 60 * 1000));
+    seconds %= 60;
+    minutes %= 60;
+    hours %= 24;
+    // seconds = seconds.toLocaleString('en-US', {
+    //   minimumIntegerDigits: 2,
+    //   useGrouping: false
+    // })
+    // minutes = minutes.toLocaleString('en-US', {
+    //   minimumIntegerDigits: 2,
+    //   useGrouping: false
+    // })
+    // hours = hours.toLocaleString('en-US', {
+    //   minimumIntegerDigits: 2,
+    //   useGrouping: false
+    // })
+    // days = days.toLocaleString('en-US', {
+    //   minimumIntegerDigits: 2,
+    //   useGrouping: false
+    // })
+    let text = "";
+    if (days !== 0) {
+      text += `${days} days `;
+    }
+    text += `${hours}:${minutes} hours`;
+
+    return text;
+  };
+
   function FixDataAndExportToExcel() {
     let tempdata_to_excel = [];
     let tempdata_to_excelrow = [];
-    for (let i = 0; i < requestDB.length; i+= 1) {
+    for (let i = 0; i < requestDB.length; i += 1) {
       tempdata_to_excel.push({ ...requestDB[i] });
     }
 
-    for (let i = 0; i < pRows.length; i+= 1) {
+    for (let i = 0; i < pRows.length; i += 1) {
       tempdata_to_excelrow.push({ ...pRows[i] });
     }
-    for (let i = 0; i < tempdata_to_excelrow.length; i+= 1) {
+    for (let i = 0; i < tempdata_to_excelrow.length; i += 1) {
       tempdata_to_excelrow[i].garage
         ? (tempdata_to_excel[i].garage_m = tempdata_to_excelrow[i].garage)
         : (tempdata_to_excel[i].garage_m = " ");
     }
 
-    for (let i = 0; i < tempdata_to_excel.length; i+= 1) {
+    for (let i = 0; i < tempdata_to_excel.length; i += 1) {
       tempdata_to_excel[i].reference
         ? (tempdata_to_excel[i].reference_m = tempdata_to_excel[i].reference)
         : (tempdata_to_excel[i].reference_m = " ");
@@ -418,12 +552,18 @@ const towingOrdersTable = (props) => {
         ? (tempdata_to_excel[i].ahmashNotes_m = tempdata_to_excel[i].ahmashNotes)
         : (tempdata_to_excel[i].ahmashNotes_m = " ");
 
-      tempdata_to_excel[i].clientJourney
-        ? (tempdata_to_excel[i].clientJourney_m = tempdata_to_excel[i].clientJourney)
+      // console.log(textClientJourney(tempdata_to_excel[i].clientJourney));
+      tempdata_to_excel[i].clientJourney && tempdata_to_excel[i].clientJourney.length > 0
+        ? (tempdata_to_excel[i].clientJourney_m = textClientJourney(
+            tempdata_to_excel[i].clientJourney
+          ))
         : (tempdata_to_excel[i].clientJourney_m = " ");
 
       tempdata_to_excel[i].erorrInfo
-        ? (tempdata_to_excel[i].erorrInfo_m = tempdata_to_excel[i].erorrInfo)
+        ? (tempdata_to_excel[i].erorrInfo_m = textErrorArray(
+            tempdata_to_excel[i].erorrInfo,
+            tempdata_to_excel[i].errInfoOther
+          ))
         : (tempdata_to_excel[i].erorrInfo_m = " ");
 
       tempdata_to_excel[i].carnumber
@@ -499,15 +639,38 @@ const towingOrdersTable = (props) => {
           ).toLocaleString("en-IL"))
         : (tempdata_to_excel[i].closeOrderTime_m = " ");
 
-      tempdata_to_excel[i].waitForApproveTime
-        ? (tempdata_to_excel[i].waitForApproveTime_m = new Date(
-            tempdata_to_excel[i].waitForApproveTime
-          ).toLocaleString("en-IL"))
-        : (tempdata_to_excel[i].waitForApproveTime_m = " ");
+      // tempdata_to_excel[i].waitForApproveTime
+      //   ? (tempdata_to_excel[i].waitForApproveTime_m = new Date(
+      //       tempdata_to_excel[i].waitForApproveTime
+      //     ).toLocaleString("en-IL"))
+      //   : (tempdata_to_excel[i].waitForApproveTime_m = " ");
+
+      tempdata_to_excel[i].openToCloseTime_m = tempdata_to_excel[i].openOrderTime
+        ? tempdata_to_excel[i].status === "פתוח" || !tempdata_to_excel[i].closeOrderTime
+          ? getTimeDiffrencese(tempdata_to_excel[i].openOrderTime, new Date())
+          : getTimeDiffrencese(
+              tempdata_to_excel[i].openOrderTime,
+              tempdata_to_excel[i].closeOrderTime
+            )
+        : "";
+
+      tempdata_to_excel[i].orderWaitTime_m = tempdata_to_excel[i].waitForApproveTime
+        ? tempdata_to_excel[i].status === "ממתין לאישור" || !tempdata_to_excel[i].openOrderTime
+          ? getTimeDiffrencese(tempdata_to_excel[i].waitForApproveTime, new Date())
+          : getTimeDiffrencese(
+              tempdata_to_excel[i].waitForApproveTime,
+              tempdata_to_excel[i].openOrderTime
+            )
+        : "";
+
+      tempdata_to_excel[i].isYaram_m = tempdata_to_excel[i].isYaram ? "אזרחי" : "צבאי";
+      tempdata_to_excel[i].personalnumber
+        ? (tempdata_to_excel[i].personalnumber_m = tempdata_to_excel[i].personalnumber)
+        : (tempdata_to_excel[i].personalnumber_m = " ");
     }
 
     // export to excel -fix
-    for (let i = 0; i < tempdata_to_excel.length; i+= 1) {
+    for (let i = 0; i < tempdata_to_excel.length; i += 1) {
       // delete unwanted fields
       delete tempdata_to_excel[i]._id;
       delete tempdata_to_excel[i].__v;
@@ -538,6 +701,9 @@ const towingOrdersTable = (props) => {
       delete tempdata_to_excel[i].errInfoOther;
       delete tempdata_to_excel[i].openOrderTime;
       delete tempdata_to_excel[i].closeOrderTime;
+      delete tempdata_to_excel[i].waitForApproveTime;
+      delete tempdata_to_excel[i].isYaram;
+      delete tempdata_to_excel[i].personalnumber;
       delete tempdata_to_excel[i].waitForApproveTime;
 
       // delete tempdata_to_excel[i].otherPhoneNumber;
@@ -580,7 +746,10 @@ const towingOrdersTable = (props) => {
       commanderNotes_m: "הערות מפקד",
       openOrderTime_m: "זמן פתיחת הזמנה",
       closeOrderTime_m: "זמן סגירת הזמנה",
-      waitForApproveTime_m: "זמן המתנת הזמנה",
+      openToCloseTime_m: "זמן מפתיחת עד סגירת הזמנה",
+      orderWaitTime_m: "זמן המתנה לאישור",
+      isYaram_m: "סוג רכב",
+      personalnumber_m: "מספר אישי",
 
       // transferOrderDate_m: "חטיבה",
       // transferOrderTime_m: "גדוד",
@@ -629,6 +798,119 @@ const towingOrdersTable = (props) => {
     </Dialog>
   );
 
+  const activatePopUp = (title, message, color) => {
+    setPopUpColor(color);
+    setPopUpMessage(message);
+    setPopUpTitle(title);
+    setIsPopUp(true);
+  };
+
+  const showPopUpMessage = () => (
+    <Dialog
+      open={isPopUp}
+      onClose={() => {
+        setIsPopUp(false);
+        setPopUpMessage("");
+        setPopUpTitle("");
+        setPopUpColor("");
+      }}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <MDBox
+        variant="gradient"
+        bgColor={popUpColor}
+        coloredShadow={popUpColor}
+        borderRadius="l"
+        // mx={2}
+        // mt={2}
+        p={3}
+        // mb={2}
+        textAlign="center"
+      >
+        <MDTypography variant="h1" fontWeight="medium" color="white" mt={1}>
+          {popUpTitle}
+        </MDTypography>
+
+        <DialogContent>
+          <MDTypography variant="h6" fontWeight="medium" color="white" mt={1}>
+            {popUpMessage}
+          </MDTypography>
+        </DialogContent>
+      </MDBox>
+    </Dialog>
+  );
+
+  const statusesArr = ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"];
+  const statusesColors = ["success", "info", "warning", "secondary", "error"];
+  const toggleStatus = (toggledStatus) => {
+    const arr = [...statuses];
+    if (statuses.includes(toggledStatus)) {
+      setStatuses(arr.filter((statusEl) => statusEl !== toggledStatus));
+    } else {
+      arr.push(toggledStatus);
+      setStatuses(arr);
+    }
+  };
+
+  const updateCivilCars = (carsData) => {
+    // תכתוב פעולה שתעשה את העברה של כל הרשומת בשרת, ככה תוכל לשלוח הודעה עם סטטום אם הפעולה הצליחה
+    // carsData.forEach(carInfo => {
+    //   const carNumber = carInfo['מספר רישוי'];
+    //   const carTypeName = carInfo['דגם'];
+    //   const releaseDate = carInfo['תאריך שחרור'];
+    //   const weight = carInfo['משקל כולל'];
+    //   const existingCar = carData.find(car => car.carnumber === carNumber);
+
+    // })
+    const civilCars = carsData.map((carInfo) => {
+      // console.log(carInfo);
+      console.log(carInfo["משקל כולל (קג)"]);
+      const carTypeName = carInfo["דגם"];
+      const carTypeObject = carTypesData.find((carType) => carType.carType === carTypeName);
+      const carTypeId = carTypeObject ? carTypeObject._id : "";
+      return {
+        carnumber: carInfo["מספר רישוי"],
+        weight: carInfo["משקל כולל (קג)"],
+        carTypeId,
+        status: !(carInfo["תאריך שחרור"] && carInfo["תאריך שחרור"].trim() !== ""),
+      };
+    });
+    // console.log(civilCars);
+    axios
+      .post("http://localhost:5000/TowingLogApi/CarDatas/updateCivilCars", { cars: civilCars })
+      .then((response) => {
+        if (response.status === 200) {
+          console.log("updated");
+          activatePopUp("העדכון בוצע בהצלחה", `רכבי היר"מ עודכנו במערכת`, "mekatnar");
+        } else {
+          console.log("failed");
+          activatePopUp("תקלת שרת", "עדכון הרכבים נכשל", "error");
+        }
+      });
+  };
+  const uploadCivilCarsXlsx = (event) => {
+    console.log("reading...");
+    const reader = new FileReader();
+    reader.readAsBinaryString(event.target.files[0]);
+    reader.onload = (e) => {
+      const dataXl = e.target.result;
+      const workbook = XLSX.read(dataXl, { type: "binary" });
+      const sheetname = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetname];
+      const parsedData = XLSX.utils.sheet_to_json(sheet, { raw: false });
+      // const newParsed = parsedData.map(car => {
+      //   const date = new Date(car['תאריך שחרור']);
+      //   return {
+      //   ...car,
+      //   'תאריך שחרור' : date
+      // }})
+      // console.log(newParsed);
+      updateCivilCars(parsedData);
+    };
+    event.target.value = ""; // in order to allow the file reader to read the same file the second time in a row
+  };
+
   const table = () => (
     <MDBox pt={6} pb={3}>
       <Grid container spacing={6}>
@@ -648,6 +930,30 @@ const towingOrdersTable = (props) => {
                 {tableTittle}
               </MDTypography>{" "}
               <Grid container justifyContent="flex-end">
+              {urlType === "towingorders" && user.admin === "0" ? (
+                <Grid item xs={2} md={2} xl={1.4}>
+                {/* <Tooltip title="העלאת רכבים אזרחיים" arrow> */}
+                      <MDButton
+                        variant="gradient"
+                        onClick={() => {
+                          uploadCarXlsxRef.current.click();
+                        }}
+                        circular="true"
+                        // iconOnly="true"
+                        size="small"
+                        startIcon={<Icon>file_upload</Icon>}
+                      >{'טעינת רכבי יר"מ'}
+                      </MDButton>
+                      {/* </Tooltip> */}
+                      <input
+                        ref={uploadCarXlsxRef}
+                        style={{ display: "none" }}
+                        type="file"
+                        accept=".xlsx, .xls"
+                        onChange={uploadCivilCarsXlsx}
+                      />
+                    </Grid>
+                  ) : null}
                 <Grid item xs={2} md={1} xl={0.5}>
                   <Tooltip title="הורדת קובץ אקסל" arrow>
                     <MDButton
@@ -681,19 +987,22 @@ const towingOrdersTable = (props) => {
                 ) : null}
               </Grid>
               <Grid style={{ position: "static", top: "7px" }}>
-                <MDButton
-                  variant="gradient"
-                  onClick={() => setFilterOpen(!filterOpen)}
-                  // onClick={() => {
-                  //   // setIsInfoPressed(true);
-                  //   // setpressedID(hozla._id);
-                  // }}
-                  // circular="true"
-                  size="small"
-                  startIcon={<Icon>filter_alt</Icon>}
-                >
-                  סינון
-                </MDButton>
+                <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
+                  <MDButton
+                    variant="gradient"
+                    onClick={() => setFilterOpen(!filterOpen)}
+                    // onClick={() => {
+                    //   // setIsInfoPressed(true);
+                    //   // setpressedID(hozla._id);
+                    // }}
+                    // circular="true"
+                    size="small"
+                    startIcon={<Icon>filter_alt</Icon>}
+                  >
+                    סינון
+                  </MDButton>
+                  
+                </Box>
               </Grid>
             </MDBox>
 
@@ -708,7 +1017,21 @@ const towingOrdersTable = (props) => {
                     }}
                   >
                     <h6 style={{}}>סטטוס</h6>
-                    <Input
+                    {statusesArr.map((statusEl, index) => (
+                      <MDButton
+                        sx={{
+                          marginRight: 2,
+                        }}
+                        color={statusesColors[index]}
+                        variant={statuses.includes(statusEl) ? "gradient" : "outlined"}
+                        onClick={() => {
+                          toggleStatus(statusEl);
+                        }}
+                      >
+                        {statusEl}
+                      </MDButton>
+                    ))}
+                    {/* <Input
                       placeholder="סטטוס"
                       type="select"
                       name="status"
@@ -721,8 +1044,10 @@ const towingOrdersTable = (props) => {
                       <option value="מבוטל">מבוטל</option>
                       <option value="מוקפא">מוקפא</option>
                       <option value="ממתין לאישור">ממתין לאישור</option>
-                    </Input>
+                    </Input> */}
                   </Col>
+                </Row>
+                <Row>
                   <Col
                     style={{
                       justifyContent: "right",
@@ -979,7 +1304,9 @@ const towingOrdersTable = (props) => {
     <DashboardLayout>
       <DashboardNavbar />
       {showError()}
+      {showPopUpMessage()}
       {addFile()}
+      {editFile()}
       {table()}
       <Outlet />
       <Footer />

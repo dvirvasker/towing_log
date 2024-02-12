@@ -38,7 +38,7 @@ import MDTypography from "components/MDTypography";
 // Authentication layout components
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 
-import { FormControl } from "@mui/material";
+import { FormControl, Snackbar, Alert, Slide } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
@@ -63,6 +63,10 @@ import { Form, Input } from "reactstrap";
 
 // ? Hozla user ==> 0
 // ? ToraHailit user ==> 3
+function SlideTransition(props) {
+  return <Slide {...props} direction="left" />;
+}
+
 function SignUpUser() {
   const navigate = useNavigate();
 
@@ -81,6 +85,13 @@ function SignUpUser() {
     loading: false,
     NavigateToReferrer: false,
   });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const openError = (error) => {
+    setSnackbarOpen(true);
+    setErrorMessage(error);
+  };
 
   function handleChange(evt) {
     const { value } = evt.target;
@@ -228,39 +239,58 @@ function SignUpUser() {
 
   //* ------------------Send data to server--------------------------
   // eslint-disable-next-line consistent-return
+  const digitsOnly = (str) => /^\d+$/.test(str);
+  const isPersonalNumberValid = (personalnum) => {
+    if (personalnum.length === 7 && digitsOnly(personalnum)) {
+      return true;
+    }
+    if (personalnum.length === 8) {
+      if (personalnum.startsWith("s") && digitsOnly(personalnum.slice(1))) {
+        return true;
+      }
+    }
+    return false;
+  };
   const CheckSignUpForm = (event) => {
     event.preventDefault();
     let flag = true;
     const ErrorReason = [];
+    let errorReasonText = "";
+
+    const AddError = (error) => {
+      flag = false;
+      ErrorReason.push(error);
+      errorReasonText += errorReasonText === "" ? `${error}` : `, ${error}`;
+    };
 
     if (signUpData.personalnumber === "") {
       flag = false;
-      ErrorReason.push("אנא הכנס מספר אישי");
+      AddError("אנא הכנס מספר אישי");
       // toast.error(ErrorReason);
     }
     if (signUpData.password === "") {
       flag = false;
-      ErrorReason.push("אנא הכנס סיסמא");
+      AddError("אנא הכנס סיסמא");
       // toast.error(ErrorReason);
     }
-    if (signUpData.personalnumber.length >= 8) {
+    if (!isPersonalNumberValid(signUpData.personalnumber)) {
       flag = false;
-      ErrorReason.push("אנא וודא כי המספר האישי תקין");
+      AddError("אנא וודא כי המספר האישי תקין");
       // toast.error(ErrorReason);
     }
     if (signUpData.firstName === "") {
       flag = false;
-      ErrorReason.push("אנא הכנס שם פרטי");
+      AddError("אנא הכנס שם פרטי");
       // toast.error(ErrorReason);
     }
     if (signUpData.lastName === "") {
       flag = false;
-      ErrorReason.push("אנא הכנס שם משפחה");
+      AddError("אנא הכנס שם משפחה");
       // toast.error(ErrorReason);
     }
     if (signUpData.admin === "") {
       flag = false;
-      ErrorReason.push("אנא בחר הרשאה");
+      AddError("אנא בחר הרשאה");
       // toast.error(ErrorReason);
     }
     // if (signUpData.admin === "") {
@@ -289,10 +319,11 @@ function SignUpUser() {
     //   }
     // }
     if (flag !== true) {
-      ErrorReason.forEach((reason) => {
-        toast.error(reason);
-        // setData({ ...data, loading: false, successmsg: false, error: true });
-      });
+      // ErrorReason.forEach((reason) => {
+      //   toast.error(reason);
+      //   // setData({ ...data, loading: false, successmsg: false, error: true });
+      // });
+      openError(errorReasonText);
       return false;
     } else {
       return true;
@@ -469,11 +500,18 @@ function SignUpUser() {
       </MDBox>
     </Card>
   );
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
 
+    setSnackbarOpen(false);
+    setErrorMessage("");
+  };
   return (
     <CoverLayout image={bgImage}>
       {/* //! fot the pop up warning windoes */}
-      <ToastContainer
+      {/* <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
@@ -484,7 +522,18 @@ function SignUpUser() {
         draggable
         pauseOnHover
         theme="colored"
-      />
+      /> */}
+      <Snackbar
+        open={snackbarOpen}
+        TransitionComponent={SlideTransition}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert onClose={handleClose} severity="error" variant="standard" sx={{ width: "100%" }}>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       {showError()}
       {showSuccess()}
       {showLoading()}

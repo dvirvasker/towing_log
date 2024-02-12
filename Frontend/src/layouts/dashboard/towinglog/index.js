@@ -1,6 +1,8 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-param-reassign */
+/* eslint-disable no-useless-computed-key */
+
 /* eslint no-underscore-dangle: 0 */
 
 /**
@@ -27,7 +29,8 @@ import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-import { Dialog, DialogContent } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
+import { Box, Button, Dialog, DialogContent } from "@mui/material";
 import { setMiniSidenav, setOpenConfigurator, useMaterialUIController } from "context";
 
 // Material Dashboard 2 React components
@@ -46,6 +49,7 @@ import MDTypography from "components/MDTypography";
 import MilitaryIndustryForm from "layouts/Forms/kshirotMisgrot/MilitaryIndustryForm";
 import CivilIndustryForm from "layouts/Forms/kshirotMisgrot/CivilIndustryForm";
 import HoliyotForm from "layouts/Forms/kshirotMisgrot/HoliyotForm";
+import TowingOrderForm from "layouts/Forms/towingOrder/towingOrderForm";
 // import MDProgress from "components/MDProgress";
 import MDCircularProgress from "components/MDCircularProgress";
 // import CircularProgress from "@mui/material/CircularProgress";
@@ -72,6 +76,7 @@ function Dashboard() {
   const [hativas, setHativas] = useState([]);
   const [gdods, setGdods] = useState([]);
   const [carTypesData, setCarTypesData] = useState([]);
+  const [toAddFile, setToAddFile] = useState(false);
 
   const [garages, setGarages] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
@@ -104,6 +109,7 @@ function Dashboard() {
     // demandDate: new Date().toISOString().split("T")[0],
     area: "בחר",
     status: "בחר",
+    statuses: [],
     garage: "בחר",
     // commanderNotes: "",
   });
@@ -310,8 +316,7 @@ function Dashboard() {
     const filter1 =
       data.area === "בחר" ? allOrders : allOrders.filter((order) => order.area === data.area);
     // סינון לפי סטטוס
-    const filter2 =
-      data.status === "בחר" ? filter1 : filter1.filter((order) => order.status === data.status);
+    const filter2 = data.statuses.length === 0 ? filter1 : filter1.filter((order) => data.statuses.includes(order.status));
     // סינון לפי מוסך
     const garagesIDs = garages.map((garage) => garage._id);
 
@@ -344,6 +349,35 @@ function Dashboard() {
   }, [data, carsList, isCarFiltered]);
   // console.log(filteredOrders);
   //   console.log(garages);
+
+  const addFile = () => (
+    <Dialog
+      px={5}
+      open={toAddFile}
+      onClose={() => setToAddFile(false)}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      maxWidth="xl"
+    >
+      <MDBox variant="gradient" bgColor="mekatnar" coloredShadow="mekatnar" borderRadius="l">
+        <DialogContent>
+          <TowingOrderForm />
+        </DialogContent>
+      </MDBox>
+    </Dialog>
+  );
+
+  const statusesArr = ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"];
+  const statusesColors = ["success", "info", "warning", "secondary", "error"];
+  const toggleStatus = (status) => {
+    const arr = [...data.statuses];
+    if (data.statuses.includes(status)) {
+      setData((prev) => ({ ...prev, statuses: arr.filter((statusEl) => statusEl !== status) }));
+    } else {
+      arr.push(status);
+      setData((prev) => ({ ...prev, statuses: arr }));
+    }
+  };
 
   function isInThisWeek(israelDate) {
     // Get the current date in Israel time
@@ -384,6 +418,19 @@ function Dashboard() {
   };
 
   const executiveBodyArr = [0, 0, 0, 0];
+  const statusCountArr = [0, 0, 0, 0, 0];
+  const statusIndexes = {
+    ["פתוח"]: 0,
+    ["ממתין לאישור"]: 1,
+    ["מוקפא"]: 2,
+    ["סגור"]: 3,
+    ["מבוטל"]: 4,
+  };
+  // 0 פתוח
+  // 1 ממתין לאישור
+  // 2 מוקפא
+  // 3 סוגר
+  // 4 מבוטל
 
   // filteredOrders.forEach((order) => {
   //   // console.log(`${order.executiveBody} : ${indexObject[order.executiveBody]}`);
@@ -397,6 +444,7 @@ function Dashboard() {
   const carTypesCount = {};
   filteredOrders.forEach((order) => {
     const date = new Date(order.demandDate);
+    statusCountArr[statusIndexes[order.status]] += 1;
     if (isInThisWeek(date)) {
       const day = date.getDay();
       daysArray[day] += 1;
@@ -420,14 +468,17 @@ function Dashboard() {
       open += 1;
     }
   });
-
+  console.log(statusCountArr);
   const byNamesArr = [];
+  console.log(carTypesCount);
   Object.entries(carTypesCount).forEach(([key, value]) => {
     const type = carTypesData.find((el) => el._id === key);
-    byNamesArr.push({
-      name: type.carType,
-      value,
-    });
+    if (type) {
+      byNamesArr.push({
+        name: type.carType,
+        value,
+      });
+    }
   });
 
   byNamesArr.sort((a, b) => a.value - b.value);
@@ -439,30 +490,80 @@ function Dashboard() {
     typeNames.push(top.name);
     typesNumbers.push(top.value);
   });
-
+  // console.log(data.statuses);
   const dashboard = () => (
     <>
-      <MDButton
-        color="mekatnar"
-        variant="gradient"
-        onClick={() => setFilterOpen((prev) => !prev)}
+      <Box
         sx={{
-          marginBottom: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 1,
         }}
-        // onClick={() => {
-        //   // setIsInfoPressed(true);
-        //   // setpressedID(hozla._id);
-        // }}
-        // circular="true"
-        size="medium"
-        startIcon={<Icon>filter_alt</Icon>}
       >
-        סינון
-      </MDButton>
+        <MDButton
+          color="mekatnar"
+          variant="gradient"
+          onClick={() => setFilterOpen((prev) => !prev)}
+          sx={{
+            marginBottom: 2,
+          }}
+          // onClick={() => {
+          //   // setIsInfoPressed(true);
+          //   // setpressedID(hozla._id);
+          // }}
+          // circular="true"
+          size="medium"
+          startIcon={<Icon>filter_alt</Icon>}
+        >
+          סינון
+        </MDButton>
+
+        <Tooltip title="הוסף הזמנה חדשה" arrow>
+          <MDButton
+            sx={{}}
+            color="mekatnar"
+            variant="gradient"
+            onClick={() => setToAddFile(true)}
+            // onClick={() => {
+            //   // setIsInfoPressed(true);
+            //   // setpressedID(hozla._id);
+            // }}
+            circular="true"
+            iconOnly="true"
+            size="medium"
+          >
+            <Icon>add</Icon>
+          </MDButton>
+        </Tooltip>
+      </Box>
+
       {filterOpen && (
         <MDBox py={3}>
           <Row>
-            <Col
+            <Col>
+            <h6 style={{}}>סטטוסים</h6>
+            </Col>
+          </Row>
+          <Row>
+          <Col>
+            {statusesArr.map((status, index) => (       
+                <MDButton
+                sx={{
+                  marginRight: 2
+                }}
+                  color={statusesColors[index]}
+                  variant={data.statuses.includes(status) ? "contained" : "outlined"}
+                  onClick={() => {
+                    toggleStatus(status);
+                  }}
+                >
+                  {status}
+                </MDButton>
+            ))}
+           </Col>
+          </Row>
+          <Row>
+            {/* <Col
               style={{
                 justifyContent: "right",
                 alignContent: "right",
@@ -484,7 +585,7 @@ function Dashboard() {
                 <option value="מוקפא">מוקפא</option>
                 <option value="ממתין לאישור">ממתין לאישור</option>
               </Input>
-            </Col>
+            </Col> */}
             <Col
               style={{
                 justifyContent: "right",
@@ -617,67 +718,6 @@ function Dashboard() {
             </Col>
           </Row>
 
-          {/* <Row>
-            <Col>
-              <h6>תאריך פתיחת ההזמנה</h6>
-            </Col>
-            <Col>
-              <h6>תאריך מבוקש</h6>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col>
-              <FormGroup>
-                <h6 style={{}}>מתאריך</h6>
-                <Input
-                  placeholder="מתאריך"
-                  type="date"
-                  name="fromDate"
-                  value={data.fromDate}
-                  onChange={handleChange}
-                />
-              </FormGroup>
-            </Col>
-            <Col>
-              <FormGroup>
-                <h6 style={{}}>עד תאריך</h6>
-                <Input
-                  placeholder="עד תאריך"
-                  type="date"
-                  name="toDate"
-                  value={data.toDate}
-                  onChange={handleChange}
-                />
-              </FormGroup>
-            </Col>
-
-            <Col>
-              <FormGroup>
-                <h6 style={{}}>מתאריך</h6>
-                <Input
-                  placeholder="מתאריך"
-                  type="date"
-                  name="fromDamandDate"
-                  value={data.fromDamandDate}
-                  onChange={handleChange}
-                />
-              </FormGroup>
-            </Col>
-            <Col>
-              <FormGroup>
-                <h6 style={{}}>עד תאריך</h6>
-                <Input
-                  placeholder="עד תאריך"
-                  type="date"
-                  name="toDamandDate"
-                  value={data.toDamandDate}
-                  onChange={handleChange}
-                />
-              </FormGroup>
-            </Col>
-          </Row> */}
-
           <Row>
             <Col>
               <FormGroup>
@@ -766,24 +806,24 @@ function Dashboard() {
         </MDBox>
       )}
       <Grid container spacing={3}>
-        <Grid item xs={6}>
-          <Grid container spacing={1}>
-            <Grid item xs={12}>
-              <DefaultInfoCard
-                icon="table_view"
-                title="הזמנות שירות"
-                description="מספר הזמנות הגרירה שקיימות"
-                value={filteredOrders.length}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <SimpleInfoCard icon="today" title="הזמנות שנפתחו היום" value={today} />
-            </Grid>
-            <Grid item xs={6}>
-              <SimpleInfoCard icon="table_view" title="הזמנות עם סטטוס פתוח" value={open} />
-            </Grid>
-          </Grid>
+        {/* <Grid item xs={6}>
+          <Grid container spacing={1}> */}
+        <Grid item xs={4}>
+          <DefaultInfoCard
+            icon="table_view"
+            title="הזמנות שירות"
+            // description="מספר הזמנות הגרירה שקיימות"
+            value={filteredOrders.length}
+          />
         </Grid>
+        <Grid item xs={4}>
+          <DefaultInfoCard icon="today" title="הזמנות שנפתחו היום" value={today} />
+        </Grid>
+        <Grid item xs={4}>
+          <DefaultInfoCard icon="table_view" title="הזמנות עם סטטוס פתוח" value={open} />
+        </Grid>
+        {/* </Grid>
+        </Grid> */}
 
         <Grid item xs={6}>
           <DefaultDoughnutChart
@@ -796,6 +836,21 @@ function Dashboard() {
                 label: "גוף מבצע",
                 backgroundColors: ["primary", "dark", "info", "mekatnar"],
                 data: executiveBodyArr,
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <PieChart
+            icon={{ color: "mekatnar", component: "pie_chart" }}
+            title="סטטוס"
+            description="אחוזי הזמנות לפי סטטוס הזמנה"
+            chart={{
+              labels: ["פתוח", "ממתין לאישור", "מוקפא", "סגור", "מבוטל"],
+              datasets: {
+                label: "סטטוס הזמנה",
+                backgroundColors:  ["primary", "dark", "info", "mekatnar", "secondary"],
+                data: statusCountArr,
               },
             }}
           />
@@ -841,7 +896,7 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-
+      {addFile()}
       {dashboard()}
       <Footer />
     </DashboardLayout>
