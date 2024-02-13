@@ -390,11 +390,11 @@ export default function data(
     let color = "mekatnar";
     if (time && statusOrder === "ממתין לאישור") {
       const milliseconds = new Date(currentDate).valueOf() - new Date(time).valueOf();
-      if (milliseconds < 10800000) {
-        nameOfGarage = "עד 3 שעות";
+      if (milliseconds < 3600000) {
+        nameOfGarage = "עד שעה";
         color = "success";
-      } else if (milliseconds > 10800000) {
-        nameOfGarage = "מעל 3 שעות";
+      } else if (milliseconds > 3600000) {
+        nameOfGarage = "מעל שעה";
         color = "error";
       }
     } else {

@@ -869,12 +869,17 @@ const towingOrdersTable = (props) => {
       const carTypeName = carInfo["דגם"];
       const carTypeObject = carTypesData.find((carType) => carType.carType === carTypeName);
       const carTypeId = carTypeObject ? carTypeObject._id : null;
-      return {
+      let result = {
         carnumber: carInfo["מספר רישוי"],
         weight: carInfo["משקל כולל (קג)"],
-        carTypeId,
+        // carTypeId,
         status: !(carInfo["תאריך שחרור"] && carInfo["תאריך שחרור"].trim() !== ""),
       };
+      if(carTypeId)
+      {
+        result.carTypeId = carTypeId;
+      }
+      return result;
     });
     // console.log(civilCars);
     axios
