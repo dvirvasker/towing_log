@@ -373,7 +373,10 @@ const TowingOrderForm = (props) => {
             };
           });
           response.data.clientJourney = fixedClientJourney;
-
+          if(!response.data.personalnumber)
+          {
+            response.data.personalnumber = "";
+          }
           // console.log(response.data);
           // setInitialStatus(response.data.status);
           setData(response.data);

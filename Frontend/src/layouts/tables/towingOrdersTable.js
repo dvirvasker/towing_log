@@ -12,6 +12,9 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prefer-template */
 /* eslint-disable react/jsx-curly-brace-presence */
+/* eslint-disable no-await-in-loop */
+
+/* eslint-disable no-loop-func */
 
 /* eslint-disable react/jsx-no-bind */
 
@@ -853,48 +856,57 @@ const towingOrdersTable = (props) => {
     }
   };
 
-  const updateCivilCars = (carsData) => {
-    // תכתוב פעולה שתעשה את העברה של כל הרשומת בשרת, ככה תוכל לשלוח הודעה עם סטטום אם הפעולה הצליחה
-    // carsData.forEach(carInfo => {
-    //   const carNumber = carInfo['מספר רישוי'];
-    //   const carTypeName = carInfo['דגם'];
-    //   const releaseDate = carInfo['תאריך שחרור'];
-    //   const weight = carInfo['משקל כולל'];
-    //   const existingCar = carData.find(car => car.carnumber === carNumber);
-
-    // })
+  const updateCivilCars = async (carsData) => {
     const civilCars = carsData.map((carInfo) => {
-      // console.log(carInfo);
-      console.log(carInfo["משקל כולל (קג)"]);
+
       const carTypeName = carInfo["דגם"];
       const carTypeObject = carTypesData.find((carType) => carType.carType === carTypeName);
       const carTypeId = carTypeObject ? carTypeObject._id : null;
       let result = {
         carnumber: carInfo["מספר רישוי"],
         weight: carInfo["משקל כולל (קג)"],
-        // carTypeId,
         status: !(carInfo["תאריך שחרור"] && carInfo["תאריך שחרור"].trim() !== ""),
       };
-      if(carTypeId)
-      {
+      if (carTypeId) {
         result.carTypeId = carTypeId;
       }
       return result;
     });
-    // console.log(civilCars);
-    axios
-      .post("http://localhost:5000/TowingLogApi/CarDatas/updateCivilCars", { cars: civilCars })
-      .then((response) => {
+    const diffCount = 3;
+
+    if (civilCars.length > diffCount) {
+      activatePopUp("העדכון מתבצע", `זה עלול לקחת מספר דקות...`, "mekatnar");
+      let worked = true;
+      for (let i = 0; i < civilCars.length && worked; i += diffCount) {
+        const arr = civilCars.slice(i, Math.min(i + diffCount, civilCars.length));
+        const response = await axios.post("http://localhost:5000/TowingLogApi/CarDatas/updateCivilCars", { cars: arr })
         if (response.status === 200) {
           console.log("updated");
-          activatePopUp("העדכון בוצע בהצלחה", `רכבי היר"מ עודכנו במערכת`, "mekatnar");
         } else {
           console.log("failed");
-          activatePopUp("תקלת שרת", "עדכון הרכבים נכשל", "error");
+          worked = false;
         }
-      });
+      }
+      if (worked) {
+        activatePopUp("העדכונים בוצעו בהצלחה", `רכבי היר"מ עודכנו במערכת`, "success");
+      } else {
+        activatePopUp("תקלת שרת", "עדכון הרכבים נכשל", "error");
+      }
+    } else {
+      axios
+        .post("http://localhost:5000/TowingLogApi/CarDatas/updateCivilCars", { cars: civilCars })
+        .then((response) => {
+          if (response.status === 200) {
+            console.log("updated");
+            activatePopUp("העדכון בוצע בהצלחה", `רכבי היר"מ עודכנו במערכת`, "success");
+          } else {
+            console.log("failed");
+            activatePopUp("תקלת שרת", "עדכון הרכבים נכשל", "error");
+          }
+        });
+    }
   };
-  const uploadCivilCarsXlsx = (event) => {
+  const uploadCivilCarsXlsx = async (event) => {
     console.log("reading...");
     const reader = new FileReader();
     reader.readAsBinaryString(event.target.files[0]);
@@ -911,7 +923,7 @@ const towingOrdersTable = (props) => {
       //   'תאריך שחרור' : date
       // }})
       // console.log(newParsed);
-      updateCivilCars(parsedData);
+     updateCivilCars(parsedData);
     };
     event.target.value = ""; // in order to allow the file reader to read the same file the second time in a row
   };
@@ -935,30 +947,31 @@ const towingOrdersTable = (props) => {
                 {tableTittle}
               </MDTypography>{" "}
               <Grid container justifyContent="flex-end">
-              {urlType === "towingorders" && user.admin === "0" ? (
-                <Grid item xs={2} md={2} xl={1.4}>
-                {/* <Tooltip title="העלאת רכבים אזרחיים" arrow> */}
-                      <MDButton
-                        variant="gradient"
-                        onClick={() => {
-                          uploadCarXlsxRef.current.click();
-                        }}
-                        circular="true"
-                        // iconOnly="true"
-                        size="small"
-                        startIcon={<Icon>file_upload</Icon>}
-                      >{'טעינת רכבי יר"מ'}
-                      </MDButton>
-                      {/* </Tooltip> */}
-                      <input
-                        ref={uploadCarXlsxRef}
-                        style={{ display: "none" }}
-                        type="file"
-                        accept=".xlsx, .xls"
-                        onChange={uploadCivilCarsXlsx}
-                      />
-                    </Grid>
-                  ) : null}
+                {urlType === "towingorders" && user.admin === "0" ? (
+                  <Grid item xs={2} md={2} xl={1.4}>
+                    <Tooltip title="העלאת קובץ אקסל" arrow>
+                    <MDButton
+                      variant="gradient"
+                      onClick={() => {
+                        uploadCarXlsxRef.current.click();
+                      }}
+                      circular="true"
+                      // iconOnly="true"
+                      size="small"
+                      startIcon={<Icon>file_upload</Icon>}
+                    >
+                      {'טעינת רכבי יר"מ'}
+                    </MDButton>
+                    </Tooltip>
+                    <input
+                      ref={uploadCarXlsxRef}
+                      style={{ display: "none" }}
+                      type="file"
+                      accept=".xlsx, .xls"
+                      onChange={uploadCivilCarsXlsx}
+                    />
+                  </Grid>
+                ) : null}
                 <Grid item xs={2} md={1} xl={0.5}>
                   <Tooltip title="הורדת קובץ אקסל" arrow>
                     <MDButton
@@ -1006,7 +1019,6 @@ const towingOrdersTable = (props) => {
                   >
                     סינון
                   </MDButton>
-                  
                 </Box>
               </Grid>
             </MDBox>
