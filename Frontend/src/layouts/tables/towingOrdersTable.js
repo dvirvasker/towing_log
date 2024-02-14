@@ -872,7 +872,7 @@ const towingOrdersTable = (props) => {
       }
       return result;
     });
-    const diffCount = 3;
+    const diffCount = 999;
 
     if (civilCars.length > diffCount) {
       activatePopUp("העדכון מתבצע", `זה עלול לקחת מספר דקות...`, "mekatnar");

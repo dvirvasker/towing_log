@@ -1430,7 +1430,7 @@ const TowingOrderForm = (props) => {
                       >
                         {`${edit ? "עדכן" : "שלח"} טופס שירות`}
                       </MDButton>
-                      {edit && (
+                      
                         <MDButton
                           color="error"
                           size="large"
@@ -1441,7 +1441,6 @@ const TowingOrderForm = (props) => {
                         >
                           צא ללא שינויים
                         </MDButton>
-                      )}
                     </div>
                   </Col>
                 </Row>
