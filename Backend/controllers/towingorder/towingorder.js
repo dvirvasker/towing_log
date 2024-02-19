@@ -69,6 +69,9 @@ exports.create = (req, res) => {
   const status = req.body.status;
   const commanderNotes = req.body.commanderNotes;
   const isYaram = req.body.isYaram;
+
+  const gdodId = isYaram ? req.body.gdodId : undefined;
+
   let dates = {};
   if(status === "פתוח")
   {
@@ -110,7 +113,9 @@ exports.create = (req, res) => {
     status,
     commanderNotes,
     isYaram,
+    gdodId,
   });
+  // console.log(towingorder);
   towingorder.save((err, data) => {
     if (err) {
       console.log("error is: ")
@@ -173,6 +178,7 @@ exports.update = (req, res) => {
     request.status = req.body.status;
     request.commanderNotes = req.body.commanderNotes;
     request.isYaram = req.body.isYaram;
+    request.gdodId = req.body.gdodId;
 
     /// updating open order time
     if(req.body.status === "פתוח" && previousStatus !== "פתוח")

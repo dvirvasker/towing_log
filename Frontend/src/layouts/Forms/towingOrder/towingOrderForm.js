@@ -20,6 +20,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-unneeded-ternary */
+/* eslint-disable prefer-destructuring */
 
 /* eslint-disable react/prop-types */ // TODO: upgrade to latest eslint tooling
 
@@ -215,8 +216,20 @@ const TowingOrderForm = (props) => {
       if (carData.length > 0) {
         setChosenCarNumber(data.carnumber);
       }
+      if (data.isYaram) {
+        // console.log(Object.keys(bankData));
+        if (Object.keys(bankData).length !== 0) {
+          setChosenGdod(data.gdodId);
+          const hativaId = bankData.Unit_bank.gdods[data.gdodId].hativaId;
+          setChosenHativa(hativaId);
+          const ogdaId = bankData.Unit_bank.hativas[hativaId].ogdaId;
+          setChosenOgda(ogdaId);
+          const pikodId = bankData.Unit_bank.ogdas[ogdaId].pikodId;
+          setChosenPikod(pikodId);
+        }
+      }
     }
-  }, [carData, edit]);
+  }, [carData, edit, bankData]);
 
   // console.log(data);
 
@@ -373,8 +386,7 @@ const TowingOrderForm = (props) => {
             };
           });
           response.data.clientJourney = fixedClientJourney;
-          if(!response.data.personalnumber)
-          {
+          if (!response.data.personalnumber) {
             response.data.personalnumber = "";
           }
           // console.log(response.data);
@@ -548,8 +560,8 @@ const TowingOrderForm = (props) => {
       status: data.status,
       commanderNotes: data.commanderNotes,
       isYaram: data.isYaram,
+      gdodId: data.isYaram && chosenGdod !== "בחר" ? chosenGdod : undefined,
     };
-    // console.log(requestData);
     const method = edit ? `update/${orderId}` : "add";
     axios
       .post(`http://localhost:5000/TowingLogApi/TowingOrder/${method}`, requestData)
@@ -962,21 +974,21 @@ const TowingOrderForm = (props) => {
                       <FormControl>
                         {/* <FormControlLabel
                           control={ */}
-                            <ToggleButtonGroup
-                            sx={{marginBottom: 1}}
-                              exclusive
-                              value={data.isYaram}
-                              onChange={(event) => {
-                                if (event.target.value === "false")
-                                  setData((prev) => ({ ...prev, isYaram: false }));
-                                if (event.target.value === "true")
-                                  setData((prev) => ({ ...prev, isYaram: true }));
-                              }}
-                            >
-                              <ToggleButton value={false}>צ'</ToggleButton>
-                              <ToggleButton value={true}>יר"מ</ToggleButton>
-                            </ToggleButtonGroup>
-                          {/* }
+                        <ToggleButtonGroup
+                          sx={{ marginBottom: 1 }}
+                          exclusive
+                          value={data.isYaram}
+                          onChange={(event) => {
+                            if (event.target.value === "false")
+                              setData((prev) => ({ ...prev, isYaram: false }));
+                            if (event.target.value === "true")
+                              setData((prev) => ({ ...prev, isYaram: true }));
+                          }}
+                        >
+                          <ToggleButton value={false}>צ'</ToggleButton>
+                          <ToggleButton value={true}>יר"מ</ToggleButton>
+                        </ToggleButtonGroup>
+                        {/* }
                           label={data.isYaram ? `יר"מ` : `צ'`}
                         /> */}
                       </FormControl>
@@ -1430,17 +1442,17 @@ const TowingOrderForm = (props) => {
                       >
                         {`${edit ? "עדכן" : "שלח"} טופס שירות`}
                       </MDButton>
-                      
-                        <MDButton
-                          color="error"
-                          size="large"
-                          onClick={handleCloseSuccsecModal}
-                          className="btn-new-blue"
-                          style={{ marginRight: "3%" }}
-                          startIcon={<Icon fontSize="small">clear</Icon>}
-                        >
-                          צא ללא שינויים
-                        </MDButton>
+
+                      <MDButton
+                        color="error"
+                        size="large"
+                        onClick={handleCloseSuccsecModal}
+                        className="btn-new-blue"
+                        style={{ marginRight: "3%" }}
+                        startIcon={<Icon fontSize="small">clear</Icon>}
+                      >
+                        צא ללא שינויים
+                      </MDButton>
                     </div>
                   </Col>
                 </Row>
